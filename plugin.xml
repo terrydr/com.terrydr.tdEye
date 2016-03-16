@@ -85,6 +85,9 @@
         <resource-file src="src/ios/button_camera_screen.png" />
         <resource-file src="src/ios/button_camera_screen@2x.png" />
         <resource-file src="src/ios/button_camera_screen@3x.png" />
+        <resource-file src="src/ios/button_camera_close.png" />
+        <resource-file src="src/ios/button_camera_close@2x.png" />
+        <resource-file src="src/ios/button_camera_close@3x.png" />
     </platform>
     
 </plugin>
