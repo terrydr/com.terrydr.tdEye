@@ -27,7 +27,7 @@
     <platform name="ios">
         <config-file  target="config.xml" parent="/*">
             <feature  name="JREye">
-                <param  name="ios-package"  value="JReye"/>
+                <param  name="ios-package"  value="JREye"/>
             </feature>
         </config-file>
         
