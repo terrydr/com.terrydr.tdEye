@@ -26,7 +26,8 @@
                                                object:nil];
     
     WYVideoCaptureController *videoVC = [[WYVideoCaptureController alloc] init];
-    [self.viewController presentViewController:videoVC animated:YES completion:^{
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:videoVC];
+    [self.viewController presentViewController:nav animated:YES completion:^{
     }];
 }
 
