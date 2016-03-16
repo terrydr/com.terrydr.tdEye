@@ -80,6 +80,9 @@
         <header-file src="src/ios/WYVideoTimeView.h" />
         <resource-file src="src/ios/Select_list_btn_solid@2x.png" />
         <resource-file src="src/ios/Select_list_btn_solid@3x.png" />
+        <resource-file src="src/ios/button_camera_screen.png" />
+        <resource-file src="src/ios/button_camera_screen@2x.png" />
+        <resource-file src="src/ios/button_camera_screen@3x.png" />
     </platform>
     
 </plugin>
