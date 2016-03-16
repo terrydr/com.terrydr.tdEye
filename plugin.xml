@@ -21,12 +21,14 @@
     </engines>
     
     <js-module src="www/JREye.js" name="JREye">
+        <!--jreye:js调用方法时的对象 -->
         <clobbers target="jreye" />
     </js-module>
     
     <platform name="ios">
         <config-file  target="config.xml" parent="/*">
             <feature  name="JREye">
+                <!--JREye:继承CDVPlugin的类名 -->
                 <param  name="ios-package"  value="JREye"/>
             </feature>
         </config-file>
