@@ -16,7 +16,7 @@
 //图片储路径
 - (NSString *)getJRMediaPathWithSign:(NSString *)sign Type:(BOOL)isLeft;
 //根据路径删除文件
-- (BOOL)deleteFileWithPath:(NSString *)filePath;
+- (BOOL)deleteFileWithEyeType:(BOOL)isLeftEye;
 //删除所有文件
 - (BOOL)deleteAllFiles;
 

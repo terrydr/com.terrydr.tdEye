@@ -59,9 +59,17 @@
 }
 
 //根据路径删除文件
-- (BOOL)deleteFileWithPath:(NSString *)filePath{
+- (BOOL)deleteFileWithEyeType:(BOOL)isLeftEye{
     BOOL isDir = NO;
     BOOL result = NO;
+    NSString *filePath;
+    NSString *dir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *path = [dir stringByAppendingPathComponent:@"JRMedia"];
+    if (isLeftEye) {
+        filePath = [NSString stringWithFormat:@"%@/%@",path,@"leftEye"];
+    }else{
+        filePath = [NSString stringWithFormat:@"%@/%@",path,@"rightEye"];
+    }
     if([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDir]) {
         NSError *e = nil;
         result = [[NSFileManager defaultManager] removeItemAtPath:filePath error:&e];
