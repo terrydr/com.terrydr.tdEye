@@ -287,7 +287,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.navigationController pushViewController:scanVc animated:YES];
 }
 - (void)closeBtnClick {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    NSDictionary *pathDic = [NSDictionary dictionary];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TakePhotosFinishedNotification"
+                                                        object:nil
+                                                      userInfo:pathDic];
+    //[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)handleSwipes:(UISwipeGestureRecognizer *)sender{
