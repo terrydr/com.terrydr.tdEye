@@ -315,6 +315,10 @@
     if ([_rightSelectedPictureModelArr isValid]) {
         [temDic setObject:_rightSelectedPictureModelArr forKey:@"rightEye"];
     }
+    NSDictionary *pathDic = [NSDictionary dictionaryWithDictionary:temDic];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TakePhotosFinishedNotification"
+                                                        object:nil
+                                                      userInfo:pathDic];
 }
 
 - (void)didReceiveMemoryWarning {
