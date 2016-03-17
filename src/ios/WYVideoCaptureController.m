@@ -291,7 +291,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [[NSNotificationCenter defaultCenter] postNotificationName:@"TakePhotosFinishedNotification"
                                                         object:nil
                                                       userInfo:pathDic];
-    //[self dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)handleSwipes:(UISwipeGestureRecognizer *)sender{
