@@ -23,6 +23,7 @@
 @property(nonatomic)BOOL isCollectionSelected;
 @property(nonatomic,strong) UICollectionView *collectionView;
 @property(nonatomic, strong) NSMutableArray *sectionArr;
+@property(nonatomic, strong) NSMutableArray *selectedModelsArr;
 @property(nonatomic, strong) NSMutableArray *leftSelectedPictureModelArr;
 @property(nonatomic, strong) NSMutableArray *rightSelectedPictureModelArr;
 
@@ -92,12 +93,15 @@
         [_rightItem setTitle:@"取消"];
     }else{
         [_rightItem setTitle:@"选择"];
-        if ([_leftSelectedPictureModelArr isValid] || [_rightSelectedPictureModelArr isValid]) {
-            for (JRPictureModel *model in _leftSelectedPictureModelArr) {
+        if ([_selectedModelsArr isValid]) {
+            for (JRPictureModel *model in _selectedModelsArr) {
                 model.isSelected = NO;
             }
-            for (JRPictureModel *model in _rightSelectedPictureModelArr) {
-                model.isSelected = NO;
+            if ([_leftSelectedPictureModelArr isValid]) {
+                [_leftSelectedPictureModelArr removeAllObjects];
+            }
+            if ([_rightSelectedPictureModelArr isValid]) {
+                [_rightSelectedPictureModelArr removeAllObjects];
             }
         }else{
             return;
@@ -110,6 +114,7 @@
     self.sectionArr = [[NSMutableArray alloc] initWithCapacity:0];
     NSMutableArray *leftEyeDataArr = [[NSMutableArray alloc] initWithCapacity:0];
     NSMutableArray *rightEyeDataArr = [[NSMutableArray alloc] initWithCapacity:0];
+    self.selectedModelsArr = [[NSMutableArray alloc] initWithCapacity:0];
     self.leftSelectedPictureModelArr = [[NSMutableArray alloc] initWithCapacity:0];
     self.rightSelectedPictureModelArr = [[NSMutableArray alloc] initWithCapacity:0];
     
@@ -227,6 +232,7 @@
             if ([typeModel.typeName isEqualToString:@"左眼"]) {
                 if (_leftSelectedPictureModelArr.count<2) {
                     cell.selectedView.hidden = NO;
+                    [_selectedModelsArr addObject:pictureModel];
                     [_leftSelectedPictureModelArr addObject:imgPath];
                 }else{
                     pictureModel.isSelected = !pictureModel.isSelected;
@@ -235,6 +241,7 @@
             }else{
                 if (_rightSelectedPictureModelArr.count<2) {
                     cell.selectedView.hidden = NO;
+                    [_selectedModelsArr addObject:pictureModel];
                     [_rightSelectedPictureModelArr addObject:imgPath];
                 }else{
                     pictureModel.isSelected = !pictureModel.isSelected;
@@ -243,6 +250,7 @@
             }
         }else{
             cell.selectedView.hidden = YES;
+            [_selectedModelsArr removeObject:pictureModel];
             if ([typeModel.typeName isEqualToString:@"左眼"]) {
                 [_leftSelectedPictureModelArr removeObject:imgPath];
             }else{
