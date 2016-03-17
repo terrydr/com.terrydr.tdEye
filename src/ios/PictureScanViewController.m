@@ -61,7 +61,7 @@
         _commitBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _commitBtn.frame = CGRectMake(0, CGRectGetHeight(self.view.bounds)-64-40-30, CGRectGetWidth(self.view.bounds), 30);
         [_commitBtn setTitle:@"提交" forState:UIControlStateNormal];
-        [_commitBtn setTintColor:[UIColor blueColor]];
+        [_commitBtn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
         [_commitBtn addTarget:self action:@selector(commitBtnClick:) forControlEvents:UIControlEventTouchUpOutside];
     }
     return _commitBtn;
