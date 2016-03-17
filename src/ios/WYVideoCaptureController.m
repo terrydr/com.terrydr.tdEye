@@ -65,6 +65,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self addNotifications];
     [self initPathologySign];
     [self setupUI];
     [self ChangeToLeft:YES];
@@ -92,6 +93,17 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)dealloc {
     NSLog(@"我是拍照控制器,我被销毁了");
+}
+
+- (void)addNotifications{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(jrTakePhotosFinished:)
+                                                 name:@"TakePhotosFinishedNotification"
+                                               object:nil];
+}
+
+- (void)jrTakePhotosFinished:(NSNotification *)notify{
+    [self closeBtnClick];
 }
 
 - (void)initPathologySign{

@@ -19,10 +19,12 @@
     UIBarButtonItem *_rightItem;
 }
 
+@property(nonatomic,strong) UIButton *commitBtn;
 @property(nonatomic)BOOL isCollectionSelected;
 @property(nonatomic,strong) UICollectionView *collectionView;
 @property(nonatomic, strong) NSMutableArray *sectionArr;
-@property(nonatomic, strong) NSMutableArray *selectedPictureModelArr;
+@property(nonatomic, strong) NSMutableArray *leftSelectedPictureModelArr;
+@property(nonatomic, strong) NSMutableArray *rightSelectedPictureModelArr;
 
 @end
 
@@ -53,6 +55,18 @@
     [self.view addSubview:self.collectionView];
 }
 
+#pragma mark ----commitBtn-----
+- (UIButton *)commitBtn{
+    if (!_commitBtn) {
+        _commitBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _commitBtn.frame = CGRectMake(0, CGRectGetHeight(self.view.bounds)-64-40-30, CGRectGetWidth(self.view.bounds), 30);
+        [_commitBtn setTitle:@"提交" forState:UIControlStateNormal];
+        [_commitBtn setTintColor:[UIColor blueColor]];
+        [_commitBtn addTarget:self action:@selector(commitBtnClick:) forControlEvents:UIControlEventTouchUpOutside];
+    }
+    return _commitBtn;
+}
+
 #pragma mark ----collectionView-----
 
 - (UICollectionView *)collectionView{
@@ -78,8 +92,11 @@
         [_rightItem setTitle:@"取消"];
     }else{
         [_rightItem setTitle:@"选择"];
-        if ([_selectedPictureModelArr isValid]) {
-            for (JRPictureModel *model in _selectedPictureModelArr) {
+        if ([_leftSelectedPictureModelArr isValid] || [_rightSelectedPictureModelArr isValid]) {
+            for (JRPictureModel *model in _leftSelectedPictureModelArr) {
+                model.isSelected = NO;
+            }
+            for (JRPictureModel *model in _rightSelectedPictureModelArr) {
                 model.isSelected = NO;
             }
         }else{
@@ -93,7 +110,8 @@
     self.sectionArr = [[NSMutableArray alloc] initWithCapacity:0];
     NSMutableArray *leftEyeDataArr = [[NSMutableArray alloc] initWithCapacity:0];
     NSMutableArray *rightEyeDataArr = [[NSMutableArray alloc] initWithCapacity:0];
-    self.selectedPictureModelArr = [[NSMutableArray alloc] initWithCapacity:0];
+    self.leftSelectedPictureModelArr = [[NSMutableArray alloc] initWithCapacity:0];
+    self.rightSelectedPictureModelArr = [[NSMutableArray alloc] initWithCapacity:0];
     
     NSString *leftFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithSign:_leftSign Type:YES];
     NSError *le = nil;
@@ -202,14 +220,36 @@
     ShootCollectionViewCell *cell = (ShootCollectionViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
     JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:indexPath.section];
     JRPictureModel *pictureModel = [typeModel.pictureArr objectAtIndex:indexPath.row];
+    NSString *imgPath = [self getImagePathWithTypeModel:typeModel pictureModel:pictureModel];
     if (_isCollectionSelected) {
         pictureModel.isSelected = !pictureModel.isSelected;
         if (pictureModel.isSelected) {
-            cell.selectedView.hidden = NO;
-            [_selectedPictureModelArr addObject:pictureModel];
+            if ([typeModel.typeName isEqualToString:@"左眼"]) {
+                if (_leftSelectedPictureModelArr.count<2) {
+                    cell.selectedView.hidden = NO;
+                    [_leftSelectedPictureModelArr addObject:imgPath];
+                }else{
+                    pictureModel.isSelected = !pictureModel.isSelected;
+                    [self showBeyondLimitSelectedCount];
+                }
+            }else{
+                if (_rightSelectedPictureModelArr.count<2) {
+                    cell.selectedView.hidden = NO;
+                    [_rightSelectedPictureModelArr addObject:imgPath];
+                }else{
+                    pictureModel.isSelected = !pictureModel.isSelected;
+                    [self showBeyondLimitSelectedCount];
+                }
+            }
         }else{
             cell.selectedView.hidden = YES;
+            if ([typeModel.typeName isEqualToString:@"左眼"]) {
+                [_leftSelectedPictureModelArr removeObject:imgPath];
+            }else{
+                [_rightSelectedPictureModelArr removeObject:imgPath];
+            }
         }
+        [self calculateSelectedPictureCount];
     }else{
         NSArray *imageArr = [self getImagesArrayWithTypeModel:typeModel pictureModelArray:typeModel.pictureArr];
         MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
@@ -220,6 +260,24 @@
         };
         [self.navigationController pushViewController:browserVc animated:YES];
     }
+}
+
+- (void)calculateSelectedPictureCount{
+    if (_leftSelectedPictureModelArr.count>0 || _rightSelectedPictureModelArr.count>0) {
+        [self.collectionView addSubview:self.commitBtn];
+    }else{
+        [self.commitBtn removeFromSuperview];
+    }
+}
+
+- (void)showBeyondLimitSelectedCount{
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"单侧眼睛最多选择两张图片" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        
+    }];
+    // Add the actions.
+    [alertController addAction:sureAction];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (NSArray *)getImagesArrayWithTypeModel:(JREyeTypeModel *)typeModel pictureModelArray:(NSArray *)pictureModelArr{
@@ -239,6 +297,28 @@
     NSString *picturePath = [NSString stringWithFormat:@"%@/%@",filePath,pictureName];
     UIImage *picture = [UIImage imageWithContentsOfFile:picturePath];
     return picture;
+}
+
+- (NSString *)getImagePathWithTypeModel:(JREyeTypeModel *)typeModel pictureModel:(JRPictureModel *)pictureModel{
+    NSString *filePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithSign:typeModel.pictureSign Type:typeModel.isLeftEye];
+    
+    NSString *pictureName = pictureModel.pictureName;
+    NSString *picturePath = [NSString stringWithFormat:@"%@/%@",filePath,pictureName];
+    return picturePath;
+}
+
+- (void)commitBtnClick:(id)sender{
+    NSMutableDictionary *temDic = [[NSMutableDictionary alloc] initWithCapacity:0];
+    if ([_leftSelectedPictureModelArr isValid]) {
+        [temDic setObject:_leftSelectedPictureModelArr forKey:@"leftEye"];
+    }
+    if ([_rightSelectedPictureModelArr isValid]) {
+        [temDic setObject:_rightSelectedPictureModelArr forKey:@"rightEye"];
+    }
+    NSDictionary *pathDic = [NSDictionary dictionaryWithDictionary:temDic];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TakePhotosFinishedNotification"
+                                                        object:nil
+                                                      userInfo:pathDic];
 }
 
 - (void)didReceiveMemoryWarning {
