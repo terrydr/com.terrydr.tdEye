@@ -21,6 +21,9 @@
 - (void)jrEyeTakePhotos:(CDVInvokedUrlCommand*)command{
     
     _callbackId = command.callbackId;
+    NSArray *paramArr = command.arguments;
+    NSString *takeType = [paramArr objectAtIndex:0];
+    NSLog(@"takeType:%@",takeType);
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(takePhotosFinished:)
                                                  name:@"TakePhotosFinishedNotification"

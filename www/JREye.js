@@ -1,12 +1,12 @@
 var jrEye= {
-jrTakePhotos: function(successCallback, errorCallback) {
+jrTakePhotos: function(takeType, successCallback, errorCallback) {
     console.log("jrTakePhotos");
     cordova.exec(
                  successCallback,
                  errorCallback,
                  "JREye",
                  "jrEyeTakePhotos",
-                 []
+                 [takeType]
                  );
     
 }
