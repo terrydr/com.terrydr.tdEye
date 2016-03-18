@@ -30,8 +30,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     AVPlayerLayer *_playerLayer;
     BOOL _isLeftEye;
     int _takenPictureCount;
-    NSString *_pictureLeftSign;
-    NSString *_pictureRightSign;
 }
 @property (nonatomic, strong) UIButton *closeBtn;
 @property (nonatomic, strong) UIView *viewContainer;
@@ -65,7 +63,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self initPathologySign];
     [self setupUI];
     [self ChangeToLeft:YES];
     [self setupCaptureView];
@@ -93,14 +90,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)dealloc {
     NSLog(@"我是拍照控制器,我被销毁了");
-}
-
-- (void)initPathologySign{
-    JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
-    _pictureLeftSign = [fileManage getPictureSign];
-    _pictureRightSign = [fileManage getPictureSign];
-    NSLog(@"_pictureLeftSign:%@",_pictureLeftSign);
-    NSLog(@"_pictureRightSign:%@",_pictureRightSign);
 }
 
 - (void)setupCaptureView {
@@ -282,8 +271,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 #pragma mark - ButtonClick
 - (void)scanBtnClick:(UIButton *)btn{
     PictureScanViewController *scanVc = [[PictureScanViewController alloc] init];
-    scanVc.leftSign = _pictureLeftSign;
-    scanVc.rightSign = _pictureRightSign;
     [self.navigationController pushViewController:scanVc animated:YES];
 }
 - (void)closeBtnClick {
@@ -348,8 +335,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
     
     JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
-    NSString *pictureSign = _isLeftEye?_pictureLeftSign:_pictureRightSign;
-    NSString *filePath = [fileManage getJRMediaPathWithSign:pictureSign Type:_isLeftEye];
+    NSString *filePath = [fileManage getJRMediaPathWithType:_isLeftEye];
     NSString *imageName = [NSString stringWithFormat:@"%02d.png",_takenPictureCount];
     NSString *imgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
     NSFileManager *fileManager = [NSFileManager defaultManager];

@@ -8,6 +8,7 @@
 
 #import "JREye.h"
 #import "WYVideoCaptureController.h"
+#import "PictureScanViewController.h"
 
 @interface JREye (){
     NSString *_callbackId;
@@ -35,6 +36,13 @@
     NSDictionary *pathDic = notify.userInfo;
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:pathDic];
     [self.commandDelegate sendPluginResult:result callbackId:_callbackId];
+}
+
+- (void)jrEyeScanPhotos:(CDVInvokedUrlCommand*)command{
+    _callbackId = command.callbackId;
+    PictureScanViewController *scanVC = [[PictureScanViewController alloc] init];
+    [self.viewController presentViewController:scanVC animated:YES completion:^{
+    }];
 }
 
 @end

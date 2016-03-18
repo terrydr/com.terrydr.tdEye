@@ -12,7 +12,6 @@
 
 @property (nonatomic) BOOL isLeftEye;
 @property(nonatomic,strong)NSString *typeName;
-@property(nonatomic,strong)NSString *pictureSign;
 @property (nonatomic,strong) NSArray *pictureArr;
 
 @end

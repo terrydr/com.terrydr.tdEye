@@ -118,7 +118,7 @@
     self.leftSelectedPictureModelArr = [[NSMutableArray alloc] initWithCapacity:0];
     self.rightSelectedPictureModelArr = [[NSMutableArray alloc] initWithCapacity:0];
     
-    NSString *leftFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithSign:_leftSign Type:YES];
+    NSString *leftFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:YES];
     NSError *le = nil;
     NSArray *leftFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:leftFilePath error:&le];
     NSLog(@"leftFileArr:%@",leftFileArr);
@@ -133,12 +133,11 @@
         JREyeTypeModel *typeModel = [[JREyeTypeModel alloc] init];
         typeModel.isLeftEye = YES;
         typeModel.typeName = @"左眼";
-        typeModel.pictureSign = _leftSign;
         typeModel.pictureArr = leftEyeDataArr;
         [_sectionArr addObject:typeModel];
     }
     
-    NSString *rightFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithSign:_rightSign Type:NO];
+    NSString *rightFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:NO];
     NSError *re = nil;
     NSArray *rightFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:rightFilePath error:&re];
     NSLog(@"rightFileArr:%@",rightFileArr);
@@ -153,7 +152,6 @@
         JREyeTypeModel *typeModel = [[JREyeTypeModel alloc] init];
         typeModel.isLeftEye = NO;
         typeModel.typeName = @"右眼";
-        typeModel.pictureSign = _rightSign;
         typeModel.pictureArr = rightEyeDataArr;
         [_sectionArr addObject:typeModel];
     }
@@ -299,7 +297,7 @@
 }
 
 - (UIImage *)getImageWithTypeModel:(JREyeTypeModel *)typeModel pictureModel:(JRPictureModel *)pictureModel{
-    NSString *filePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithSign:typeModel.pictureSign Type:typeModel.isLeftEye];
+    NSString *filePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:typeModel.isLeftEye];
     
     NSString *pictureName = pictureModel.pictureName;
     NSString *picturePath = [NSString stringWithFormat:@"%@/%@",filePath,pictureName];
@@ -308,7 +306,7 @@
 }
 
 - (NSString *)getImagePathWithTypeModel:(JREyeTypeModel *)typeModel pictureModel:(JRPictureModel *)pictureModel{
-    NSString *filePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithSign:typeModel.pictureSign Type:typeModel.isLeftEye];
+    NSString *filePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:typeModel.isLeftEye];
     
     NSString *pictureName = pictureModel.pictureName;
     NSString *picturePath = [NSString stringWithFormat:@"%@/%@",filePath,pictureName];

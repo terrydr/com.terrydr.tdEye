@@ -28,7 +28,7 @@
 }
 
 //图片存储路径
-- (NSString *)getJRMediaPathWithSign:(NSString *)sign Type:(BOOL)isLeft{
+- (NSString *)getJRMediaPathWithType:(BOOL)isLeft{
     NSString *dir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSString *path = [dir stringByAppendingPathComponent:@"JRMedia"];
     BOOL isDir = NO;
@@ -37,24 +37,17 @@
         [[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:NO attributes:nil error:&e];
     }
     
-    NSString *typePath;
+    NSString *mediaPath;
     if (isLeft) {
-        typePath = [NSString stringWithFormat:@"%@/%@",path,@"leftEye"];
+        mediaPath = [NSString stringWithFormat:@"%@/%@",path,@"leftEye"];
     }else{
-        typePath = [NSString stringWithFormat:@"%@/%@",path,@"rightEye"];
+        mediaPath = [NSString stringWithFormat:@"%@/%@",path,@"rightEye"];
     }
     
-    if(![[NSFileManager defaultManager] fileExistsAtPath:typePath isDirectory:&isDir]) {
-        NSError *e = nil;
-        [[NSFileManager defaultManager] createDirectoryAtPath:typePath withIntermediateDirectories:NO attributes:nil error:&e];
-    }
-    
-    NSString *mediaPath = [NSString stringWithFormat:@"%@/%@",typePath,sign];
     if(![[NSFileManager defaultManager] fileExistsAtPath:mediaPath isDirectory:&isDir]) {
         NSError *e = nil;
         [[NSFileManager defaultManager] createDirectoryAtPath:mediaPath withIntermediateDirectories:NO attributes:nil error:&e];
     }
-    
     return mediaPath;
 }
 

@@ -10,7 +10,4 @@
 
 @interface PictureScanViewController : UIViewController
 
-@property (nonatomic, strong) NSString *leftSign;
-@property (nonatomic, strong) NSString *rightSign;
-
 @end

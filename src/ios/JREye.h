@@ -12,5 +12,7 @@
 
 //跳转到拍照，视频界面
 - (void)jrEyeTakePhotos:(CDVInvokedUrlCommand*)command;
+//浏览拍摄的图片
+- (void)jrEyeScanPhotos:(CDVInvokedUrlCommand*)command;
 
 @end
