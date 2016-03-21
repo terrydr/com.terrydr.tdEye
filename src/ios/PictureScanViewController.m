@@ -16,6 +16,7 @@
 #import "MLSelectPhotoBrowserViewController.h"
 
 @interface PictureScanViewController ()<UICollectionViewDataSource,UICollectionViewDelegate>{
+    UIBarButtonItem *_leftItem;
     UIBarButtonItem *_rightItem;
 }
 
