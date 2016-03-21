@@ -10,4 +10,6 @@
 
 @interface PictureScanViewController : UIViewController
 
+@property(nonatomic)BOOL isScan;
+
 @end

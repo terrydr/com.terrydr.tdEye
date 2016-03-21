@@ -49,7 +49,14 @@
                                                   style:UIBarButtonItemStylePlain
                                                  target:self
                                                  action:@selector(rightBarButtonItemAction)];
+    _leftItem = [[UIBarButtonItem alloc] initWithTitle:@"取消"
+                                                 style:UIBarButtonItemStylePlain
+                                                target:self
+                                                action:@selector(leftBarButtonItemAction)];
     self.navigationItem.rightBarButtonItem = _rightItem;
+    if (_isScan) {
+        self.navigationItem.leftBarButtonItem = _leftItem;
+    }
 }
 
 - (void)initSubview{
@@ -108,6 +115,10 @@
         }
     }
     [_collectionView reloadData];
+}
+
+- (void)leftBarButtonItemAction{
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)initShootCollectionDataArray{
