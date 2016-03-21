@@ -54,7 +54,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 /// 是否允许旋转 (注意在旋转过程中禁止屏幕旋转)
 @property (nonatomic, assign, getter=isEnableRotation) BOOL enableRotation;
 /// 旋转前的屏幕大小
-@property (nonatomic, assign) CGRect lastBounds;
+//@property (nonatomic, assign) CGRect lastBounds;
 /// 后台任务标识
 @property (nonatomic, assign) UIBackgroundTaskIdentifier backgroundTaskIndentifier;
 
