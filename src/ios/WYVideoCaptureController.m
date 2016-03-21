@@ -32,6 +32,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     int _takenPictureCount;
 }
 @property (nonatomic, strong) UIButton *closeBtn;
+@property (nonatomic, strong) UIButton *flashBtn;
 @property (nonatomic, strong) UIView *viewContainer;
 @property (nonatomic, strong) ProgressView *progressView;
 @property (nonatomic, strong) UILabel *dotLabel;
@@ -43,6 +44,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 /// 负责输入和输出设备之间数据传递
 @property (nonatomic, strong) AVCaptureSession *captureSession;
+@property (nonatomic, strong) AVCaptureDevice *captureDevice;
 /// 负责从AVCaptureDevice获取数据
 @property (nonatomic, strong) AVCaptureDeviceInput *captureDeviceInput;
 /// 照片输出流
@@ -99,14 +101,14 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [_captureSession setSessionPreset:AVCaptureSessionPreset1280x720]; // 设置分辨率
     }
     // 2.获得输入设备
-    AVCaptureDevice *captureDevice = [self getCameraDeviceWithPosition:AVCaptureDevicePositionBack];
-    if (captureDevice == nil) {
+    self.captureDevice = [self getCameraDeviceWithPosition:AVCaptureDevicePositionBack];
+    if (_captureDevice == nil) {
         NSLog(@"获取输入设备失败");
         return;
     }
     // 4.根据输入设备初始化设备输入对象,用于获得输入数据
     NSError *error = nil;
-    _captureDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:captureDevice error:&error];
+    _captureDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:_captureDevice error:&error];
     if (error) {
         NSLog(@"创建设备输入对象失败 -- error = %@", error);
         return;
@@ -129,7 +131,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _captureVideoPreviewLayer.frame = layer.bounds;
     _captureVideoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     [layer insertSublayer:_captureVideoPreviewLayer atIndex:0];
-    [self addNotificationToCaptureDevice:captureDevice];
+    [self addNotificationToCaptureDevice:_captureDevice];
 }
 
 #pragma mark - CaptureMethod
@@ -196,6 +198,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     [self.view addSubview:_closeBtn];
     [self.view addSubview:_viewContainer];
+    [self.view addSubview:_flashBtn];
     [self.view addSubview:_progressView];
     [self.view addSubview:_dotLabel];
     [self.view addSubview:_leftBtn];
@@ -205,6 +208,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:_scanBtn];
     
     _closeBtn.frame = CGRectMake(0, 10, 60, 30);
+    _flashBtn.frame = CGRectMake(CGRectGetWidth(self.view.bounds)-60, 60, 60, 30);
     _viewContainer.frame = CGRectMake(0, 44, APP_WIDTH, APP_WIDTH);
     _progressView.frame = CGRectMake(0, CGRectGetMaxY(_viewContainer.frame), APP_WIDTH, 5);
     _dotLabel.frame = CGRectMake((APP_WIDTH - 5) * 0.5, APP_WIDTH + 60 , 5, 5);
@@ -222,9 +226,14 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)prepareUI {
     self.title = @"拍照";
     
-    _closeBtn = [[UIButton alloc] init];
+    _closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_closeBtn setImage:[UIImage imageNamed:@"button_camera_close"] forState:UIControlStateNormal];
     [_closeBtn addTarget:self action:@selector(closeBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    
+    _flashBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_flashBtn setTitle:@"开启" forState:UIControlStateNormal];
+    [_flashBtn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
+    [_flashBtn addTarget:self action:@selector(flashBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     
     _viewContainer = [[UIView alloc] init];
     //添加滑动手势
@@ -279,6 +288,23 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                                                         object:nil
                                                       userInfo:pathDic];
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)flashBtnClick:(id)sender{
+    UIButton *btn = (UIButton *)sender;
+    btn.selected = !btn.selected;
+    [_captureDevice lockForConfiguration:nil];
+    if (btn.isSelected) {
+        [_flashBtn setTitle:@"关闭" forState:UIControlStateNormal];
+        [_captureDevice setFlashMode:AVCaptureFlashModeOn];
+        [_captureDevice setTorchMode:AVCaptureTorchModeOn];
+        [_captureDevice setTorchModeOnWithLevel:0.01f error:nil];
+    }else{
+        [_flashBtn setTitle:@"开启" forState:UIControlStateNormal];
+        [_captureDevice setFlashMode:AVCaptureFlashModeOff];
+        [_captureDevice setTorchMode:AVCaptureTorchModeOff];
+    }
+    [_captureDevice unlockForConfiguration];
 }
 
 - (void)handleSwipes:(UISwipeGestureRecognizer *)sender{
