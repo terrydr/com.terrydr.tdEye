@@ -44,7 +44,8 @@
 - (void)jrEyeScanPhotos:(CDVInvokedUrlCommand*)command{
     _callbackId = command.callbackId;
     PictureScanViewController *scanVC = [[PictureScanViewController alloc] init];
-    [self.viewController presentViewController:scanVC animated:YES completion:^{
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:scanVC];
+    [self.viewController presentViewController:nav animated:YES completion:^{
     }];
 }
 
