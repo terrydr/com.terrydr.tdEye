@@ -62,6 +62,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 @implementation WYVideoCaptureController
 
+// [user changable but not recommended] custom exposure duration
+static float customExposureDuration = 0.05;
+// [user changable but not recommended] custom ISO
+static float customISO = 40.0;
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -293,16 +298,14 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)flashBtnClick:(id)sender{
     UIButton *btn = (UIButton *)sender;
     btn.selected = !btn.selected;
+    
     [_captureDevice lockForConfiguration:nil];
     if (btn.isSelected) {
         [_flashBtn setTitle:@"关闭" forState:UIControlStateNormal];
-        [_captureDevice setFlashMode:AVCaptureFlashModeOn];
-        [_captureDevice setTorchMode:AVCaptureTorchModeOn];
-        [_captureDevice setTorchModeOnWithLevel:0.01f error:nil];
+        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:40.0 completionHandler:nil];
     }else{
         [_flashBtn setTitle:@"开启" forState:UIControlStateNormal];
-        [_captureDevice setFlashMode:AVCaptureFlashModeOff];
-        [_captureDevice setTorchMode:AVCaptureTorchModeOff];
+        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:80.0 completionHandler:nil];
     }
     [_captureDevice unlockForConfiguration];
 }
