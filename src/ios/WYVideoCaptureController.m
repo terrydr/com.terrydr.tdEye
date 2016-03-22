@@ -305,16 +305,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [_captureDevice lockForConfiguration:nil];
     if (btn.isSelected) {
         [_flashBtn setTitle:@"关闭" forState:UIControlStateNormal];
-//        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:40.0 completionHandler:nil];
-        
-        [_captureDevice setWhiteBalanceModeLockedWithDeviceWhiteBalanceGains:AVCaptureWhiteBalanceGainsCurrent completionHandler:nil];
-        
-        
-        
-        
+        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:40.0 completionHandler:nil];
     }else{
         [_flashBtn setTitle:@"开启" forState:UIControlStateNormal];
-//        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:80.0 completionHandler:nil];
+        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:80.0 completionHandler:nil];
     }
     [_captureDevice unlockForConfiguration];
 }
