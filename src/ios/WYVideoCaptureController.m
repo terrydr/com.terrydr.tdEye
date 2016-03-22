@@ -32,6 +32,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     int _takenPictureCount;
 }
 @property (nonatomic, strong) UIButton *closeBtn;
+@property (nonatomic, strong) UISlider *wbSlider;
 @property (nonatomic, strong) UIButton *flashBtn;
 @property (nonatomic, strong) UIView *viewContainer;
 @property (nonatomic, strong) ProgressView *progressView;
@@ -107,6 +108,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }
     // 2.获得输入设备
     self.captureDevice = [self getCameraDeviceWithPosition:AVCaptureDevicePositionBack];
+    [self wbSliderMethod:_wbSlider];
     if (_captureDevice == nil) {
         NSLog(@"获取输入设备失败");
         return;
@@ -203,6 +205,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     [self.view addSubview:_closeBtn];
     [self.view addSubview:_viewContainer];
+    [self.view addSubview:_wbSlider];
     [self.view addSubview:_flashBtn];
     [self.view addSubview:_progressView];
     [self.view addSubview:_dotLabel];
@@ -213,6 +216,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:_scanBtn];
     
     _closeBtn.frame = CGRectMake(0, 10, 60, 30);
+    CGFloat sliderOriginX = (CGRectGetWidth(self.view.bounds)-200)/2.0;
+    CGFloat sliderOriginY = 44+APP_WIDTH-40;
+    _wbSlider.frame = CGRectMake(sliderOriginX, sliderOriginY, 200, 20);
     _flashBtn.frame = CGRectMake(CGRectGetWidth(self.view.bounds)-60, 60, 60, 30);
     _viewContainer.frame = CGRectMake(0, 44, APP_WIDTH, APP_WIDTH);
     _progressView.frame = CGRectMake(0, CGRectGetMaxY(_viewContainer.frame), APP_WIDTH, 5);
@@ -234,6 +240,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_closeBtn setImage:[UIImage imageNamed:@"button_camera_close"] forState:UIControlStateNormal];
     [_closeBtn addTarget:self action:@selector(closeBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    
+    _wbSlider = [[UISlider alloc] init];
+    _wbSlider.minimumValue = 3000.0f;
+    _wbSlider.maximumValue = 12000.0f;
+    _wbSlider.value = 6000.0f;
+    [_wbSlider addTarget:self action:@selector(wbSliderMethod:) forControlEvents:UIControlEventValueChanged];
     
     _flashBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_flashBtn setTitle:@"开启" forState:UIControlStateNormal];
@@ -296,6 +308,18 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                                                         object:nil
                                                       userInfo:pathDic];
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)wbSliderMethod:(id)sender{
+    UISlider *slider = (UISlider *)sender;
+    AVCaptureWhiteBalanceTemperatureAndTintValues temperatureAndTint = {
+        .temperature = slider.value,
+        .tint = 0,
+    };
+    AVCaptureWhiteBalanceGains wbGains = [_captureDevice deviceWhiteBalanceGainsForTemperatureAndTintValues:temperatureAndTint];
+    [_captureDevice lockForConfiguration:nil];
+    [_captureDevice setWhiteBalanceModeLockedWithDeviceWhiteBalanceGains:wbGains completionHandler:nil];
+    [_captureDevice unlockForConfiguration];
 }
 
 - (void)flashBtnClick:(id)sender{
