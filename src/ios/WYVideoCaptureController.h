@@ -10,4 +10,6 @@
 
 @interface WYVideoCaptureController : UIViewController
 
+@property(nonatomic)BOOL isScan;
+
 @end

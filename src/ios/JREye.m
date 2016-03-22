@@ -8,7 +8,6 @@
 
 #import "JREye.h"
 #import "WYVideoCaptureController.h"
-#import "PictureScanViewController.h"
 
 @interface JREye (){
     NSString *_callbackId;
@@ -30,6 +29,7 @@
                                                object:nil];
     
     WYVideoCaptureController *videoVC = [[WYVideoCaptureController alloc] init];
+    videoVC.isScan = NO;
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:videoVC];
     [self.viewController presentViewController:nav animated:YES completion:^{
     }];
@@ -43,9 +43,9 @@
 
 - (void)jrEyeScanPhotos:(CDVInvokedUrlCommand*)command{
     _callbackId = command.callbackId;
-    PictureScanViewController *scanVC = [[PictureScanViewController alloc] init];
-    scanVC.isScan = YES;
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:scanVC];
+    WYVideoCaptureController *videoVC = [[WYVideoCaptureController alloc] init];
+    videoVC.isScan = YES;
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:videoVC];
     [self.viewController presentViewController:nav animated:YES completion:^{
     }];
 }

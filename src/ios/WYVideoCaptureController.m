@@ -62,11 +62,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 @implementation WYVideoCaptureController
 
-// [user changable but not recommended] custom exposure duration
-static float customExposureDuration = 0.05;
-// [user changable but not recommended] custom ISO
-static float customISO = 40.0;
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -74,6 +69,11 @@ static float customISO = 40.0;
     [self ChangeToLeft:YES];
     [self setupCaptureView];
     self.view.backgroundColor = RGB(0x16161b);
+    
+    if (_isScan) {
+        [self pushToPictureScan:NO];
+    }
+    
 }
 /// 隐藏状态栏
 - (BOOL)prefersStatusBarHidden {
@@ -284,8 +284,11 @@ static float customISO = 40.0;
 
 #pragma mark - ButtonClick
 - (void)scanBtnClick:(UIButton *)btn{
+    [self pushToPictureScan:YES];
+}
+- (void)pushToPictureScan:(BOOL)animated{
     PictureScanViewController *scanVc = [[PictureScanViewController alloc] init];
-    [self.navigationController pushViewController:scanVc animated:YES];
+    [self.navigationController pushViewController:scanVc animated:animated];
 }
 - (void)closeBtnClick {
     NSDictionary *pathDic = [NSDictionary dictionary];
@@ -302,10 +305,16 @@ static float customISO = 40.0;
     [_captureDevice lockForConfiguration:nil];
     if (btn.isSelected) {
         [_flashBtn setTitle:@"关闭" forState:UIControlStateNormal];
-        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:40.0 completionHandler:nil];
+//        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:40.0 completionHandler:nil];
+        
+        [_captureDevice setWhiteBalanceModeLockedWithDeviceWhiteBalanceGains:AVCaptureWhiteBalanceGainsCurrent completionHandler:nil];
+        
+        
+        
+        
     }else{
         [_flashBtn setTitle:@"开启" forState:UIControlStateNormal];
-        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:80.0 completionHandler:nil];
+//        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:80.0 completionHandler:nil];
     }
     [_captureDevice unlockForConfiguration];
 }
