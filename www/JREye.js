@@ -1,4 +1,3 @@
-cordova.define("cordova-plugin-eyecamera.JREye", function(require, exports, module) {
 var jrEye= {
 jrTakePhotos: function(takeType, successCallback, errorCallback) {
     console.log("jrTakePhotos");
@@ -40,7 +39,4 @@ jrScanPhotos: function(successCallback, errorCallback) {
     
 }
 
-
 module.exports = jrEye;
-
-});
