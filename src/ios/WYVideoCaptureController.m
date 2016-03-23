@@ -73,6 +73,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     if (_isScan) {
         [self pushToPictureScan:NO];
+    }else{
+        [self cleanOlderData];
     }
     
 }
@@ -98,6 +100,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)dealloc {
     NSLog(@"我是拍照控制器,我被销毁了");
+}
+
+- (void)cleanOlderData{
+    [[JRMediaFileManage shareInstance] deleteAllFiles];
 }
 
 - (void)setupCaptureView {
