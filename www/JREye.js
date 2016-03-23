@@ -36,5 +36,7 @@ jrScanPhotos: function(paramDic,successCallback, errorCallback) {
                  );
     
 }
+    
+}
 
 module.exports = jrEye;
