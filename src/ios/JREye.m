@@ -63,7 +63,9 @@
     browserVc.photos = [dataDic objectForKey:@"data"];
     browserVc.deleteCallBack = ^(NSArray *assets){
     };
-    [self.viewController.navigationController pushViewController:browserVc animated:YES];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:browserVc];
+    [self.viewController presentViewController:nav animated:YES completion:^{
+    }];
 }
 
 @end
