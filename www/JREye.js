@@ -25,17 +25,15 @@ jrSelectPhotos: function(successCallback, errorCallback) {
 }
    ,
                
-jrScanPhotos: function(successCallback, errorCallback) {
+jrScanPhotos: function(paramDic,successCallback, errorCallback) {
     console.log("jrScanPhotos");
     cordova.exec(
                  successCallback,
                  errorCallback,
                  "JREye",
                  "jrEyeScanPhotos",
-                 []
+                 [paramDic]
                  );
-               
-}
     
 }
 
