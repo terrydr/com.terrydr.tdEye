@@ -13,7 +13,7 @@ jrTakePhotos: function(takeType, successCallback, errorCallback) {
     ,
  
 jrSelectPhotos: function(successCallback, errorCallback) {
-    console.log("jrScanPhotos");
+    console.log("jrSelectPhotos");
     cordova.exec(
                  successCallback,
                  errorCallback,
