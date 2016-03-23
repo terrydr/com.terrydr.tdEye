@@ -54,7 +54,8 @@
 - (void)jrEyeScanPhotos:(CDVInvokedUrlCommand*)command{
     _callbackId = command.callbackId;
     NSArray *paramArr = command.arguments;
-    NSDictionary *dataDic = [paramArr objectAtIndex:0];
+    NSString *jsonStr = [paramArr objectAtIndex:0];
+    NSDictionary *dataDic = [self dictionaryWithJsonString:jsonStr];
     NSInteger currentIndex = [[dataDic objectForKey:@"index"] integerValue];
     MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
     [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
@@ -66,6 +67,28 @@
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:browserVc];
     [self.viewController presentViewController:nav animated:YES completion:^{
     }];
+}
+
+/*!
+ * @brief 把格式化的JSON格式的字符串转换成字典
+ * @param jsonString JSON格式的字符串
+ * @return 返回字典
+ */
+- (NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString {
+    if (jsonString == nil) {
+        return nil;
+    }
+    
+    NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *err;
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
+                                                        options:NSJSONReadingMutableContainers
+                                                          error:&err];
+    if(err) {
+        NSLog(@"json解析失败：%@",err);
+        return nil;
+    }
+    return dic;
 }
 
 @end
