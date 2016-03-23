@@ -1,3 +1,4 @@
+cordova.define("cordova-plugin-eyecamera.JREye", function(require, exports, module) {
 var jrEye= {
 jrTakePhotos: function(takeType, successCallback, errorCallback) {
     console.log("jrTakePhotos");
@@ -12,6 +13,19 @@ jrTakePhotos: function(takeType, successCallback, errorCallback) {
 }
     ,
  
+jrSelectPhotos: function(successCallback, errorCallback) {
+    console.log("jrScanPhotos");
+    cordova.exec(
+                 successCallback,
+                 errorCallback,
+                 "JREye",
+                 "jrEyeSelectPhotos",
+                 []
+                 );
+    
+}
+   ,
+               
 jrScanPhotos: function(successCallback, errorCallback) {
     console.log("jrScanPhotos");
     cordova.exec(
@@ -21,10 +35,12 @@ jrScanPhotos: function(successCallback, errorCallback) {
                  "jrEyeScanPhotos",
                  []
                  );
-    
+               
 }
     
 }
 
 
 module.exports = jrEye;
+
+});

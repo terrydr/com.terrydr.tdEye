@@ -8,6 +8,7 @@
 
 #import "JREye.h"
 #import "WYVideoCaptureController.h"
+#import "MLSelectPhotoBrowserViewController.h"
 
 @interface JREye (){
     NSString *_callbackId;
@@ -41,13 +42,28 @@
     [self.commandDelegate sendPluginResult:result callbackId:_callbackId];
 }
 
-- (void)jrEyeScanPhotos:(CDVInvokedUrlCommand*)command{
+- (void)jrEyeSelectPhotos:(CDVInvokedUrlCommand*)command{
     _callbackId = command.callbackId;
     WYVideoCaptureController *videoVC = [[WYVideoCaptureController alloc] init];
     videoVC.isScan = YES;
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:videoVC];
     [self.viewController presentViewController:nav animated:YES completion:^{
     }];
+}
+
+- (void)jrEyeScanPhotos:(CDVInvokedUrlCommand*)command{
+    _callbackId = command.callbackId;
+    NSArray *paramArr = command.arguments;
+    NSDictionary *dataDic = [paramArr objectAtIndex:0];
+    NSInteger currentIndex = [[dataDic objectForKey:@"index"] integerValue];
+    MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
+    [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
+    browserVc.isModelData = NO;
+    browserVc.currentPage = currentIndex;
+    browserVc.photos = [dataDic objectForKey:@"data"];
+    browserVc.deleteCallBack = ^(NSArray *assets){
+    };
+    [self.viewController.navigationController pushViewController:browserVc animated:YES];
 }
 
 @end

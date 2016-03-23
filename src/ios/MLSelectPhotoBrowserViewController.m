@@ -317,7 +317,14 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     
     if (self.photos.count) {
         cell.backgroundColor = [UIColor clearColor];
-        UIImage *photo = self.photos[indexPath.item]; //[self.dataSource photoBrowser:self photoAtIndex:indexPath.item];
+        UIImage *photo; //[self.dataSource photoBrowser:self photoAtIndex:indexPath.item];
+        if (_isModelData) {
+            photo = self.photos[indexPath.item];
+        }else{
+            NSDictionary *paramDic = self.photos[indexPath.item];
+            NSString *imgPath = [paramDic objectForKey:@"origin"];
+            photo = [UIImage imageWithContentsOfFile:imgPath];
+        }
         
         if([[cell.contentView.subviews lastObject] isKindOfClass:[UIView class]]){
             [[cell.contentView.subviews lastObject] removeFromSuperview];

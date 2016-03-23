@@ -16,6 +16,8 @@ typedef void(^deleteCallBackBlock)();
 @property (strong,nonatomic) NSArray *photos;
 // 当前提供的分页数
 @property (nonatomic , assign) NSInteger currentPage;
+// 当前提供的分页数
+@property (nonatomic , assign) BOOL isModelData;
 
 @property (nonatomic , copy) deleteCallBackBlock deleteCallBack;
 @end

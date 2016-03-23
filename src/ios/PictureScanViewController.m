@@ -261,6 +261,7 @@
         NSArray *imageArr = [self getImagesArrayWithTypeModel:typeModel pictureModelArray:typeModel.pictureArr];
         MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
         [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
+        browserVc.isModelData = YES;
         browserVc.currentPage = indexPath.row;
         browserVc.photos = imageArr;
         browserVc.deleteCallBack = ^(NSArray *assets){
