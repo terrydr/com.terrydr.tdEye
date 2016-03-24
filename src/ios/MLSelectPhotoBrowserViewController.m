@@ -19,7 +19,10 @@
 static NSInteger ZLPickerColletionViewPadding = 20;
 static NSString *_cellIdentifier = @"collectionViewCell";
 
-@interface MLSelectPhotoBrowserViewController () <UIScrollViewDelegate,ZLPhotoPickerPhotoScrollViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDataSource,UICollectionViewDelegate>
+@interface MLSelectPhotoBrowserViewController () <UIScrollViewDelegate,ZLPhotoPickerPhotoScrollViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDataSource,UICollectionViewDelegate>{
+    
+    UIBarButtonItem *_leftItem;
+}
 
 // 控件
 @property (strong,nonatomic)    UIButton          *deleleBtn;
@@ -197,6 +200,21 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     
     self.view.backgroundColor = [UIColor blackColor];
     self.extendedLayoutIncludesOpaqueBars = YES;
+    if (!_isModelData) {
+        [self configureNavgationBar];
+    }
+}
+
+- (void)configureNavgationBar{
+    _leftItem = [[UIBarButtonItem alloc] initWithTitle:@"取消"
+                                                 style:UIBarButtonItemStylePlain
+                                                target:self
+                                                action:@selector(leftBarButtonItemAction)];
+    self.navigationItem.leftBarButtonItem = _leftItem;
+}
+
+- (void)leftBarButtonItemAction{
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark -初始化底部ToorBar
