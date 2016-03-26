@@ -111,11 +111,9 @@
             if ([_rightSelectedPictureModelArr isValid]) {
                 [_rightSelectedPictureModelArr removeAllObjects];
             }
-        }else{
-            return;
+            [_collectionView reloadData];
         }
     }
-    [_collectionView reloadData];
 }
 
 - (void)initShootCollectionDataArray{
