@@ -78,12 +78,15 @@
 - (UICollectionView *)collectionView{
     if (!_collectionView) {
         float AD_height = 87.0f/2.0f;//header高度
+        float footer_height = 22.0f/2.0f;//footer高度
         UICollectionViewFlowLayout *flowLayout=[[UICollectionViewFlowLayout alloc] init];
         [flowLayout setScrollDirection:UICollectionViewScrollDirectionVertical];
         flowLayout.headerReferenceSize = CGSizeMake(CGRectGetWidth(self.view.frame), AD_height+10);//头部
+        flowLayout.footerReferenceSize = CGSizeMake(CGRectGetWidth(self.view.frame), footer_height);//尾部
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame)) collectionViewLayout:flowLayout];
         [_collectionView registerClass:[ShootCollectionViewCell class] forCellWithReuseIdentifier:@"cellID"];
         [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"ReusableView"];
+        [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:@"ReusableView"];
         _collectionView.backgroundColor = RGB(0xf7f7f7);
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
@@ -166,21 +169,30 @@
 //头部显示的内容
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
     
-    UICollectionReusableView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:
+    UICollectionReusableView *reuseableView = [collectionView dequeueReusableSupplementaryViewOfKind:
                                             UICollectionElementKindSectionHeader withReuseIdentifier:@"ReusableView" forIndexPath:indexPath];
-    ShootCollectionHeaderView *collectionHeaderView = [[ShootCollectionHeaderView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), (87.0f/2.0f))];
-    JREyeTypeModel *model = [_sectionArr objectAtIndex:indexPath.section];
-    collectionHeaderView.typeNameLabel.text = model.typeName;
-    if ([model.typeName isEqualToString:@"左眼"]) {
-        collectionHeaderView.iconImgView.image = [UIImage imageNamed:@"leftEyeicon"];
-    }else{
-        collectionHeaderView.iconImgView.image = [UIImage imageNamed:@"rightEyeicon"];
+    if (kind == UICollectionElementKindSectionHeader) {
+        ShootCollectionHeaderView *collectionHeaderView = [[ShootCollectionHeaderView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), (87.0f/2.0f))];
+        JREyeTypeModel *model = [_sectionArr objectAtIndex:indexPath.section];
+        collectionHeaderView.typeNameLabel.text = model.typeName;
+        if ([model.typeName isEqualToString:@"左眼"]) {
+            collectionHeaderView.iconImgView.image = [UIImage imageNamed:@"leftEyeicon"];
+        }else{
+            collectionHeaderView.iconImgView.image = [UIImage imageNamed:@"rightEyeicon"];
+        }
+        for (id view in reuseableView.subviews) {
+            [view removeFromSuperview];
+        }
+        [reuseableView addSubview:collectionHeaderView];//头部广告栏
+    }else if (kind == UICollectionElementKindSectionFooter){
+        UIView *collectionFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), 22.0f/2.0f)];
+        collectionFooterView.backgroundColor = RGB(0xf7f7f7);
+        for (id view in reuseableView.subviews) {
+            [view removeFromSuperview];
+        }
+        [reuseableView addSubview:collectionFooterView];//尾部广告栏
     }
-    for (id view in headerView.subviews) {
-        [view removeFromSuperview];
-    }
-    [headerView addSubview:collectionHeaderView];//头部广告栏
-    return headerView;
+    return reuseableView;
 }
 
 #pragma mark --UICollectionViewDelegateFlowLayout
