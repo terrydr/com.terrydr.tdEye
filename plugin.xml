@@ -93,6 +93,10 @@
         <resource-file src="src/ios/whiteBalanceLefticon@3x.png" />
         <resource-file src="src/ios/whiteBalanceRighticon@2x.png" />
         <resource-file src="src/ios/whiteBalanceRighticon@3x.png" />
+        <resource-file src="src/ios/leftEyeicon@2x.png" />
+        <resource-file src="src/ios/leftEyeicon@3x.png" />
+        <resource-file src="src/ios/rightEyeicon@2x.png" />
+        <resource-file src="src/ios/rightEyeicon@3x.png" />
     </platform>
     
 </plugin>
