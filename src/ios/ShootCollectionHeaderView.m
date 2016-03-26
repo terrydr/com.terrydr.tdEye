@@ -46,6 +46,14 @@
     self.typeNameLabel.font = [UIFont systemFontOfSize:16.0f];
     [self addSubview:_typeNameLabel];
     
+    CGFloat bottomLineWidth = CGRectGetWidth(self.bounds);
+    CGFloat bottomLineHeight = 1.0f;
+    CGFloat bottomLineOriginX = 0.0f;
+    CGFloat bottomLineOriginY = CGRectGetHeight(self.bounds)-bottomLineHeight;
+    UIView *bottomLineView = [[UIView alloc] initWithFrame:CGRectMake(bottomLineOriginX, bottomLineOriginY, bottomLineWidth, bottomLineHeight)];
+    bottomLineView.backgroundColor = RGB(0xdddddd);
+    [self addSubview:bottomLineView];
+    
     self.chooseBtn = [ShootCollectionButton buttonWithType:UIButtonTypeCustom];
     self.chooseBtn.hidden = YES;
     self.chooseBtn.isSelected = NO;
