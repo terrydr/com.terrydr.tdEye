@@ -23,6 +23,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 #define kVideoLimit 10
 
 @interface WYVideoCaptureController (){
+    UIBarButtonItem *_leftItem;
     CGRect _leftBtnFrame;
     CGRect _centerBtnFrame;
     CGRect _rightBtnFrame;
@@ -33,7 +34,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 @property (nonatomic, strong) UIButton *closeBtn;
 @property (nonatomic, strong) UISlider *wbSlider;
-@property (nonatomic, strong) UIButton *flashBtn;
 @property (nonatomic, strong) UIView *viewContainer;
 @property (nonatomic, strong) ProgressView *progressView;
 @property (nonatomic, strong) UILabel *dotLabel;
@@ -43,6 +43,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UIButton *cameraBtn;
 @property (nonatomic, strong) UIImageView *imageView;
 @property (nonatomic, strong) UIButton *imageViewBtn;
+@property (nonatomic, strong) UIView *toolView;
+@property (nonatomic, strong) UIImageView *ISOImgView;
+@property (nonatomic, strong) UIButton *ISOBtn;
+@property (nonatomic, strong) UIView *whiteBalanceView;
 
 /// 负责输入和输出设备之间数据传递
 @property (nonatomic, strong) AVCaptureSession *captureSession;
@@ -53,12 +57,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) AVCaptureStillImageOutput *captureStillImageOutput;
 /// 相机拍摄预览层
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *captureVideoPreviewLayer;
-/// 是否允许旋转 (注意在旋转过程中禁止屏幕旋转)
-@property (nonatomic, assign, getter=isEnableRotation) BOOL enableRotation;
-/// 旋转前的屏幕大小
-//@property (nonatomic, assign) CGRect lastBounds;
-/// 后台任务标识
-@property (nonatomic, assign) UIBackgroundTaskIdentifier backgroundTaskIndentifier;
 
 @end
 
@@ -67,6 +65,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self configureNavgationBar];
     [self setupUI];
     [self ChangeToLeft:YES];
     [self setupCaptureView];
@@ -79,14 +78,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }
     
 }
-/// 隐藏状态栏
-- (BOOL)prefersStatusBarHidden {
-    return YES;
-}
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    self.navigationController.navigationBarHidden = YES;
     [self initTakenParameters];
 }
 
@@ -101,6 +95,18 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)dealloc {
     NSLog(@"我是拍照控制器,我被销毁了");
+}
+
+- (void)configureNavgationBar{
+    _leftItem = [[UIBarButtonItem alloc] initWithTitle:@"取消"
+                                                 style:UIBarButtonItemStylePlain
+                                                target:self
+                                                action:@selector(leftBarButtonItemAction)];
+    self.navigationItem.leftBarButtonItem = _leftItem;
+}
+
+- (void)leftBarButtonItemAction{
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)cleanOlderData{
@@ -192,31 +198,21 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
 }
 
-#pragma mark - SuperMethod
-- (BOOL)shouldAutorotate {
-    return self.isEnableRotation;
-}
-/// 屏幕旋转时调整视频预览图层的方向
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    AVCaptureConnection *captureConnection = [_captureVideoPreviewLayer connection];
-    captureConnection.videoOrientation = (AVCaptureVideoOrientation)toInterfaceOrientation;
-}
-/// 旋转后重新设置大小
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    _captureVideoPreviewLayer.frame = _viewContainer.bounds;
-}
-
 #pragma mark - UI设计
 - (void)setupUI {
     [self prepareUI];
     
     [self.view addSubview:_closeBtn];
     [self.view addSubview:_viewContainer];
-    [self.view addSubview:_wbSlider];
-    [self.view addSubview:_flashBtn];
+    //[self.view addSubview:_progressView];
+    [self.view addSubview:self.whiteBalanceView];
+    [self.view addSubview:self.wbSlider];
+    [self.view addSubview:self.toolView];
+    [self.view addSubview:self.ISOImgView];
+    [self.view addSubview:self.ISOBtn];
     [self.view addSubview:_imageView];
     [self.view addSubview:_imageViewBtn];
-    //[self.view addSubview:_progressView];
+    
     [self.view addSubview:_dotLabel];
     [self.view addSubview:_leftBtn];
     [self.view addSubview:_centerBtn];
@@ -224,13 +220,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:_cameraBtn];
     
     _closeBtn.frame = CGRectMake(0, 10, 60, 30);
-    CGFloat sliderOriginX = (CGRectGetWidth(self.view.bounds)-200)/2.0;
-    CGFloat sliderOriginY = 44+APP_WIDTH-40;
-    _wbSlider.frame = CGRectMake(sliderOriginX, sliderOriginY, 200, 20);
-    _flashBtn.frame = CGRectMake(CGRectGetWidth(self.view.bounds)-60, 60, 60, 30);
-    _viewContainer.frame = CGRectMake(0, 44, APP_WIDTH, APP_WIDTH);
+    _viewContainer.frame = CGRectMake(0, 64, APP_WIDTH, APP_HEIGHT-64);
     _progressView.frame = CGRectMake(0, CGRectGetMaxY(_viewContainer.frame), APP_WIDTH, 5);
-    _dotLabel.frame = CGRectMake((APP_WIDTH - 5) * 0.5, APP_WIDTH + 60 , 5, 5);
+    _dotLabel.frame = CGRectMake((APP_WIDTH - 5) * 0.5,APP_HEIGHT - ((324.0f-30.0f)/2.0f) , 5, 5);
     CGFloat btnW = 40;
     CGFloat leftBtnX = (APP_WIDTH - 3 * btnW - 2 * 32) *0.5;
     CGFloat leftBtnY = CGRectGetMaxY(_dotLabel.frame) + 6;
@@ -239,9 +231,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _centerBtnFrame = CGRectOffset(_leftBtnFrame, 32 + btnW, 0);
     _rightBtnFrame = CGRectOffset(_centerBtnFrame, 32 + btnW, 0);
     [self restoreBtn];
-    _cameraBtn.frame = CGRectMake((APP_WIDTH - 67) * 0.5, CGRectGetMaxY(_centerBtnFrame) + 32, 67, 67);
+    _cameraBtn.frame = CGRectMake((APP_WIDTH - 67) * 0.5, APP_HEIGHT-62-26, 62, 62);
     CGFloat imageViewOriginX = CGRectGetWidth(self.view.bounds)-60-20;
-    _imageView.frame = CGRectMake(imageViewOriginX, CGRectGetMaxY(_centerBtnFrame) + 32, 60, 60);
+    _imageView.frame = CGRectMake(imageViewOriginX, APP_HEIGHT-62-26, 60, 60);
     _imageViewBtn.frame = _imageView.frame;
 }
 - (void)prepareUI {
@@ -250,17 +242,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_closeBtn setImage:[UIImage imageNamed:@"button_camera_close"] forState:UIControlStateNormal];
     [_closeBtn addTarget:self action:@selector(closeBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    
-    _wbSlider = [[UISlider alloc] init];
-    _wbSlider.minimumValue = 3000.0f;
-    _wbSlider.maximumValue = 12000.0f;
-    _wbSlider.value = 6000.0f;
-    [_wbSlider addTarget:self action:@selector(wbSliderMethod:) forControlEvents:UIControlEventValueChanged];
-    
-    _flashBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_flashBtn setTitle:@"开启" forState:UIControlStateNormal];
-    [_flashBtn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-    [_flashBtn addTarget:self action:@selector(flashBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     
     _viewContainer = [[UIView alloc] init];
     //添加滑动手势
@@ -287,26 +268,103 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _dotLabel = [[UILabel alloc] init];  // 5 - 5
     _dotLabel.layer.cornerRadius = 2.5;
     _dotLabel.clipsToBounds = YES;
-    _dotLabel.backgroundColor = RGB(0xffc437);
+    _dotLabel.backgroundColor = RGB(0x76c000);
     
     _leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_leftBtn setTitle:@"左眼" forState:UIControlStateNormal];
-    [_leftBtn setTitleColor:RGB(0xfefeff) forState:UIControlStateNormal];
+    [_leftBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     _leftBtn.titleLabel.font = [UIFont systemFontOfSize:15.0];
     [_leftBtn addTarget:self action:@selector(leftBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     _centerBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_centerBtn setTitleColor:RGB(0xffc437) forState:UIControlStateNormal];
+    [_centerBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_centerBtn setTitle:@"左眼" forState:UIControlStateNormal];
     _centerBtn.titleLabel.font = [UIFont systemFontOfSize:15.0];
     _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_rightBtn setTitle:@"右眼" forState:UIControlStateNormal];
-    [_rightBtn setTitleColor:RGB(0xfefeff) forState:UIControlStateNormal];
+    [_rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     _rightBtn.titleLabel.font = [UIFont systemFontOfSize:15.0];
     [_rightBtn addTarget:self action:@selector(rightBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     
     _cameraBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_cameraBtn setImage:[UIImage imageNamed:@"button_camera_screen"] forState:UIControlStateNormal];
+    [_cameraBtn setImage:[UIImage imageNamed:@"takePhoto"] forState:UIControlStateNormal];
     [_cameraBtn addTarget:self action:@selector(cameraBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+#pragma mark - View
+- (UIImageView *)ISOImgView{
+    if (!_ISOImgView) {
+        UIImage *ISOImg = [UIImage imageNamed:@"iso-icon"];
+        CGFloat ISOWidth = ISOImg.size.width;
+        CGFloat ISOHeight = ISOImg.size.height;
+        CGFloat ISOOriginX = APP_WIDTH-(30.0f/2.0f)-ISOWidth;
+        CGFloat ISOOriginY = 64.0f + (45.0f/2.0f);
+        _ISOImgView = [[UIImageView alloc] initWithFrame:CGRectMake(ISOOriginX, ISOOriginY, ISOWidth, ISOHeight)];
+        _ISOImgView.image = ISOImg;
+    }
+    return _ISOImgView;
+}
+
+- (UIButton *)ISOBtn{
+    if (!_ISOBtn) {
+        UIImage *ISOImg = [UIImage imageNamed:@"whiteBalance"];
+        CGFloat ISOWidth = ISOImg.size.width;
+        CGFloat ISOHeight = ISOImg.size.height;
+        CGFloat ISOOriginX = APP_WIDTH-(30.0f/2.0f)-ISOWidth;
+        CGFloat ISOOriginY = CGRectGetMaxY(_ISOImgView.frame) + (10.0f/2.0f);
+        _ISOBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _ISOBtn.frame = CGRectMake(ISOOriginX, ISOOriginY, ISOWidth, ISOHeight);
+        [_ISOBtn setBackgroundImage:ISOImg forState:UIControlStateNormal];
+        [_ISOBtn addTarget:self action:@selector(flashBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _ISOBtn;
+}
+
+- (UIView *)toolView{
+    if (!_toolView) {
+        CGFloat toolWidth = APP_WIDTH;
+        CGFloat toolHeight = 324.0f/2.0f;
+        CGFloat toolOriginX = 0.0f;
+        CGFloat toolOriginY = APP_HEIGHT-toolHeight;
+        _toolView = [[UIView alloc] initWithFrame:CGRectMake(toolOriginX, toolOriginY, toolWidth, toolHeight)];
+        _toolView.backgroundColor = RGB(0x000000);
+        _toolView.alpha = 0.6f;
+    }
+    return _toolView;
+}
+
+- (UIView *)whiteBalanceView{
+    if (!_whiteBalanceView) {
+        CGFloat width = 553.0f/2.0f;
+        CGFloat height = 70.0f/2.0f;
+        CGFloat originX = (APP_WIDTH-width)/2.0f;
+        CGFloat originY = APP_HEIGHT - (324.0f+62.0f+44.0f)/2.0f;
+        _whiteBalanceView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
+        _whiteBalanceView.backgroundColor = RGB(0x000000);
+        _whiteBalanceView.alpha = 0.8f;
+        _whiteBalanceView.layer.cornerRadius = 5.0f;
+        _whiteBalanceView.layer.masksToBounds = YES;
+    }
+    return _whiteBalanceView;
+}
+
+- (UISlider *)wbSlider{
+    if (!_wbSlider) {
+        UIImage *leftImg = [UIImage imageNamed:@"whiteBalanceLefticon"];
+        UIImage *rightImg = [UIImage imageNamed:@"whiteBalanceRighticon"];
+        
+        CGFloat sliderWidth = CGRectGetWidth(_whiteBalanceView.bounds) - (22.0f+22.0f)/2.0f;
+        CGFloat sliderHeight = 31.0f;
+        CGFloat sliderOriginX = CGRectGetMinX(_whiteBalanceView.frame) + 22.0f/2.0f;
+        CGFloat sliderOriginY = CGRectGetMinY(_whiteBalanceView.frame) +((CGRectGetHeight(_whiteBalanceView.bounds)-sliderHeight)/2.0f);
+        _wbSlider = [[UISlider alloc] initWithFrame:CGRectMake(sliderOriginX, sliderOriginY, sliderWidth, sliderHeight)];
+        _wbSlider.minimumValue = 3000.0f;
+        _wbSlider.maximumValue = 12000.0f;
+        _wbSlider.value = 6000.0f;
+        _wbSlider.minimumValueImage = leftImg;
+        _wbSlider.maximumValueImage = rightImg;
+        [_wbSlider addTarget:self action:@selector(wbSliderMethod:) forControlEvents:UIControlEventValueChanged];
+    }
+    return _wbSlider;
 }
 
 #pragma mark - ButtonClick
@@ -346,10 +404,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     [_captureDevice lockForConfiguration:nil];
     if (btn.isSelected) {
-        [_flashBtn setTitle:@"关闭" forState:UIControlStateNormal];
         [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:40.0 completionHandler:nil];
     }else{
-        [_flashBtn setTitle:@"开启" forState:UIControlStateNormal];
         [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:80.0 completionHandler:nil];
     }
     [_captureDevice unlockForConfiguration];
@@ -368,7 +424,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)leftBtnClick:(UIButton *)btn {
-    [_centerBtn setTitleColor:RGB(0xfefeff) forState:UIControlStateNormal];
     _dotLabel.hidden = YES;
     [UIView animateWithDuration:kAnimationDuration animations:^{
         _leftBtn.frame = _centerBtnFrame;
@@ -378,7 +433,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }];
 }
 - (void)rightBtnClick:(UIButton *)btn {
-    [_centerBtn setTitleColor:RGB(0xfefeff) forState:UIControlStateNormal];
     _dotLabel.hidden = YES;
     [UIView animateWithDuration:kAnimationDuration animations:^{
         _rightBtn.frame = _centerBtnFrame;
@@ -426,7 +480,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _centerBtn.frame = _centerBtnFrame;
     _rightBtn.frame = _rightBtnFrame;
     _dotLabel.hidden = NO;
-    [_centerBtn setTitleColor:RGB(0xffc437) forState:UIControlStateNormal];
+    [_centerBtn setTitleColor:RGB(0x76c000) forState:UIControlStateNormal];
 }
 
 - (void)initTakenParameters{
