@@ -35,6 +35,7 @@
         
         <source-file src="src/ios/JREye.m" />
         <header-file src="src/ios/JREye.h" />
+        <header-file src="src/ios/TDHeader.h" />
         <source-file src="src/ios/WYVideoCaptureController.m" />
         <header-file src="src/ios/WYVideoCaptureController.h" />
         <source-file src="src/ios/JRPictureModel.m" />
@@ -82,12 +83,16 @@
         <header-file src="src/ios/WYVideoTimeView.h" />
         <resource-file src="src/ios/Select_list_btn_solid@2x.png" />
         <resource-file src="src/ios/Select_list_btn_solid@3x.png" />
-        <resource-file src="src/ios/button_camera_screen.png" />
-        <resource-file src="src/ios/button_camera_screen@2x.png" />
-        <resource-file src="src/ios/button_camera_screen@3x.png" />
-        <resource-file src="src/ios/button_camera_close.png" />
-        <resource-file src="src/ios/button_camera_close@2x.png" />
-        <resource-file src="src/ios/button_camera_close@3x.png" />
+        <resource-file src="src/ios/takePhoto@2x.png" />
+        <resource-file src="src/ios/takePhoto@3x.png" />
+        <resource-file src="src/ios/iso-icon@2x.png" />
+        <resource-file src="src/ios/iso-icon@3x.png" />
+        <resource-file src="src/ios/whiteBalance@2x.png" />
+        <resource-file src="src/ios/whiteBalance@3x.png" />
+        <resource-file src="src/ios/whiteBalanceLefticon@2x.png" />
+        <resource-file src="src/ios/whiteBalanceLefticon@3x.png" />
+        <resource-file src="src/ios/whiteBalanceRighticon@2x.png" />
+        <resource-file src="src/ios/whiteBalanceRighticon@3x.png" />
     </platform>
     
 </plugin>
