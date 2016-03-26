@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TDHeader.h"
 #import "ShootCollectionButton.h"
 
 @interface ShootCollectionHeaderView : UIView

@@ -80,7 +80,7 @@
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame)) collectionViewLayout:flowLayout];
         [_collectionView registerClass:[ShootCollectionViewCell class] forCellWithReuseIdentifier:@"cellID"];
         [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"ReusableView"];
-        _collectionView.backgroundColor = [UIColor whiteColor];
+        _collectionView.backgroundColor = RGB(0xf7f7f7);
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
     }

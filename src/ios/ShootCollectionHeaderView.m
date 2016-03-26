@@ -8,9 +8,6 @@
 
 #import "ShootCollectionHeaderView.h"
 
-//16进制颜色
-#define kUIColorFromRGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
-
 @implementation ShootCollectionHeaderView
 
 /*
@@ -40,7 +37,7 @@
     self.chooseBtn.isSelected = NO;
     self.chooseBtn.frame = CGRectMake(CGRectGetWidth(self.frame)-40-5, 5, 40, 30);
     [self.chooseBtn setTitle:@"选择" forState:UIControlStateNormal];
-    [self.chooseBtn setTitleColor:kUIColorFromRGB(0x4f8aff) forState:UIControlStateNormal];
+    [self.chooseBtn setTitleColor:RGB(0x4f8aff) forState:UIControlStateNormal];
     self.chooseBtn.titleLabel.font = [UIFont systemFontOfSize:16.0f];
     [self addSubview:_chooseBtn];
 }
