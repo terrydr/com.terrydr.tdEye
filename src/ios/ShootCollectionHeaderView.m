@@ -27,7 +27,21 @@
 }
 
 - (void)configctureSubviews{
-    self.typeNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 20, CGRectGetWidth(self.frame)-80, 20)];
+    self.backgroundColor = RGB(0xffffff);
+    UIImage *iconImg = [UIImage imageNamed:@"leftEyeicon"];
+    CGFloat imgViewWidth = iconImg.size.width;
+    CGFloat imgViewHeitht = iconImg.size.height;
+    CGFloat imgViewOriginX = 20.0f;
+    CGFloat imgViewOriginY = CGRectGetMidY(self.bounds);
+    
+    self.iconImgView = [[UIImageView alloc] initWithFrame:CGRectMake(imgViewOriginX, imgViewOriginY, imgViewWidth, imgViewHeitht)];
+    [self addSubview:_iconImgView];
+    
+    CGFloat typeOriginX = CGRectGetMaxX(_iconImgView.frame) + 12.0f/2.0f;
+    CGFloat typeOriginY = 0.0f;
+    CGFloat typeWidth = CGRectGetWidth(self.bounds)-typeOriginX-20.0f;
+    CGFloat typeHeight = CGRectGetHeight(self.bounds);
+    self.typeNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(typeOriginX, typeOriginY, typeWidth, typeHeight)];
     self.typeNameLabel.textAlignment = NSTextAlignmentLeft;
     self.typeNameLabel.font = [UIFont systemFontOfSize:16.0f];
     [self addSubview:_typeNameLabel];

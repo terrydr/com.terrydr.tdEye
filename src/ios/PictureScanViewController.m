@@ -73,7 +73,7 @@
 
 - (UICollectionView *)collectionView{
     if (!_collectionView) {
-        float AD_height = 40;//header高度
+        float AD_height = 87.0f/2.0f;//header高度
         UICollectionViewFlowLayout *flowLayout=[[UICollectionViewFlowLayout alloc] init];
         [flowLayout setScrollDirection:UICollectionViewScrollDirectionVertical];
         flowLayout.headerReferenceSize = CGSizeMake(CGRectGetWidth(self.view.frame), AD_height+10);//头部
@@ -164,9 +164,14 @@
     
     UICollectionReusableView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:
                                             UICollectionElementKindSectionHeader withReuseIdentifier:@"ReusableView" forIndexPath:indexPath];
-    ShootCollectionHeaderView *collectionHeaderView = [[ShootCollectionHeaderView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), 40)];
+    ShootCollectionHeaderView *collectionHeaderView = [[ShootCollectionHeaderView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), (87.0f/2.0f))];
     JREyeTypeModel *model = [_sectionArr objectAtIndex:indexPath.section];
     collectionHeaderView.typeNameLabel.text = model.typeName;
+    if ([model.typeName isEqualToString:@"左眼"]) {
+        collectionHeaderView.iconImgView.image = [UIImage imageNamed:@"leftEyeicon"];
+    }else{
+        collectionHeaderView.iconImgView.image = [UIImage imageNamed:@"rightEyeicon"];
+    }
     for (id view in headerView.subviews) {
         [view removeFromSuperview];
     }
