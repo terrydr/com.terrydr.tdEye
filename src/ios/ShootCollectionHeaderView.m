@@ -32,7 +32,7 @@
     CGFloat imgViewWidth = iconImg.size.width;
     CGFloat imgViewHeitht = iconImg.size.height;
     CGFloat imgViewOriginX = 20.0f;
-    CGFloat imgViewOriginY = CGRectGetMidY(self.bounds);
+    CGFloat imgViewOriginY = (CGRectGetHeight(self.bounds)-imgViewHeitht)/2.0f;
     
     self.iconImgView = [[UIImageView alloc] initWithFrame:CGRectMake(imgViewOriginX, imgViewOriginY, imgViewWidth, imgViewHeitht)];
     [self addSubview:_iconImgView];
