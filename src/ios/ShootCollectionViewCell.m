@@ -23,16 +23,15 @@
         self.imgView.layer.masksToBounds = YES;
         [self addSubview:self.imgView];
         
-        self.selectedView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.frame), CGRectGetWidth(self.frame))];
-        self.selectedView.hidden = YES;
-        self.selectedView.backgroundColor = [UIColor blackColor];
-        self.selectedView.alpha = 0.6f;
-        [self addSubview:self.selectedView];
-        
-        CGFloat origin = (CGRectGetWidth(self.frame)-30)/2.0f;
-        UIImageView *selectedImgView = [[UIImageView alloc] initWithFrame:CGRectMake(origin, origin, 30, 30)];
-        selectedImgView.image = [UIImage imageNamed:@"Select_list_btn_solid"];
-        [_selectedView addSubview:selectedImgView];
+        UIImage *selectedImg = [UIImage imageNamed:@"albumSelectedicon"];
+        CGFloat selectedWidth = selectedImg.size.width;
+        CGFloat selectedHeight = selectedImg.size.height;
+        CGFloat selectedOriginX = CGRectGetWidth(self.bounds)-selectedWidth-12.0f/2.0f;
+        CGFloat selectedOriginY = CGRectGetHeight(self.bounds)-selectedHeight-12.0f/2.0f;
+        self.selectedImgView = [[UIImageView alloc] initWithFrame:CGRectMake(selectedOriginX, selectedOriginY, selectedWidth, selectedHeight)];
+        self.selectedImgView.hidden = YES;
+        self.selectedImgView.image = selectedImg;
+        [self addSubview:self.selectedImgView];
     }
     return self;
 }

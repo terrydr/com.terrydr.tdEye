@@ -218,9 +218,9 @@
     JRPictureModel *pictureModel = [typeModel.pictureArr objectAtIndex:indexPath.row];
     cell.imgView.image = [self getImageWithTypeModel:typeModel pictureModel:pictureModel];
     if (pictureModel.isSelected) {
-        cell.selectedView.hidden = NO;
+        cell.selectedImgView.hidden = NO;
     }else{
-        cell.selectedView.hidden = YES;
+        cell.selectedImgView.hidden = YES;
     }
     return cell;
 }
@@ -235,7 +235,7 @@
         if (pictureModel.isSelected) {
             if ([typeModel.typeName isEqualToString:@"左眼"]) {
                 if (_leftSelectedPictureModelArr.count<2) {
-                    cell.selectedView.hidden = NO;
+                    cell.selectedImgView.hidden = NO;
                     [_selectedModelsArr addObject:pictureModel];
                     [_leftSelectedPictureModelArr addObject:imgPath];
                 }else{
@@ -244,7 +244,7 @@
                 }
             }else{
                 if (_rightSelectedPictureModelArr.count<2) {
-                    cell.selectedView.hidden = NO;
+                    cell.selectedImgView.hidden = NO;
                     [_selectedModelsArr addObject:pictureModel];
                     [_rightSelectedPictureModelArr addObject:imgPath];
                 }else{
@@ -253,7 +253,7 @@
                 }
             }
         }else{
-            cell.selectedView.hidden = YES;
+            cell.selectedImgView.hidden = YES;
             [_selectedModelsArr removeObject:pictureModel];
             if ([typeModel.typeName isEqualToString:@"左眼"]) {
                 [_leftSelectedPictureModelArr removeObject:imgPath];

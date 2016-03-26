@@ -11,6 +11,6 @@
 @interface ShootCollectionViewCell : UICollectionViewCell
 
 @property(nonatomic ,strong) UIImageView *imgView;
-@property(nonatomic ,strong) UIView *selectedView;
+@property(nonatomic ,strong) UIImageView *selectedImgView;
 
 @end
