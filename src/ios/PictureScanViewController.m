@@ -60,8 +60,12 @@
 #pragma mark ----commitBtn-----
 - (UIButton *)commitBtn{
     if (!_commitBtn) {
-        _commitBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        _commitBtn.frame = CGRectMake(0, CGRectGetHeight(self.view.bounds)-40-30, CGRectGetWidth(self.view.bounds), 30);
+        CGFloat commitWidth = 688.0f/2.0f;
+        CGFloat commitHeight = 98.0f/2.0f;
+        CGFloat commitOriginX = (CGRectGetWidth(self.view.bounds)-commitWidth)/2.0f;
+        CGFloat commitOriginY = CGRectGetHeight(self.view.bounds)-commitHeight-40;
+        _commitBtn = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        _commitBtn.frame = CGRectMake(commitOriginX, commitOriginY, commitWidth, commitHeight);
         [_commitBtn setTitle:@"提交" forState:UIControlStateNormal];
         [_commitBtn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
         [_commitBtn addTarget:self action:@selector(commitBtnClick:) forControlEvents:UIControlEventTouchUpInside];
