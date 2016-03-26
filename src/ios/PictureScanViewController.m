@@ -86,7 +86,6 @@
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame)) collectionViewLayout:flowLayout];
         [_collectionView registerClass:[ShootCollectionViewCell class] forCellWithReuseIdentifier:@"cellID"];
         [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"ReusableView"];
-        [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:@"ReusableView"];
         _collectionView.backgroundColor = RGB(0xf7f7f7);
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
@@ -188,13 +187,6 @@
             [view removeFromSuperview];
         }
         [reuseableView addSubview:collectionHeaderView];//头部广告栏
-    }else if (kind == UICollectionElementKindSectionFooter){
-        UIView *collectionFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), 22.0f/2.0f)];
-        collectionFooterView.backgroundColor = RGB(0xf7f7f7);
-        for (id view in reuseableView.subviews) {
-            [view removeFromSuperview];
-        }
-        [reuseableView addSubview:collectionFooterView];//尾部广告栏
     }
     return reuseableView;
 }
