@@ -14,6 +14,7 @@
 
 @property (nonatomic, strong) UIImageView *iconImgView;
 @property (nonatomic, strong) UILabel *typeNameLabel;
+@property (nonatomic, strong) UIView *headerLineView;
 @property (nonatomic, strong) ShootCollectionButton *chooseBtn;
 
 @end

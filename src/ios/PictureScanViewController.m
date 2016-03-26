@@ -180,6 +180,11 @@
         }else{
             collectionHeaderView.iconImgView.image = [UIImage imageNamed:@"rightEyeicon"];
         }
+        if (indexPath.section==0) {
+            collectionHeaderView.headerLineView.hidden = YES;
+        }else{
+            collectionHeaderView.headerLineView.hidden = NO;
+        }
         for (id view in reuseableView.subviews) {
             [view removeFromSuperview];
         }

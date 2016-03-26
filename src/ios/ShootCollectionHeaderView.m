@@ -46,6 +46,14 @@
     self.typeNameLabel.font = [UIFont systemFontOfSize:16.0f];
     [self addSubview:_typeNameLabel];
     
+    CGFloat headerLineWidth = CGRectGetWidth(self.bounds);
+    CGFloat headerLineHeight = 1.0f;
+    CGFloat headerLineOriginX = 0.0f;
+    CGFloat headerLineOriginY = 0.0f;
+    self.headerLineView = [[UIView alloc] initWithFrame:CGRectMake(headerLineOriginX, headerLineOriginY, headerLineWidth, headerLineHeight)];
+    self.headerLineView.backgroundColor = RGB(0xdddddd);
+    [self addSubview:_headerLineView];
+    
     CGFloat bottomLineWidth = CGRectGetWidth(self.bounds);
     CGFloat bottomLineHeight = 1.0f;
     CGFloat bottomLineOriginX = 0.0f;
