@@ -9,6 +9,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TDHeader.h"
 typedef void(^deleteCallBackBlock)();
 
 @interface MLSelectPhotoBrowserViewController : UIViewController

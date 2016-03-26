@@ -35,6 +35,8 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 @property (weak,nonatomic)      UILabel *makeView;
 @property (strong,nonatomic)    UIButton *doneBtn;
 
+@property (strong,nonatomic)    UIView *infoView;
+
 @property (strong,nonatomic)    NSMutableDictionary *deleteAssets;
 @property (strong,nonatomic)    NSMutableArray *doneAssets;
 
@@ -82,6 +84,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:_cellIdentifier];
         
         [self.view addSubview:collectionView];
+        [self.view addSubview:self.infoView];
         self.collectionView = collectionView;
         
         _collectionView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -95,6 +98,40 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         }
     }
     return _collectionView;
+}
+
+- (UIView *)infoView{
+    if (!_infoView) {
+        CGFloat infoWidth = CGRectGetWidth(self.view.bounds);
+        CGFloat infoHeight = 98.0f/2.0f;
+        CGFloat infoOriginX = 0.0f;
+        CGFloat infoOriginY = CGRectGetHeight(self.view.bounds)-infoHeight;
+        _infoView = [[UIView alloc] initWithFrame:CGRectMake(infoOriginX, infoOriginY, infoWidth, infoHeight)];
+        _infoView.backgroundColor = RGB(0xf6f6f6);
+        
+        CGFloat typeOriginX = 32.0f/2.0f;
+        CGFloat typeOriginY = 0.0f;
+        CGFloat typeWidth = 60.0f;
+        CGFloat typeHeight = infoHeight;
+        UILabel *eyeTypeLab = [[UILabel alloc] initWithFrame:CGRectMake(typeOriginX, typeOriginY, typeWidth, typeHeight)];
+        eyeTypeLab.text = @"左眼";
+        eyeTypeLab.textAlignment = NSTextAlignmentLeft;
+        [_infoView addSubview:eyeTypeLab];
+        
+        CGFloat selectedWidth = 158.0f/2.0f;
+        CGFloat selectedHeight = 52.0f/2.0f;
+        CGFloat selectedOriginX = infoWidth - selectedWidth - 32.0f/2.0f;
+        CGFloat selectedOriginY = (infoHeight - selectedHeight)/2.0f;
+        UILabel *selectedLabel = [[UILabel alloc] initWithFrame:CGRectMake(selectedOriginX, selectedOriginY, selectedWidth, selectedHeight)];
+        selectedLabel.backgroundColor = [UIColor greenColor];
+        selectedLabel.layer.cornerRadius = 5.0f;
+        selectedLabel.layer.masksToBounds = YES;
+        selectedLabel.text = @"已选择 2 张";
+        selectedLabel.textColor = [UIColor whiteColor];
+        selectedLabel.textAlignment = NSTextAlignmentCenter;
+        [_infoView addSubview:selectedLabel];
+    }
+    return _infoView;
 }
 
 #pragma mark Get View
@@ -368,6 +405,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 // 单击调用
 - (void) pickerPhotoScrollViewDidSingleClick:(MLSelectPhotoPickerBrowserPhotoScrollView *)photoScrollView{
     self.navigationController.navigationBar.hidden = !self.navigationController.navigationBar.isHidden;
+    self.infoView.hidden = !self.infoView.hidden;
     if (self.isEditing) {
         self.toolBar.hidden = !self.toolBar.isHidden;
     }
