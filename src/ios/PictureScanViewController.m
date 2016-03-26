@@ -111,6 +111,7 @@
             if ([_rightSelectedPictureModelArr isValid]) {
                 [_rightSelectedPictureModelArr removeAllObjects];
             }
+            [self.commitBtn removeFromSuperview];
             [_collectionView reloadData];
         }
     }
