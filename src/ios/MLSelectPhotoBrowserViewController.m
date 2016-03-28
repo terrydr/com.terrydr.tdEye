@@ -126,7 +126,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         selectedLabel.backgroundColor = [UIColor greenColor];
         selectedLabel.layer.cornerRadius = 5.0f;
         selectedLabel.layer.masksToBounds = YES;
-        selectedLabel.text = @"已选择 2 张";
+        selectedLabel.text = @"已选 2 张";
         selectedLabel.textColor = [UIColor whiteColor];
         selectedLabel.textAlignment = NSTextAlignmentCenter;
         [_infoView addSubview:selectedLabel];
