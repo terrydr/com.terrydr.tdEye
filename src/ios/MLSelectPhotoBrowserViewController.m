@@ -28,6 +28,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 @property (strong,nonatomic)    UIButton          *deleleBtn;
 @property (strong,nonatomic)    UIButton          *trashBtn;
 @property (weak,nonatomic)      UIButton          *backBtn;
+@property (strong,nonatomic)    UIButton          *selectedBtn;
 @property (weak,nonatomic)      UICollectionView  *collectionView;
 
 // 标记View
@@ -85,6 +86,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         
         [self.view addSubview:collectionView];
         [self.view addSubview:self.infoView];
+        [self.view addSubview:self.selectedBtn];
         self.collectionView = collectionView;
         
         _collectionView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -152,6 +154,33 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         
     }
     return _makeView;
+}
+
+- (UIButton *)selectedBtn{
+    if (!_selectedBtn) {
+        UIImage *selectedImg = [UIImage imageNamed:@"unselectedicon"];
+        CGFloat selectedWidth = selectedImg.size.width;
+        CGFloat selectedHeight = selectedImg.size.height;
+        CGFloat selectedOriginX = CGRectGetWidth(self.view.bounds)-selectedWidth-22.0f/2.0f;
+        CGFloat selectedOriginY = 64 +22.0f/2.0f;
+        _selectedBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _selectedBtn.frame = CGRectMake(selectedOriginX, selectedOriginY, selectedWidth, selectedHeight);
+        [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
+        [_selectedBtn addTarget:self action:@selector(seclectedBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _selectedBtn;
+}
+
+- (void)seclectedBtnClick:(id)sender{
+    UIButton *btn = (UIButton *)sender;
+    btn.selected = !btn.isSelected;
+    UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
+    UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
+    if (btn.selected) {
+        [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
+    }else{
+        [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
+    }
 }
 
 - (UIButton *)doneBtn{
