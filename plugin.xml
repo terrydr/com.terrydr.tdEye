@@ -97,6 +97,14 @@
         <resource-file src="src/ios/leftEyeicon@3x.png" />
         <resource-file src="src/ios/rightEyeicon@2x.png" />
         <resource-file src="src/ios/rightEyeicon@3x.png" />
+        <resource-file src="src/ios/unselectedicon@2x.png" />
+        <resource-file src="src/ios/unselectedicon@3x.png" />
+        <resource-file src="src/ios/selectedicon@2x.png" />
+        <resource-file src="src/ios/selectedicon@3x.png" />
+        <resource-file src="src/ios/selectedicon@2x.png" />
+        <resource-file src="src/ios/selectedicon@3x.png" />
+        <resource-file src="src/ios/Submit-icon@2x.png" />
+        <resource-file src="src/ios/Submit-icon@3x.png" />
     </platform>
     
 </plugin>
