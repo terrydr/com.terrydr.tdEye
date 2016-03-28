@@ -292,7 +292,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 #pragma mark - View
 - (UIButton *)ISOBtn{
     if (!_ISOBtn) {
-        UIImage *ISOImg = [UIImage imageNamed:@"iso-icon"];
+        UIImage *ISOImg = [UIImage imageNamed:@"ISOicon"];
         CGFloat ISOWidth = ISOImg.size.width;
         CGFloat ISOHeight = ISOImg.size.height;
         CGFloat ISOOriginX = APP_WIDTH-(30.0f/2.0f)-ISOWidth;
@@ -397,10 +397,15 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     UIButton *btn = (UIButton *)sender;
     btn.selected = !btn.selected;
     
+    UIImage *ISOImg = [UIImage imageNamed:@"ISOicon"];
+    UIImage *ISOClickImg = [UIImage imageNamed:@"ISOclickicon"];
+    
     [_captureDevice lockForConfiguration:nil];
     if (btn.isSelected) {
+        [_ISOBtn setBackgroundImage:ISOClickImg forState:UIControlStateNormal];
         [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:40.0 completionHandler:nil];
     }else{
+        [_ISOBtn setBackgroundImage:ISOImg forState:UIControlStateNormal];
         [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:80.0 completionHandler:nil];
     }
     [_captureDevice unlockForConfiguration];
