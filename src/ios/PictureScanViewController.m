@@ -230,7 +230,8 @@
     
     JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:indexPath.section];
     JRPictureModel *pictureModel = [typeModel.pictureArr objectAtIndex:indexPath.row];
-    cell.imgView.image = [self getImageWithTypeModel:typeModel pictureModel:pictureModel];
+    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:typeModel.isLeftEye];
+    cell.imgView.image = [UIImage imageWithContentsOfFile:imgPath];
     if (pictureModel.isSelected) {
         cell.selectedImgView.hidden = NO;
     }else{
@@ -243,7 +244,7 @@
     ShootCollectionViewCell *cell = (ShootCollectionViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
     JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:indexPath.section];
     JRPictureModel *pictureModel = [typeModel.pictureArr objectAtIndex:indexPath.row];
-    NSString *imgPath = [self getImagePathWithTypeModel:typeModel pictureModel:pictureModel];
+    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:typeModel.isLeftEye];
     if (_isCollectionSelected) {
         pictureModel.isSelected = !pictureModel.isSelected;
         if (pictureModel.isSelected) {
@@ -277,13 +278,16 @@
         }
         [self calculateSelectedPictureCount];
     }else{
-        NSArray *imageArr = [self getImagesArrayWithTypeModel:typeModel pictureModelArray:typeModel.pictureArr];
         MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
+        if ([typeModel.typeName isEqualToString:@"左眼"]) {
+            browserVc.isLeftEye = YES;
+        }else{
+            browserVc.isLeftEye = NO;
+        }
         [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
         browserVc.isModelData = YES;
         browserVc.currentPage = indexPath.row;
-        browserVc.eyeType = typeModel.typeName;
-        browserVc.photos = imageArr;
+        browserVc.photos = typeModel.pictureArr;
         browserVc.deleteCallBack = ^(NSArray *assets){
         };
         [self.navigationController pushViewController:browserVc animated:YES];
@@ -308,32 +312,33 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (NSArray *)getImagesArrayWithTypeModel:(JREyeTypeModel *)typeModel pictureModelArray:(NSArray *)pictureModelArr{
-    NSMutableArray *tempArr = [[NSMutableArray alloc] initWithCapacity:0];
-    for (JRPictureModel *pictureModel in pictureModelArr) {
-        UIImage *image = [self getImageWithTypeModel:typeModel pictureModel:pictureModel];
-        [tempArr addObject:image];
-    }
-    NSArray *imageArr = [NSArray arrayWithArray:tempArr];
-    return imageArr;
-}
+//- (NSArray *)getImagesArrayWithTypeModel:(JREyeTypeModel *)typeModel pictureModelArray:(NSArray *)pictureModelArr{
+//    NSMutableArray *tempArr = [[NSMutableArray alloc] initWithCapacity:0];
+//    for (JRPictureModel *pictureModel in pictureModelArr) {
+//        NSString *imagePath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:typeModel.isLeftEye];
+//        UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
+//        [tempArr addObject:image];
+//    }
+//    NSArray *imageArr = [NSArray arrayWithArray:tempArr];
+//    return imageArr;
+//}
 
-- (UIImage *)getImageWithTypeModel:(JREyeTypeModel *)typeModel pictureModel:(JRPictureModel *)pictureModel{
-    NSString *filePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:typeModel.isLeftEye];
-    
-    NSString *pictureName = pictureModel.pictureName;
-    NSString *picturePath = [NSString stringWithFormat:@"%@/%@",filePath,pictureName];
-    UIImage *picture = [UIImage imageWithContentsOfFile:picturePath];
-    return picture;
-}
+//- (UIImage *)getImageWithTypeModel:(JREyeTypeModel *)typeModel pictureModel:(JRPictureModel *)pictureModel{
+//    NSString *filePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:typeModel.isLeftEye];
+//    
+//    NSString *pictureName = pictureModel.pictureName;
+//    NSString *picturePath = [NSString stringWithFormat:@"%@/%@",filePath,pictureName];
+//    UIImage *picture = [UIImage imageWithContentsOfFile:picturePath];
+//    return picture;
+//}
 
-- (NSString *)getImagePathWithTypeModel:(JREyeTypeModel *)typeModel pictureModel:(JRPictureModel *)pictureModel{
-    NSString *filePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:typeModel.isLeftEye];
-    
-    NSString *pictureName = pictureModel.pictureName;
-    NSString *picturePath = [NSString stringWithFormat:@"%@/%@",filePath,pictureName];
-    return picturePath;
-}
+//- (NSString *)getImagePathWithTypeModel:(JREyeTypeModel *)typeModel pictureModel:(JRPictureModel *)pictureModel{
+//    NSString *filePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:typeModel.isLeftEye];
+//    
+//    NSString *pictureName = pictureModel.pictureName;
+//    NSString *picturePath = [NSString stringWithFormat:@"%@/%@",filePath,pictureName];
+//    return picturePath;
+//}
 
 - (void)commitBtnClick:(id)sender{
     NSMutableDictionary *temDic = [[NSMutableDictionary alloc] initWithCapacity:0];

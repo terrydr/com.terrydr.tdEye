@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "JREyeTypeModel.h"
+#import "JRPictureModel.h"
 
 @interface JRMediaFileManage : NSObject
 
@@ -19,5 +21,7 @@
 - (BOOL)deleteFileWithEyeType:(BOOL)isLeftEye;
 //删除所有文件
 - (BOOL)deleteAllFiles;
+//获取图片路径
+- (NSString *)getImagePathWithPictureName:(NSString *)pictureName isLeftEye:(BOOL)eyeType;
 
 @end

@@ -83,4 +83,10 @@
     return result;
 }
 
+- (NSString *)getImagePathWithPictureName:(NSString *)pictureName isLeftEye:(BOOL)eyeType{
+    NSString *filePath = [self getJRMediaPathWithType:eyeType];
+    NSString *picturePath = [NSString stringWithFormat:@"%@/%@",filePath,pictureName];
+    return picturePath;
+}
+
 @end
