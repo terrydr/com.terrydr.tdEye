@@ -34,7 +34,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    [self configureNavgationBar];
     [self addNotifications];
     [self initSubview];
     [self initShootCollectionDataArray];
@@ -42,11 +41,15 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    self.navigationController.navigationBarHidden = NO;
+    [self configureNavgationBar];
 }
 
 - (void)configureNavgationBar{
     self.title = @"图片浏览";
+    self.navigationController.navigationBar.translucent = NO;
+    self.navigationController.navigationBar.barTintColor = RGB(0x3691e6);
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+    [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, [UIFont boldSystemFontOfSize:18.f], NSFontAttributeName, nil]];
     _rightItem = [[UIBarButtonItem alloc] initWithTitle:@"选择"
                                                   style:UIBarButtonItemStylePlain
                                                  target:self

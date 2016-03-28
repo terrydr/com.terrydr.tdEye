@@ -32,7 +32,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     BOOL _isLeftEye;
     int _takenPictureCount;
 }
-@property (nonatomic, strong) UIButton *closeBtn;
 @property (nonatomic, strong) UISlider *wbSlider;
 @property (nonatomic, strong) UIView *viewContainer;
 @property (nonatomic, strong) ProgressView *progressView;
@@ -65,7 +64,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self configureNavgationBar];
     [self setupUI];
     [self ChangeToLeft:YES];
     [self setupCaptureView];
@@ -81,6 +79,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    [self configureNavgationBar];
     [self initTakenParameters];
 }
 
@@ -98,6 +97,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)configureNavgationBar{
+    self.navigationController.navigationBar.translucent = YES;
+    self.navigationController.navigationBar.barTintColor = RGB(0x000000);
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+    [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, [UIFont boldSystemFontOfSize:18.f], NSFontAttributeName, nil]];
+    
+    self.title = @"拍照";
     _leftItem = [[UIBarButtonItem alloc] initWithTitle:@"取消"
                                                  style:UIBarButtonItemStylePlain
                                                 target:self
@@ -202,7 +207,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)setupUI {
     [self prepareUI];
     
-    [self.view addSubview:_closeBtn];
     [self.view addSubview:_viewContainer];
     //[self.view addSubview:_progressView];
     [self.view addSubview:self.whiteBalanceView];
@@ -219,7 +223,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:_rightBtn];
     [self.view addSubview:_cameraBtn];
     
-    _closeBtn.frame = CGRectMake(0, 10, 60, 30);
     _viewContainer.frame = CGRectMake(0, 64, APP_WIDTH, APP_HEIGHT-64);
     _progressView.frame = CGRectMake(0, CGRectGetMaxY(_viewContainer.frame), APP_WIDTH, 5);
     _dotLabel.frame = CGRectMake((APP_WIDTH - 5) * 0.5,APP_HEIGHT - ((324.0f-30.0f)/2.0f) , 5, 5);
@@ -237,12 +240,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _imageViewBtn.frame = _imageView.frame;
 }
 - (void)prepareUI {
-    self.title = @"拍照";
-    
-    _closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_closeBtn setImage:[UIImage imageNamed:@"button_camera_close"] forState:UIControlStateNormal];
-    [_closeBtn addTarget:self action:@selector(closeBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    
     _viewContainer = [[UIView alloc] init];
     //添加滑动手势
     UISwipeGestureRecognizer *leftSwipGestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipes:)];
@@ -382,14 +379,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     PictureScanViewController *scanVc = [[PictureScanViewController alloc] init];
     [self.navigationController pushViewController:scanVc animated:animated];
 }
-- (void)closeBtnClick {
-    NSDictionary *pathDic = [NSDictionary dictionary];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"TakePhotosFinishedNotification"
-                                                        object:nil
-                                                      userInfo:pathDic];
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
-
 - (void)wbSliderMethod:(id)sender{
     UISlider *slider = (UISlider *)sender;
     AVCaptureWhiteBalanceTemperatureAndTintValues temperatureAndTint = {
