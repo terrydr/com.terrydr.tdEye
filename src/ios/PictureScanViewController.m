@@ -67,7 +67,9 @@
         _commitBtn = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         _commitBtn.frame = CGRectMake(commitOriginX, commitOriginY, commitWidth, commitHeight);
         [_commitBtn setTitle:@"提交" forState:UIControlStateNormal];
-        [_commitBtn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
+        [_commitBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_commitBtn setBackgroundImage:[UIImage imageNamed:@"Submit-icon"]
+                              forState:UIControlStateNormal];
         [_commitBtn addTarget:self action:@selector(commitBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _commitBtn;
