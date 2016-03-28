@@ -114,7 +114,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         CGFloat typeWidth = 60.0f;
         CGFloat typeHeight = infoHeight;
         UILabel *eyeTypeLab = [[UILabel alloc] initWithFrame:CGRectMake(typeOriginX, typeOriginY, typeWidth, typeHeight)];
-        eyeTypeLab.text = @"左眼";
+        eyeTypeLab.text = _eyeType;
         eyeTypeLab.textAlignment = NSTextAlignmentLeft;
         [_infoView addSubview:eyeTypeLab];
         

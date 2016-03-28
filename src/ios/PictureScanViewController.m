@@ -280,6 +280,7 @@
         [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
         browserVc.isModelData = YES;
         browserVc.currentPage = indexPath.row;
+        browserVc.eyeType = typeModel.typeName;
         browserVc.photos = imageArr;
         browserVc.deleteCallBack = ^(NSArray *assets){
         };
