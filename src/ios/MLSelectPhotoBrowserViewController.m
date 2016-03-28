@@ -472,7 +472,9 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 // 单击调用
 - (void) pickerPhotoScrollViewDidSingleClick:(MLSelectPhotoPickerBrowserPhotoScrollView *)photoScrollView{
     self.navigationController.navigationBar.hidden = !self.navigationController.navigationBar.isHidden;
-    self.infoView.hidden = !self.infoView.hidden;
+    if (_isModelData) {
+        self.infoView.hidden = !self.infoView.hidden;
+    }
     if (self.isEditing) {
         self.toolBar.hidden = !self.toolBar.isHidden;
     }
