@@ -17,6 +17,7 @@ typedef void(^deleteCallBackBlock)();
 @property (strong,nonatomic) NSArray *photos;
 // 左眼/右眼
 @property (nonatomic , assign) BOOL isLeftEye;
+@property (strong,nonatomic) NSMutableArray *selectedArr;
 // 当前提供的分页数
 @property (nonatomic , assign) NSInteger currentPage;
 // 当前提供的分页数

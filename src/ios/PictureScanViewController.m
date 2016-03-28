@@ -35,6 +35,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     [self configureNavgationBar];
+    [self addNotifications];
     [self initSubview];
     [self initShootCollectionDataArray];
 }
@@ -53,8 +54,20 @@
     self.navigationItem.rightBarButtonItem = _rightItem;
 }
 
+- (void)addNotifications{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(changeSelectedStatus)
+                                                 name:@"DidSelectedPictures"
+                                               object:nil];
+}
+
 - (void)initSubview{
     [self.view addSubview:self.collectionView];
+}
+
+- (void)changeSelectedStatus{
+    [self rightBarButtonItemAction];
+    [self calculateSelectedPictureCount];
 }
 
 #pragma mark ----commitBtn-----
@@ -281,8 +294,10 @@
         MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
         if ([typeModel.typeName isEqualToString:@"左眼"]) {
             browserVc.isLeftEye = YES;
+            browserVc.selectedArr = _leftSelectedPictureModelArr;
         }else{
             browserVc.isLeftEye = NO;
+            browserVc.selectedArr = _rightSelectedPictureModelArr;
         }
         [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
         browserVc.isModelData = YES;
@@ -311,34 +326,6 @@
     [alertController addAction:sureAction];
     [self presentViewController:alertController animated:YES completion:nil];
 }
-
-//- (NSArray *)getImagesArrayWithTypeModel:(JREyeTypeModel *)typeModel pictureModelArray:(NSArray *)pictureModelArr{
-//    NSMutableArray *tempArr = [[NSMutableArray alloc] initWithCapacity:0];
-//    for (JRPictureModel *pictureModel in pictureModelArr) {
-//        NSString *imagePath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:typeModel.isLeftEye];
-//        UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
-//        [tempArr addObject:image];
-//    }
-//    NSArray *imageArr = [NSArray arrayWithArray:tempArr];
-//    return imageArr;
-//}
-
-//- (UIImage *)getImageWithTypeModel:(JREyeTypeModel *)typeModel pictureModel:(JRPictureModel *)pictureModel{
-//    NSString *filePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:typeModel.isLeftEye];
-//    
-//    NSString *pictureName = pictureModel.pictureName;
-//    NSString *picturePath = [NSString stringWithFormat:@"%@/%@",filePath,pictureName];
-//    UIImage *picture = [UIImage imageWithContentsOfFile:picturePath];
-//    return picture;
-//}
-
-//- (NSString *)getImagePathWithTypeModel:(JREyeTypeModel *)typeModel pictureModel:(JRPictureModel *)pictureModel{
-//    NSString *filePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:typeModel.isLeftEye];
-//    
-//    NSString *pictureName = pictureModel.pictureName;
-//    NSString *picturePath = [NSString stringWithFormat:@"%@/%@",filePath,pictureName];
-//    return picturePath;
-//}
 
 - (void)commitBtnClick:(id)sender{
     NSMutableDictionary *temDic = [[NSMutableDictionary alloc] initWithCapacity:0];

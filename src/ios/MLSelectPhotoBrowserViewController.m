@@ -182,6 +182,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     UIButton *btn = (UIButton *)sender;
     btn.selected = !btn.isSelected;
     JRPictureModel *pictureModel = self.photos[_currentPage];
+    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:_isLeftEye];
     UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
     UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
     if (btn.selected) {
@@ -189,12 +190,14 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             [self mlShowBeyondLimitSelectedCount];
         }else{
             _selectedCount++;
+            [_selectedArr addObject:imgPath];
             pictureModel.isSelected = YES;
             _selectedLabel.text = [NSString stringWithFormat:@"已选 %d 张",_selectedCount];
             [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
         }
     }else{
         _selectedCount--;
+        [_selectedArr removeObject:imgPath];
         pictureModel.isSelected = NO;
         _selectedLabel.text = [NSString stringWithFormat:@"已选 %d 张",_selectedCount];
         [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
@@ -506,6 +509,10 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     
     self.navigationController.navigationBar.hidden = NO;
     self.toolBar.hidden = NO;
+    if (_selectedArr && _selectedArr.count>0) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"DidSelectedPictures"
+                                                            object:nil];
+    }
 }
 
 #pragma mark - <UIScrollViewDelegate>
