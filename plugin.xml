@@ -81,8 +81,6 @@
         <header-file src="src/ios/WYTopImgBtn.h" />
         <source-file src="src/ios/WYVideoTimeView.m" />
         <header-file src="src/ios/WYVideoTimeView.h" />
-        <resource-file src="src/ios/Select_list_btn_solid@2x.png" />
-        <resource-file src="src/ios/Select_list_btn_solid@3x.png" />
         <resource-file src="src/ios/takePhoto@2x.png" />
         <resource-file src="src/ios/takePhoto@3x.png" />
         <resource-file src="src/ios/iso-icon@2x.png" />
