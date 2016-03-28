@@ -88,8 +88,10 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:_cellIdentifier];
         
         [self.view addSubview:collectionView];
-        [self.view addSubview:self.infoView];
-        [self.view addSubview:self.selectedBtn];
+        if (_isModelData) {
+            [self.view addSubview:self.infoView];
+            [self.view addSubview:self.selectedBtn];
+        }
         self.collectionView = collectionView;
         
         _collectionView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -548,22 +550,26 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 - (void)setPageLabelPage:(NSInteger)page{
-    _selectedBtn.hidden = NO;
     self.title = [NSString stringWithFormat:@"%ld / %ld",page + 1, self.photos.count];
-    JRPictureModel *pictureModel = self.photos[page];
-    UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
-    UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
-    if (pictureModel.isSelected) {
-        _selectedBtn.selected = YES;
-        [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
-    }else{
-        _selectedBtn.selected = NO;
-        [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
+    if (_isModelData) {
+        _selectedBtn.hidden = NO;
+        JRPictureModel *pictureModel = self.photos[page];
+        UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
+        UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
+        if (pictureModel.isSelected) {
+            _selectedBtn.selected = YES;
+            [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
+        }else{
+            _selectedBtn.selected = NO;
+            [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
+        }
     }
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
-    _selectedBtn.hidden = YES;
+    if (_isModelData) {
+        _selectedBtn.hidden = YES;
+    }
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
