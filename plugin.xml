@@ -83,6 +83,8 @@
         <header-file src="src/ios/WYVideoTimeView.h" />
         <resource-file src="src/ios/takePhoto@2x.png" />
         <resource-file src="src/ios/takePhoto@3x.png" />
+        <resource-file src="src/ios/albumSelectedicon@2x.png" />
+        <resource-file src="src/ios/albumSelectedicon@3x.png" />
         <resource-file src="src/ios/iso-icon@2x.png" />
         <resource-file src="src/ios/iso-icon@3x.png" />
         <resource-file src="src/ios/whiteBalance@2x.png" />
