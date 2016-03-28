@@ -44,8 +44,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UIImageView *imageView;
 @property (nonatomic, strong) UIButton *imageViewBtn;
 @property (nonatomic, strong) UIView *toolView;
-@property (nonatomic, strong) UIImageView *ISOImgView;
 @property (nonatomic, strong) UIButton *ISOBtn;
+@property (nonatomic, strong) UIButton *whiteBalanceBtn;
 @property (nonatomic, strong) UIView *whiteBalanceView;
 
 /// 负责输入和输出设备之间数据传递
@@ -208,8 +208,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:self.whiteBalanceView];
     [self.view addSubview:self.wbSlider];
     [self.view addSubview:self.toolView];
-    [self.view addSubview:self.ISOImgView];
     [self.view addSubview:self.ISOBtn];
+    [self.view addSubview:self.whiteBalanceBtn];
     [self.view addSubview:_imageView];
     [self.view addSubview:_imageViewBtn];
     
@@ -291,32 +291,34 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 #pragma mark - View
-- (UIImageView *)ISOImgView{
-    if (!_ISOImgView) {
+- (UIButton *)ISOBtn{
+    if (!_ISOBtn) {
         UIImage *ISOImg = [UIImage imageNamed:@"iso-icon"];
         CGFloat ISOWidth = ISOImg.size.width;
         CGFloat ISOHeight = ISOImg.size.height;
         CGFloat ISOOriginX = APP_WIDTH-(30.0f/2.0f)-ISOWidth;
         CGFloat ISOOriginY = 64.0f + (45.0f/2.0f);
-        _ISOImgView = [[UIImageView alloc] initWithFrame:CGRectMake(ISOOriginX, ISOOriginY, ISOWidth, ISOHeight)];
-        _ISOImgView.image = ISOImg;
-    }
-    return _ISOImgView;
-}
-
-- (UIButton *)ISOBtn{
-    if (!_ISOBtn) {
-        UIImage *ISOImg = [UIImage imageNamed:@"whiteBalance"];
-        CGFloat ISOWidth = ISOImg.size.width;
-        CGFloat ISOHeight = ISOImg.size.height;
-        CGFloat ISOOriginX = APP_WIDTH-(30.0f/2.0f)-ISOWidth;
-        CGFloat ISOOriginY = CGRectGetMaxY(_ISOImgView.frame) + (10.0f/2.0f);
         _ISOBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _ISOBtn.frame = CGRectMake(ISOOriginX, ISOOriginY, ISOWidth, ISOHeight);
         [_ISOBtn setBackgroundImage:ISOImg forState:UIControlStateNormal];
-        [_ISOBtn addTarget:self action:@selector(flashBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+        [_ISOBtn addTarget:self action:@selector(ISOBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _ISOBtn;
+}
+
+- (UIButton *)whiteBalanceBtn{
+    if (!_whiteBalanceBtn) {
+        UIImage *whiteBalanceImg = [UIImage imageNamed:@"white-balance-icon"];
+        CGFloat whiteBalanceWidth = whiteBalanceImg.size.width;
+        CGFloat whiteBalanceHeight = whiteBalanceImg.size.height;
+        CGFloat whiteBalanceOriginX = APP_WIDTH-(30.0f/2.0f)-whiteBalanceWidth;
+        CGFloat whiteBalanceOriginY = CGRectGetMaxY(_ISOBtn.frame) + (10.0f/2.0f);
+        _whiteBalanceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _whiteBalanceBtn.frame = CGRectMake(whiteBalanceOriginX, whiteBalanceOriginY, whiteBalanceWidth, whiteBalanceHeight);
+        [_whiteBalanceBtn setBackgroundImage:whiteBalanceImg forState:UIControlStateNormal];
+        [_whiteBalanceBtn addTarget:self action:@selector(whiteBalanceBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _whiteBalanceBtn;
 }
 
 - (UIView *)toolView{
@@ -339,6 +341,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat originX = (APP_WIDTH-width)/2.0f;
         CGFloat originY = APP_HEIGHT - (324.0f+62.0f+44.0f)/2.0f;
         _whiteBalanceView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
+        _whiteBalanceView.hidden = YES;
         _whiteBalanceView.backgroundColor = RGB(0x000000);
         _whiteBalanceView.alpha = 0.8f;
         _whiteBalanceView.layer.cornerRadius = 5.0f;
@@ -357,6 +360,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat sliderOriginX = CGRectGetMinX(_whiteBalanceView.frame) + 22.0f/2.0f;
         CGFloat sliderOriginY = CGRectGetMinY(_whiteBalanceView.frame) +((CGRectGetHeight(_whiteBalanceView.bounds)-sliderHeight)/2.0f);
         _wbSlider = [[UISlider alloc] initWithFrame:CGRectMake(sliderOriginX, sliderOriginY, sliderWidth, sliderHeight)];
+        _wbSlider.hidden = YES;
         _wbSlider.minimumValue = 3000.0f;
         _wbSlider.maximumValue = 12000.0f;
         _wbSlider.value = 6000.0f;
@@ -398,7 +402,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [_captureDevice unlockForConfiguration];
 }
 
-- (void)flashBtnClick:(id)sender{
+- (void)ISOBtnClick:(id)sender{
     UIButton *btn = (UIButton *)sender;
     btn.selected = !btn.selected;
     
@@ -409,6 +413,22 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:80.0 completionHandler:nil];
     }
     [_captureDevice unlockForConfiguration];
+}
+
+- (void)whiteBalanceBtnClick:(id)sender{
+    UIButton *btn = (UIButton *)sender;
+    btn.selected = !btn.isSelected;
+    _whiteBalanceView.hidden = !_whiteBalanceView.hidden;
+    _wbSlider.hidden = !_wbSlider.hidden;
+    UIImage *whiteBalanceImg = [UIImage imageNamed:@"white-balance-icon"];
+    UIImage *whiteBalanceSelectedImg = [UIImage imageNamed:@"white-balance-click-icon"];
+    if (btn.isSelected) {
+        [_whiteBalanceBtn setBackgroundImage:whiteBalanceSelectedImg
+                                    forState:UIControlStateNormal];
+    }else{
+        [_whiteBalanceBtn setBackgroundImage:whiteBalanceImg
+                                    forState:UIControlStateNormal];
+    }
 }
 
 - (void)handleSwipes:(UISwipeGestureRecognizer *)sender{
