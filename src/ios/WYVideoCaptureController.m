@@ -97,6 +97,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)configureNavgationBar{
+    //将status bar 文本颜色设置为白色
+    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
     self.navigationController.navigationBar.translucent = YES;
     self.navigationController.navigationBar.barTintColor = RGB(0x000000);
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
