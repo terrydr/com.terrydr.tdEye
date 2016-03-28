@@ -191,6 +191,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         }else{
             _selectedCount++;
             [_selectedArr addObject:imgPath];
+            [_selectedModelArr addObject:pictureModel];
             pictureModel.isSelected = YES;
             _selectedLabel.text = [NSString stringWithFormat:@"已选 %d 张",_selectedCount];
             [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
@@ -198,6 +199,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     }else{
         _selectedCount--;
         [_selectedArr removeObject:imgPath];
+        [_selectedModelArr addObject:pictureModel];
         pictureModel.isSelected = NO;
         _selectedLabel.text = [NSString stringWithFormat:@"已选 %d 张",_selectedCount];
         [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];

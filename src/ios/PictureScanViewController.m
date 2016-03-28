@@ -66,6 +66,7 @@
 }
 
 - (void)changeSelectedStatus{
+    [_collectionView reloadData];
     [self rightBarButtonItemAction];
     [self calculateSelectedPictureCount];
 }
@@ -299,6 +300,7 @@
             browserVc.isLeftEye = NO;
             browserVc.selectedArr = _rightSelectedPictureModelArr;
         }
+        browserVc.selectedModelArr = _selectedModelsArr;
         [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
         browserVc.isModelData = YES;
         browserVc.currentPage = indexPath.row;
