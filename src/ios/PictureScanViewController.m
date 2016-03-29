@@ -124,6 +124,7 @@
             for (JRPictureModel *model in _selectedModelsArr) {
                 model.isSelected = NO;
             }
+            [_selectedModelsArr removeAllObjects];
             if ([_leftSelectedPictureModelArr isValid]) {
                 [_leftSelectedPictureModelArr removeAllObjects];
             }
@@ -192,6 +193,10 @@
     
     UICollectionReusableView *reuseableView = [collectionView dequeueReusableSupplementaryViewOfKind:
                                             UICollectionElementKindSectionHeader withReuseIdentifier:@"ReusableView" forIndexPath:indexPath];
+    
+    for (id view in reuseableView.subviews) {
+        [view removeFromSuperview];
+    }
     if (kind == UICollectionElementKindSectionHeader) {
         ShootCollectionHeaderView *collectionHeaderView = [[ShootCollectionHeaderView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), (87.0f/2.0f))];
         JREyeTypeModel *model = [_sectionArr objectAtIndex:indexPath.section];
@@ -205,9 +210,6 @@
             collectionHeaderView.headerLineView.hidden = YES;
         }else{
             collectionHeaderView.headerLineView.hidden = NO;
-        }
-        for (id view in reuseableView.subviews) {
-            [view removeFromSuperview];
         }
         [reuseableView addSubview:collectionHeaderView];//头部广告栏
     }
