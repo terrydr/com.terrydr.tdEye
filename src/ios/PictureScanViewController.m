@@ -65,6 +65,7 @@
 }
 
 - (void)initSubview{
+    self.view.backgroundColor = RGB(0xf7f7f7);
     [self.view addSubview:self.collectionView];
 }
 
@@ -102,7 +103,7 @@
         [flowLayout setScrollDirection:UICollectionViewScrollDirectionVertical];
         flowLayout.headerReferenceSize = CGSizeMake(CGRectGetWidth(self.view.frame), AD_height+10);//头部
         flowLayout.footerReferenceSize = CGSizeMake(CGRectGetWidth(self.view.frame), footer_height);//尾部
-        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame)) collectionViewLayout:flowLayout];
+        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame)-64.0f) collectionViewLayout:flowLayout];
         [_collectionView registerClass:[ShootCollectionViewCell class] forCellWithReuseIdentifier:@"cellID"];
         [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"ReusableView"];
         _collectionView.backgroundColor = RGB(0xf7f7f7);
@@ -130,6 +131,9 @@
                 [_rightSelectedPictureModelArr removeAllObjects];
             }
             [self.commitBtn removeFromSuperview];
+            CGRect rect = _collectionView.frame;
+            rect.size.height = CGRectGetHeight(self.view.bounds);
+            _collectionView.frame = rect;
             [_collectionView reloadData];
         }
     }
@@ -317,8 +321,16 @@
 - (void)calculateSelectedPictureCount{
     if (_leftSelectedPictureModelArr.count>0 || _rightSelectedPictureModelArr.count>0) {
         [self.view addSubview:self.commitBtn];
+        
+        CGRect rect = _collectionView.frame;
+        rect.size.height = CGRectGetMinY(_commitBtn.frame)-20.0f;
+        _collectionView.frame = rect;
     }else{
         [self.commitBtn removeFromSuperview];
+        
+        CGRect rect = _collectionView.frame;
+        rect.size.height = CGRectGetHeight(self.view.bounds);
+        _collectionView.frame = rect;
     }
 }
 
