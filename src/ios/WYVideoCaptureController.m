@@ -436,6 +436,14 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }];
 }
 - (void)cameraBtnClick:(UIButton *)btn {
+    if (_leftTakenPictureCount==6 || _rightTakenPictureCount==6) {
+        [self showBeyondLimitTakenCount];
+    }else{
+        [self takePictureMethod];
+    }
+}
+
+- (void)takePictureMethod{
     if (_isLeftEye) {
         _leftTakenPictureCount++;
     }else{
@@ -450,6 +458,27 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
         [wself saveTakenPictureData:imageData];
     }];
+}
+
+- (void)showBeyondLimitTakenCount{
+    __weak WYVideoCaptureController *wself = self;
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"单侧眼睛最多拍摄六张图片,是否重拍?" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"重拍" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        if (_isLeftEye) {
+            _leftTakenPictureCount=0;
+        }else{
+            _rightTakenPictureCount=0;
+        }
+        [[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
+        [wself takePictureMethod];
+    }];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        
+    }];
+    // Add the actions.
+    [alertController addAction:cancelAction];
+    [alertController addAction:sureAction];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)saveTakenPictureData:(NSData *)imgData{
