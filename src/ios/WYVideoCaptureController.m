@@ -30,7 +30,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     AVPlayer *_player;
     AVPlayerLayer *_playerLayer;
     BOOL _isLeftEye;
-    int _takenPictureCount;
+    int _leftTakenPictureCount;
+    int _rightTakenPictureCount;
 }
 @property (nonatomic, strong) UISlider *wbSlider;
 @property (nonatomic, strong) UIView *viewContainer;
@@ -63,6 +64,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [super viewDidLoad];
     
     [self setupUI];
+    [self initTakenParameters];
     [self ChangeToLeft:YES];
     [self setupCaptureView];
     self.view.backgroundColor = RGB(0x16161b);
@@ -72,13 +74,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }else{
         [self cleanOlderData];
     }
-    
 }
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     [self configureNavgationBar];
-    [self initTakenParameters];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -436,9 +436,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }];
 }
 - (void)cameraBtnClick:(UIButton *)btn {
-    _takenPictureCount++;
-    if (_takenPictureCount==1) {
-        [[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
+    if (_isLeftEye) {
+        _leftTakenPictureCount++;
+    }else{
+        _rightTakenPictureCount++;
     }
     
     __weak WYVideoCaptureController *wself = self;
@@ -458,7 +459,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
     NSString *filePath = [fileManage getJRMediaPathWithType:_isLeftEye];
-    NSString *imageName = [NSString stringWithFormat:@"%02d.png",_takenPictureCount];
+    NSString *imageName;
+    if (_isLeftEye) {
+        imageName = [NSString stringWithFormat:@"%02d.png",_leftTakenPictureCount];
+    }else{
+        imageName = [NSString stringWithFormat:@"%02d.png",_rightTakenPictureCount];
+    }
     NSString *imgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     BOOL result = [fileManager createFileAtPath:imgPath
@@ -478,14 +484,14 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)initTakenParameters{
-    _takenPictureCount = 0;
+    _leftTakenPictureCount = 0;
+    _rightTakenPictureCount = 0;
 }
 /// 切换拍照和视频录制
 ///
 /// @param isPhoto YES->拍照  NO->视频录制
 - (void)ChangeToLeft:(BOOL)isLeft{
     [self restoreBtn];
-    [self initTakenParameters];
     _isLeftEye = isLeft;
     NSString *centerTitle = isLeft ? @"左眼" : @"右眼";
     [_centerBtn setTitle:centerTitle forState:UIControlStateNormal];
