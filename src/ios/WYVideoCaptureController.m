@@ -40,8 +40,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UIButton *centerBtn;
 @property (nonatomic, strong) UIButton *rightBtn;
 @property (nonatomic, strong) UIButton *cameraBtn;
-@property (nonatomic, strong) UIImageView *imageView;
-@property (nonatomic, strong) UIButton *imageViewBtn;
 @property (nonatomic, strong) UIView *toolView;
 @property (nonatomic, strong) UIButton *ISOBtn;
 @property (nonatomic, strong) UIButton *whiteBalanceBtn;
@@ -216,8 +214,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:self.toolView];
     [self.view addSubview:self.ISOBtn];
     [self.view addSubview:self.whiteBalanceBtn];
-    [self.view addSubview:_imageView];
-    [self.view addSubview:_imageViewBtn];
     
     [self.view addSubview:_dotLabel];
     [self.view addSubview:_leftBtn];
@@ -237,9 +233,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _rightBtnFrame = CGRectOffset(_centerBtnFrame, 32 + btnW, 0);
     [self restoreBtn];
     _cameraBtn.frame = CGRectMake((APP_WIDTH - 67) * 0.5, APP_HEIGHT-62-26, 62, 62);
-    CGFloat imageViewOriginX = CGRectGetWidth(self.view.bounds)-60-20;
-    _imageView.frame = CGRectMake(imageViewOriginX, APP_HEIGHT-62-26, 60, 60);
-    _imageViewBtn.frame = _imageView.frame;
 }
 - (void)prepareUI {
     _viewContainer = [[UIView alloc] init];
@@ -251,15 +244,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     UISwipeGestureRecognizer *rightSwipGestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipes:)];
     rightSwipGestureRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
     [_viewContainer addGestureRecognizer:rightSwipGestureRecognizer];
-    
-    _imageView = [[UIImageView alloc] init];
-    _imageView.contentMode = UIViewContentModeScaleAspectFill;
-    _imageView.layer.masksToBounds = YES;
-    
-    _imageViewBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_imageViewBtn addTarget:self
-                      action:@selector(imageViewBtnClick:)
-            forControlEvents:UIControlEventTouchUpInside];
     
     _progressView = [[ProgressView alloc] initWithFrame:CGRectMake(0, APP_WIDTH + 44, APP_WIDTH, 5)];
     _progressView.totalTime = kVideoTotalTime;
@@ -371,12 +355,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 #pragma mark - ButtonClick
-- (void)scanBtnClick:(UIButton *)btn{
-    [self pushToPictureScan:YES];
-}
--(void)imageViewBtnClick:(UIButton *)btn{
-    [self pushToPictureScan:YES];
-}
 - (void)pushToPictureScan:(BOOL)animated{
     PictureScanViewController *scanVc = [[PictureScanViewController alloc] init];
     [self.navigationController pushViewController:scanVc animated:animated];
@@ -476,7 +454,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)saveTakenPictureData:(NSData *)imgData{
     UIImage *image = [UIImage imageWithData:imgData];
     UIImage *saveImg = [UIImage imageWithCGImage:[self handleImage:image]];
-    _imageView.image = saveImg;
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
     
     JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
@@ -488,6 +465,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                                        contents:saveImgData
                                      attributes:nil];
     NSLog(@"result:%d",result);
+    [self pushToPictureScan:YES];
 }
 
 #pragma mark - private
