@@ -36,6 +36,8 @@
         <source-file src="src/ios/JREye.m" />
         <header-file src="src/ios/JREye.h" />
         <header-file src="src/ios/TDHeader.h" />
+        <source-file src="src/ios/TDNavgationController.m" />
+        <header-file src="src/ios/TDNavgationController.h" />
         <source-file src="src/ios/WYVideoCaptureController.m" />
         <header-file src="src/ios/WYVideoCaptureController.h" />
         <source-file src="src/ios/JRPictureModel.m" />

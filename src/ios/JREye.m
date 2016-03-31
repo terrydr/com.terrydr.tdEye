@@ -7,6 +7,7 @@
 //
 
 #import "JREye.h"
+#import "TDNavgationController.h"
 #import "WYVideoCaptureController.h"
 #import "MLSelectPhotoBrowserViewController.h"
 
@@ -31,7 +32,7 @@
     
     WYVideoCaptureController *videoVC = [[WYVideoCaptureController alloc] init];
     videoVC.isScan = NO;
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:videoVC];
+    TDNavgationController *nav = [[TDNavgationController alloc] initWithRootViewController:videoVC];
     [self.viewController presentViewController:nav animated:YES completion:^{
     }];
 }
@@ -46,7 +47,7 @@
     _callbackId = command.callbackId;
     WYVideoCaptureController *videoVC = [[WYVideoCaptureController alloc] init];
     videoVC.isScan = YES;
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:videoVC];
+    TDNavgationController *nav = [[TDNavgationController alloc] initWithRootViewController:videoVC];
     [self.viewController presentViewController:nav animated:YES completion:^{
     }];
 }
@@ -64,7 +65,7 @@
     browserVc.photos = [dataDic objectForKey:@"data"];
     browserVc.deleteCallBack = ^(NSArray *assets){
     };
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:browserVc];
+    TDNavgationController *nav = [[TDNavgationController alloc] initWithRootViewController:browserVc];
     [self.viewController presentViewController:nav animated:YES completion:^{
     }];
 }
