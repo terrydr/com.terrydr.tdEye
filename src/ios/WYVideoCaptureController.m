@@ -436,10 +436,18 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }];
 }
 - (void)cameraBtnClick:(UIButton *)btn {
-    if (_leftTakenPictureCount==6 || _rightTakenPictureCount==6) {
-        [self showBeyondLimitTakenCount];
+    if (_isLeftEye) {
+        if (_leftTakenPictureCount == 6) {
+            [self showBeyondLimitTakenCount];
+        }else{
+            [self takePictureMethod];
+        }
     }else{
-        [self takePictureMethod];
+        if (_rightTakenPictureCount == 6) {
+            [self showBeyondLimitTakenCount];
+        }else{
+            [self takePictureMethod];
+        }
     }
 }
 
@@ -469,7 +477,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         }else{
             _rightTakenPictureCount=0;
         }
-        [[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
+        //[[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
         [wself takePictureMethod];
     }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
