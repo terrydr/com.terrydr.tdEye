@@ -478,10 +478,13 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             _rightTakenPictureCount=0;
         }
         //[[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
-        [wself takePictureMethod];
+        //[wself takePictureMethod];
     }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // 更新界面
+            [wself pushToPictureScan:YES];
+        });
     }];
     // Add the actions.
     [alertController addAction:cancelAction];
