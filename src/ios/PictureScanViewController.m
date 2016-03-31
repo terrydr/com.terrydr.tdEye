@@ -78,10 +78,10 @@
 #pragma mark ----commitBtn-----
 - (UIButton *)commitBtn{
     if (!_commitBtn) {
-        CGFloat commitWidth = 688.0f/2.0f;
+        CGFloat commitWidth = CGRectGetWidth(self.view.bounds)-15.0f*2;
         CGFloat commitHeight = 98.0f/2.0f;
-        CGFloat commitOriginX = (CGRectGetWidth(self.view.bounds)-commitWidth)/2.0f;
         CGFloat commitOriginY = CGRectGetHeight(self.view.bounds)-commitHeight-40;
+        CGFloat commitOriginX = 15.0f;
         _commitBtn = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         _commitBtn.frame = CGRectMake(commitOriginX, commitOriginY, commitWidth, commitHeight);
         [_commitBtn setTitle:@"提交" forState:UIControlStateNormal];
