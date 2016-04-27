@@ -314,7 +314,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat width = 553.0f/2.0f;
         CGFloat height = 70.0f/2.0f;
         CGFloat originX = (APP_WIDTH-width)/2.0f;
-        CGFloat originY = APP_HEIGHT - (324.0f+62.0f+44.0f)/2.0f;
+        CGFloat originY = APP_HEIGHT - CGRectGetHeight(self.toolView.bounds) - (62.0f+44.0f)/2.0f;
         _whiteBalanceView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
         _whiteBalanceView.hidden = YES;
         _whiteBalanceView.backgroundColor = RGB(0x000000);
