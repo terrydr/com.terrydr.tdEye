@@ -61,6 +61,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.title = @"拍照";
     
     [self setupUI];
     [self initTakenParameters];
@@ -101,7 +102,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, [UIFont boldSystemFontOfSize:18.f], NSFontAttributeName, nil]];
     
-    self.title = @"拍照";
     _leftItem = [[UIBarButtonItem alloc] initWithTitle:@"取消"
                                                  style:UIBarButtonItemStylePlain
                                                 target:self
