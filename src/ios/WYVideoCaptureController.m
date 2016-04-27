@@ -219,7 +219,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:_rightBtn];
     [self.view addSubview:_cameraBtn];
     
-    _viewContainer.frame = CGRectMake(0, 64, APP_WIDTH, APP_HEIGHT-64);
+    CGFloat viewContainerHeight = APP_HEIGHT-64-CGRectGetHeight(self.toolView.bounds);
+    _viewContainer.frame = CGRectMake(0, 64, APP_WIDTH, viewContainerHeight);
     _progressView.frame = CGRectMake(0, CGRectGetMaxY(_viewContainer.frame), APP_WIDTH, 5);
     CGFloat btnW = 40;
     CGFloat leftBtnX = (APP_WIDTH - 3 * btnW - 2 * 32) *0.5;
