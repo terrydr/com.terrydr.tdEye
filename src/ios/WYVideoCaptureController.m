@@ -36,7 +36,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UISlider *wbSlider;
 @property (nonatomic, strong) UIView *viewContainer;
 @property (nonatomic, strong) ProgressView *progressView;
-@property (nonatomic, strong) UILabel *dotLabel;
 @property (nonatomic, strong) UIButton *leftBtn;
 @property (nonatomic, strong) UIButton *centerBtn;
 @property (nonatomic, strong) UIButton *rightBtn;
@@ -215,7 +214,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:self.ISOBtn];
     [self.view addSubview:self.whiteBalanceBtn];
     
-    [self.view addSubview:_dotLabel];
     [self.view addSubview:_leftBtn];
     [self.view addSubview:_centerBtn];
     [self.view addSubview:_rightBtn];
@@ -223,16 +221,15 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     _viewContainer.frame = CGRectMake(0, 64, APP_WIDTH, APP_HEIGHT-64);
     _progressView.frame = CGRectMake(0, CGRectGetMaxY(_viewContainer.frame), APP_WIDTH, 5);
-    _dotLabel.frame = CGRectMake((APP_WIDTH - 5) * 0.5,APP_HEIGHT - ((324.0f-30.0f)/2.0f) , 5, 5);
     CGFloat btnW = 40;
     CGFloat leftBtnX = (APP_WIDTH - 3 * btnW - 2 * 32) *0.5;
-    CGFloat leftBtnY = CGRectGetMaxY(_dotLabel.frame) + 6;
+    CGFloat leftBtnY = APP_HEIGHT-62-btnW;
     
     _leftBtnFrame = CGRectMake(leftBtnX, leftBtnY, btnW, btnW);
     _centerBtnFrame = CGRectOffset(_leftBtnFrame, 32 + btnW, 0);
     _rightBtnFrame = CGRectOffset(_centerBtnFrame, 32 + btnW, 0);
     [self restoreBtn];
-    _cameraBtn.frame = CGRectMake((APP_WIDTH - 67) * 0.5, APP_HEIGHT-62-26, 62, 62);
+    _cameraBtn.frame = CGRectMake((APP_WIDTH - 67) * 0.5, APP_HEIGHT-62, 62, 62);
 }
 - (void)prepareUI {
     _viewContainer = [[UIView alloc] init];
@@ -247,11 +244,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     _progressView = [[ProgressView alloc] initWithFrame:CGRectMake(0, APP_WIDTH + 44, APP_WIDTH, 5)];
     _progressView.totalTime = kVideoTotalTime;
-    
-    _dotLabel = [[UILabel alloc] init];  // 5 - 5
-    _dotLabel.layer.cornerRadius = 2.5;
-    _dotLabel.clipsToBounds = YES;
-    _dotLabel.backgroundColor = RGB(0x76c000);
     
     _leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_leftBtn setTitle:@"左眼" forState:UIControlStateNormal];
@@ -307,12 +299,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (UIView *)toolView{
     if (!_toolView) {
         CGFloat toolWidth = APP_WIDTH;
-        CGFloat toolHeight = 324.0f/2.0f;
+        CGFloat toolHeight = 100.0f;
         CGFloat toolOriginX = 0.0f;
         CGFloat toolOriginY = APP_HEIGHT-toolHeight;
         _toolView = [[UIView alloc] initWithFrame:CGRectMake(toolOriginX, toolOriginY, toolWidth, toolHeight)];
         _toolView.backgroundColor = RGB(0x000000);
-        _toolView.alpha = 0.6f;
     }
     return _toolView;
 }
@@ -418,7 +409,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)leftBtnClick:(UIButton *)btn {
-    _dotLabel.hidden = YES;
     [UIView animateWithDuration:kAnimationDuration animations:^{
         _leftBtn.frame = _centerBtnFrame;
         _centerBtn.frame = _rightBtnFrame;
@@ -427,7 +417,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }];
 }
 - (void)rightBtnClick:(UIButton *)btn {
-    _dotLabel.hidden = YES;
     [UIView animateWithDuration:kAnimationDuration animations:^{
         _rightBtn.frame = _centerBtnFrame;
         _centerBtn.frame = _leftBtnFrame;
@@ -537,7 +526,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _leftBtn.frame = _leftBtnFrame;
     _centerBtn.frame = _centerBtnFrame;
     _rightBtn.frame = _rightBtnFrame;
-    _dotLabel.hidden = NO;
     [_centerBtn setTitleColor:RGB(0x76c000) forState:UIControlStateNormal];
 }
 
