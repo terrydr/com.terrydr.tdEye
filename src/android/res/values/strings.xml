@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CameraTest</string>
+    <string name="title_activity_camera">CameraActivity</string>   
+    <string name="eye_right">右眼</string>
+    <string name="eye_left">左眼</string>
+    <string name="header_bar_enter_selection_tv">选择</string>
+	<string name="cance_bt_tv">取消</string>
+	<string name="selected_tv">已选0张</string>
+	<string name="commit_bt">提交</string>
+    <!-- 存储文件文件夹 -->
+    <string name="Files">Files</string>
+    <!-- 图像文件夹 -->
+    <string name="Image">Image</string>
+    <!-- 缩略图文件夹 -->
+    <string name="Thumbnail">Thumbnail</string>
+</resources>
