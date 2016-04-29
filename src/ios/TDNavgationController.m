@@ -18,8 +18,8 @@
     return NO;
 }
 
-//- (UIInterfaceOrientationMask)supportedInterfaceOrientations{
-//    return UIInterfaceOrientationMaskPortrait;//只支持这一个方向(正常的方向)
-//}
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations{
+    return UIInterfaceOrientationMaskPortrait;//只支持这一个方向(正常的方向)
+}
 
 @end
