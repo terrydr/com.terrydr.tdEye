@@ -181,7 +181,9 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	}
 	@Override
 	public void onBackPressed() {
-			super.onBackPressed();
+		backPrevious();
+		finish();
+		super.onBackPressed();
 	}
 	@Override
 	protected void onStop() {

@@ -283,7 +283,7 @@ public class AlbumAty extends Activity implements View.OnClickListener,
 				s.add(repImagePath);
 			}
 			loadAlbum1(mSaveRoot_left, ".jpg", mAlbumView,s);
-			loadAlbum1(mSaveRoot_right, ".jpg", mAlbumView,s);
+			loadAlbum1(mSaveRoot_right, ".jpg", mAlbumView_right,s);
 			break;
 		default:
 			break;
