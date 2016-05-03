@@ -2,6 +2,7 @@ package com.terrydr.eyeScope;
 
 import android.content.Context;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.FrameLayout;
@@ -20,13 +21,26 @@ public class ThumbnaiImageView extends FrameLayout  {
 	private final DisplayImageOptions mOptions;
 	private String mPath;
 	private int mPosition;
+	private CheckBox checkBox;
+	
 
 	public ThumbnaiImageView(Context context,ImageLoader imageLoader,DisplayImageOptions options) {
 		super(context);
 		inflate(context, R.layout.item_album_grid, this);
 		FilterImageView imageView=(FilterImageView) findViewById(R.id.imgThumbnail);
-		CheckBox checkBox=(CheckBox) findViewById(R.id.checkbox);
-//		ImageView checkBox=(ImageView) findViewById(R.id.item_album_grid_selected_iv);
+		checkBox=(CheckBox) findViewById(R.id.checkbox);
+//		checkBox.setOnClickListener(new OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				// TODO Auto-generated method stub
+//				if(checkBox.isChecked())
+//					checkBox.setChecked(true);
+//				else
+//					checkBox.setChecked(false);
+//				
+//			}
+//		});
 		mViewHolder=new ViewHolder(imageView,checkBox,null);
 		this.mImageLoader=imageLoader;
 		this.mOptions=options;
@@ -77,6 +91,7 @@ public class ThumbnaiImageView extends FrameLayout  {
 	public void setOnClickListener(OnClickListener l) {
 		//重写click事件，将该View的click转到imageview触发
 		mViewHolder.imageView.setOnClickListener(l);
+//		mViewHolder.checkBox.setOnClickListener(l);
 	}
 
 	public class ViewHolder {

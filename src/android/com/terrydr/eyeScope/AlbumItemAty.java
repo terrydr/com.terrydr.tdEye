@@ -3,12 +3,12 @@ package com.terrydr.eyeScope;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.terrydr.eyeScope.MatrixImageView.OnSingleTapListener;
-
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AlphaAnimation;
@@ -30,8 +30,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	private ImageView mBackView;
 	private TextView mCountView,selected_tv,leftorright_tv;
 	private View mHeaderBar,mBottomBar;
-	private CheckBox select_cb;
-	private int i = 0;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -45,7 +43,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		leftorright_tv=(TextView)findViewById(R.id.leftorright_tv);
 		
 		selected_tv= (TextView)findViewById(R.id.selected_tv);
-		select_cb=(CheckBox) findViewById(R.id.albumitem_selected_cb);
 
 		mBackView.setOnClickListener(this);
 		mCountView.setOnClickListener(this);
@@ -68,18 +65,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		}
 		loadAlbum(mSaveRoot,currentFileName);
 		
-		select_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){ 
-            @Override 
-            public void onCheckedChanged(CompoundButton buttonView, 
-                    boolean isChecked) { 
-                if(isChecked){ 
-                	i++;
-                }else{ 
-                	i--;
-                } 
-                selected_tv.setText("已选择" + i + "张");
-            } 
-        }); 
 	}
 
 	/**  
@@ -111,7 +96,8 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 					currentItem=files.indexOf(file);
 				paths.add(file.getAbsolutePath());
 			}
-			mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(paths));
+//			mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(paths));
+			mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(this,paths));
 			mViewPager.setCurrentItem(currentItem);
 			mCountView.setText((currentItem+1)+"/"+paths.size());
 		}
@@ -165,10 +151,28 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		}	
 	}
 
+	/**
+	 * 返回上一个activity
+	 */
+	private void backPrevious(){
+		// 数据是使用Intent返回
+		Intent intent = new Intent();
+		Bundle bundle = new Bundle();
+		ArrayList<String> _paths = new ArrayList<String>();
+		for(String path : mViewPager.getPathsArray()){
+			_paths.add(path);
+		}
+		bundle.putStringArrayList("selectPaths", _paths);
+		intent.putExtras(bundle);
+		// 设置返回数据
+		this.setResult(0, intent);
+		this.finish();
+	}
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.header_bar_photo_back:
+			backPrevious();
 			finish();
 			break;
 		default:
@@ -182,6 +186,10 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	@Override
 	protected void onStop() {
 		super.onStop();
+	}
+
+	public void onChangeTesChanged(String _text) {
+		selected_tv.setText(_text);
 	}
 
 }

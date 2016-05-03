@@ -133,7 +133,12 @@
             android:theme="@android:style/Theme.NoTitleBar"/>
 			<activity android:name="com.terrydr.eyeScope.AlbumItemAty"
 			android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.NoTitleBar" />			
+            android:theme="@android:style/Theme.NoTitleBar" />		
+			<activity
+            android:name="com.terrydr.eyeScope.AlbumItemAtyForJs"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>			
         </config-file>
 
 		<config-file target="res/values/strings.xml" parent="/resources">
@@ -185,6 +190,8 @@
                      target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/AlbumItemAty.java"
                      target-dir="src/com/terrydr/eyeScope"/>
+		<source-file src="src/android/com/terrydr/eyeScope/AlbumItemAtyForJs.java"
+                     target-dir="src/com/terrydr/eyeScope"/>					 
 		<source-file src="src/android/com/terrydr/eyeScope/CameraActivity.java"
                      target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/CameraContainer.java"
@@ -227,6 +234,7 @@
 		<source-file src="src/android/res/layout/album_item_header_bar.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/album.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/albumitem.xml" target-dir="res/layout" />
+		<source-file src="src/android/res/layout/albumitem_for_js.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/camera_bottom_bar.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/camera_header_bar.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/cameracontainer.xml" target-dir="res/layout" />

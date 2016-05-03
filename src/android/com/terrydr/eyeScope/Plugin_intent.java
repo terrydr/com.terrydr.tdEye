@@ -2,95 +2,110 @@ package com.terrydr.eyeScope;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+public class Plugin_intent extends CordovaPlugin {
+	private final static String TAG = "Plugin_intent";
+	private String infos;
 
-public class Plugin_intent extends CordovaPlugin{
-	private String infos;  
 	public Plugin_intent() {
 	}
-	
-	CallbackContext callbackContext;  
-	  
-    @Override  
-    public boolean execute(String action, org.json.JSONArray args,  
-            CallbackContext callbackContext) throws org.json.JSONException {  
-        this.callbackContext = callbackContext;  
-        Log.e("callbackContext","d" + callbackContext);
-        if (action.equals("intent")) {  
-            infos = args.getString(0);  
-            this.startCameraActivity();  
-            
-            return true;  
-        }  
-        
-        if (action.equals("jrEyeTakePhotos")) {  
-            infos = args.getString(0);  
-            this.startCameraActivity();  
-            callbackContext.success();  
-            return true;  
-        }  
-        //缩略图界面
-        if (action.equals("jrEyeSelectPhotos")) {  
-            infos = args.getString(0);  
-            this.startCameraActivity();  
-            return true;  
-        }
-        //大图片预览界面 参数{data:[图片路径，图片路径]}
-        
-        if (action.equals("jrEyeScanPhotos")) {  
-            infos = args.getString(0);  
-            this.startCameraActivity();  
-            return true;  
-        }  
-        return false;  
-  
-    }  
-	
-    /**
-     * 跳转到拍照界面  返回参数{leftEye:[];right:[]}
-     */
-	private void startCameraActivity() {
-		// cordova.getActivity() 获取当前activity的this
-		Intent intent = new Intent(cordova.getActivity(), CameraActivity.class);
-		cordova.startActivityForResult((CordovaPlugin) this, intent, 0);
+
+	CallbackContext callbackContext;
+
+	@Override
+	public boolean execute(String action, org.json.JSONArray args,
+			CallbackContext callbackContext) throws org.json.JSONException {
+		this.callbackContext = callbackContext;
+		if (action.equals("jrEyeTakePhotos")) {
+			Log.e(TAG, "jrEyeTakePhotos:" + callbackContext);
+			this.startCameraActivity();
+			return true;
+		} else if (action.equals("jrEyeSelectPhotos")) { // 相册缩略图界面
+			Log.e(TAG, "jrEyeSelectPhotos:" + callbackContext);
+			startAlbumAty();
+			return true;
+		} else if (action.equals("jrEyeScanPhotos")) { // 大图片预览界面参数{data:[图片路径，图片路径]}
+			Log.e(TAG, "jrEyeScanPhotos:" + callbackContext);
+			infos = args.getString(0);
+			this.startAlbumItemAty(infos);
+			return true;
+		}
+		return true;
 
 	}
-	
-	public void jrEyeTakePhotos(String result){
+
+	/**
+	 * 跳转到拍照界面 返回参数{leftEye:[];rightEye:[]}
+	 */
+	private void startCameraActivity() {
+		Intent intent = new Intent(cordova.getActivity(), CameraActivity.class);
+		cordova.startActivityForResult((CordovaPlugin) this, intent, 0);
+	}
+
+	/**
+	 * 跳转到相册缩略图界面
+	 */
+	private void startAlbumAty() {
+		Log.e(TAG, "startAlbumAty");
+		Intent intent = new Intent(cordova.getActivity(), AlbumAty.class);
+		cordova.getActivity().startActivity(intent);
+	}
+
+	/**
+	 * 大图片预览界面 参数{data:[图片路径，图片路径]}
+	 */
+	private void startAlbumItemAty(String args) {
+		// cordova.getActivity() 获取当前activity的this
+		Log.e(TAG, "startAlbumItemAty:" + args);
+		Intent intent = new Intent(cordova.getActivity(),
+				AlbumItemAtyForJs.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("data", args);
+		intent.putExtras(bundle);
+		cordova.startActivityForResult((CordovaPlugin) this, intent, 0);
+	}
+
+	public void jrEyeTakePhotos(String result) {
 		callbackContext.success(result);
 	}
-	
-	 @Override  
-	    public void onActivityResult(int requestCode, int resultCode, Intent intent) {  
-	  
-//	        super.onActivityResult(requestCode, resultCode, intent);  
-			switch (resultCode) { // resultCode为回传的标记，回传的是RESULT_OK
-			case 0:
-//				Bundle b = data.getExtras();
-//				mExposureNum = b.getInt("mexposureNum");
-//				mContainer.setCameraISO_int(mExposureNum);
-				break;
-			case 5:
-				Bundle b = intent.getExtras();
-				String result_Json = b.getString("result_Json");
-				
-				Log.e("132", result_Json);
-				Log.e("callbackContext","dd" + callbackContext);
-				callbackContext.success(result_Json);
-				break;
-			default:
-				break;
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+		super.onActivityResult(requestCode, resultCode, intent);
+		switch (resultCode) { // resultCode为回传的标记，回传的是RESULT_OK
+		case 0:
+			Log.e(TAG, "r1111111:");
+			break;
+		case 5:
+			Bundle b = intent.getExtras();
+			String result_Json = b.getString("result_Json");
+			Log.e(TAG, "result_Json String:" + result_Json);
+			// PluginResult mPlugin = new PluginResult(PluginResult.Status.OK,
+			// result_Json);
+			// mPlugin.setKeepCallback(true);
+			// callbackContext.sendPluginResult(mPlugin);
+			org.json.JSONObject result = null;
+			try {
+				result = new org.json.JSONObject(result_Json);
+				Log.e(TAG, "result:" + result);
+			} catch (JSONException e) {
+				Log.e(TAG, "String to Json error!");
 			}
-	        // 反回给js
-//	        callbackContext.success(com.alibaba.fastjson.JSONArray  
-//	                .toJSONString(ResponseJSON.getInstance().getJsonObjects()));  
-//	        if (ResponseJSON.getInstance().getJsonObjects() != null  
-//	                && ResponseJSON.getInstance().getJsonObjects().size() > 0) {  
-//	            Toast.makeText(cordova.getActivity(), "完成", 1000).show();  
-//	        }  
-	    }  
+			Log.e(TAG, "callbackContext:" + callbackContext);
+			callbackContext.success(result);
+			break;
+		default:
+			break;
+		}
+	}
 }

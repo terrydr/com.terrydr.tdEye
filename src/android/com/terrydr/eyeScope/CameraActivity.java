@@ -407,10 +407,13 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.e(TAG,"222222:");
 		switch (resultCode) { // resultCode为回传的标记，回传的是RESULT_OK
 		case 0:
 			Bundle b = data.getExtras();
-			mExposureNum = b.getInt("mexposureNum");
+			if(b!=null){
+				mExposureNum = b.getInt("mexposureNum");
+			}
 			mContainer.setCameraISO_int(mExposureNum);
 			break;
 		case 5:
@@ -493,12 +496,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 	@Override
 	public void onBackPressed() {
-		// 数据是使用Intent返回
-		// Intent intent = new Intent();
-		// 把返回数据存入Intent
-		// intent.putExtras(bundle);
-		// 设置返回数据
-		// this.setResult(0, intent);
 		this.finish();
 		super.onBackPressed();
 	}

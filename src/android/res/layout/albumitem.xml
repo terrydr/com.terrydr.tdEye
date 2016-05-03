@@ -39,7 +39,7 @@
             android:src="@drawable/item_album_grid_selected" />
         -->
 
-        <CheckBox
+<!--         <CheckBox
             android:id="@+id/albumitem_selected_cb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
             android:background="@drawable/item_album_grid_checkbox"
             android:button="@null"
             android:checked="false"
-            android:focusable="false" />
+            android:focusable="false" /> -->
 
         <include
             android:id="@+id/album_item_bottom_bar"

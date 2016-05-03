@@ -54,6 +54,7 @@
         android:numColumns="3"
         android:padding="10dip"
         android:stretchMode="columnWidth"
+        android:descendantFocusability="blocksDescendants" 
         android:verticalSpacing="10dip" />
 
     <ImageView
@@ -101,6 +102,7 @@
         android:numColumns="3"
         android:padding="10dip"
         android:stretchMode="columnWidth"
+        android:descendantFocusability="blocksDescendants" 
         android:verticalSpacing="10dip" />
 
     <ImageView

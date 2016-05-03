@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -132,6 +133,8 @@ public class AlbumGridView extends GridView {
 
 		/** 当前选中的文件的集合 */
 		Set<String> itemSelectedSet = new HashSet<String>();
+//		Set<String> itemSelectedSet1 = new HashSet<String>();
+		boolean fal = false;
 
 		/** 选中图片后执行的回调函数 */
 		AlbumGridView.OnCheckedChangeListener listener = null;
@@ -139,6 +142,14 @@ public class AlbumGridView extends GridView {
 		public AlbumViewAdapter(List<String> paths) {
 			super();
 			this.mPaths = paths;
+		}
+		
+		public AlbumViewAdapter(List<String> paths,Set<String> _itemSelectedSet) {
+			super();
+			this.mPaths = paths;
+			this.itemSelectedSet = _itemSelectedSet;
+			this.fal = true;
+			Log.e("this.itemSelectedSet:", itemSelectedSet.toString());
 		}
 
 		/**
@@ -151,6 +162,7 @@ public class AlbumGridView extends GridView {
 			// 重置map
 			itemSelectedSet = new HashSet<String>();
 			this.listener = listener;
+			this.fal = false;
 			super.notifyDataSetChanged();
 		}
 
@@ -217,8 +229,12 @@ public class AlbumGridView extends GridView {
 			// 设置点击事件，将ItemClick事件转化为AlbumItemView的Click事件
 			albumItemView.setOnClickListener(this);
 			String path = getItem(position);
+			Log.e("itemSelectedSet:", this.itemSelectedSet.toString());
+			Log.e("path:", path);
 			albumItemView.setTags(path, position, mEditable,
 					itemSelectedSet.contains(path));
+//			albumItemView.setTags(path, position, mEditable,
+//					true);
 			return albumItemView;
 		}
 
@@ -230,23 +246,25 @@ public class AlbumGridView extends GridView {
 						.getParent();
 				getOnItemClickListener().onItemClick(AlbumGridView.this, view,
 						view.getPosition(), 0L);
+				
 			}
 		}
 
 		@Override
-		public void onCheckedChanged(CompoundButton buttonView,
+		public void onCheckedChanged(final CompoundButton buttonView,
 				boolean isChecked) {
-			if(itemSelectedSet.size()>=2){
+			if(itemSelectedSet.size()>=2 && isChecked && !fal){
 				AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 				builder.setMessage("单侧眼睛最多选择两张图片")
 						.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								
+								buttonView.setChecked(false);
 							}
 						});
 				builder.create().show();
+				
 			}else{
 				if (buttonView.getTag() == null)
 					return;
