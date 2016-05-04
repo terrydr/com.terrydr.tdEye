@@ -77,9 +77,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 				mCamera.release();
 				mCamera = null;
 			}
-
 		}
-		
 	};
 
 

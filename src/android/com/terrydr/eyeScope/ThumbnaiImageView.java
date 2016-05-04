@@ -21,7 +21,7 @@ public class ThumbnaiImageView extends FrameLayout  {
 	private final DisplayImageOptions mOptions;
 	private String mPath;
 	private int mPosition;
-	private CheckBox checkBox;
+	public CheckBox checkBox;
 	
 	public ThumbnaiImageView(Context context,ImageLoader imageLoader,DisplayImageOptions options) {
 		super(context);

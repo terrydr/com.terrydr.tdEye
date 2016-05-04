@@ -42,6 +42,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	private ImageView mBackView, cance_back_iv;
 	private Bundle bundle;
 	private boolean isPlugin = false;  //标记是否是plugin传过来的,默认为false:否;ure:是
+	ThumbnaiImageView view;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +72,16 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				if (mAlbumView.getEditable())
+				if (mAlbumView.getEditable()){
+					view = (ThumbnaiImageView) arg1;
+					boolean isChecked  = view.checkBox.isChecked();
+					if(isChecked){
+						view.checkBox.setChecked(false);
+					}else{
+						view.checkBox.setChecked(true);
+					}
 					return;
+				}
 				Intent intent = new Intent(AlbumAty.this, AlbumItemAty.class);
 				intent.putExtra("path", arg1.getTag().toString());
 				intent.putExtra("root", mSaveRoot_left);
@@ -84,25 +93,33 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				if (mAlbumView_right.getEditable())
+				if (mAlbumView_right.getEditable()){
+					view = (ThumbnaiImageView) arg1;
+					boolean isChecked  = view.checkBox.isChecked();
+					if(isChecked){
+						view.checkBox.setChecked(false);
+					}else{
+						view.checkBox.setChecked(true);
+					}
 					return;
+				}
 				Intent intent = new Intent(AlbumAty.this, AlbumItemAty.class);
 				intent.putExtra("path", arg1.getTag().toString());
 				intent.putExtra("root", mSaveRoot_right);
 				startActivityForResult(intent, 0);
 			}
 		});
-		// mAlbumView.setOnItemLongClickListener(new OnItemLongClickListener() {
-		// @Override
-		// public boolean onItemLongClick(AdapterView<?> parent, View view,
-		// int position, long id) {
-		//
-		// if (mAlbumView.getEditable())
-		// return true;
-		// // enterEdit();
-		// return true;
-		// }
-		// });
+//		 mAlbumView.setOnItemLongClickListener(new OnItemLongClickListener() {
+//		 @Override
+//		 public boolean onItemLongClick(AdapterView<?> parent, View view,
+//		 int position, long id) {
+//		
+//		 if (mAlbumView.getEditable())
+//		 return true;
+//		 // enterEdit();
+//		 return true;
+//		 }
+//		 });
 		Set<String> itemSelectedSet = new HashSet<String>();
 		loadAlbum1(mSaveRoot_left, ".jpg", mAlbumView, itemSelectedSet);
 		loadAlbum1(mSaveRoot_right, ".jpg", mAlbumView_right, itemSelectedSet);

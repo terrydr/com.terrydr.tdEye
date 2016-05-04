@@ -84,7 +84,7 @@ public class Plugin_intent extends CordovaPlugin {
 			org.json.JSONObject result = null;
 			try {
 				result = new org.json.JSONObject(result_Json);
-//				Log.e(TAG, "result:" + result);
+				Log.e(TAG, "result:" + result);
 			} catch (JSONException e) {
 				Log.e(TAG, "String to Json error!");
 			}

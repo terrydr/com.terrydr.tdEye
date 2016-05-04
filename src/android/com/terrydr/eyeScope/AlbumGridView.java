@@ -228,12 +228,9 @@ public class AlbumGridView extends GridView {
 		@Override
 		public void onClick(View v) {
 			if (getOnItemClickListener() != null) {
-				// 这里取了上两层父类，因为真正触onClick的是FilterImageView
-				ThumbnaiImageView view = (ThumbnaiImageView) v.getParent()
-						.getParent();
-				getOnItemClickListener().onItemClick(AlbumGridView.this, view,
-						view.getPosition(), 0L);
-				
+//				// 这里取了上两层父类，因为真正触onClick的是FilterImageView
+				ThumbnaiImageView view = (ThumbnaiImageView) v.getParent().getParent();
+				getOnItemClickListener().onItemClick(AlbumGridView.this, view,view.getPosition(), 0L);
 			}
 		}
 
