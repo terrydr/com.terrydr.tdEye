@@ -8,12 +8,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AlphaAnimation;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.terrydr.eyeScope.R;
@@ -155,7 +152,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	 * 返回上一个activity
 	 */
 	private void backPrevious(){
-		// 数据是使用Intent返回
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();
 		ArrayList<String> _paths = new ArrayList<String>();
@@ -164,7 +160,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		}
 		bundle.putStringArrayList("selectPaths", _paths);
 		intent.putExtras(bundle);
-		// 设置返回数据
 		this.setResult(0, intent);
 		this.finish();
 	}

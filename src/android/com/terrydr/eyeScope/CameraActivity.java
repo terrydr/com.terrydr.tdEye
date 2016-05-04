@@ -42,6 +42,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private boolean leftOrRight = true; // 默认为左 true:左眼，false:右眼
 	private int i_left = 0; // 记录单侧拍摄图像个数
 	private int i_right = 0; // 记录单侧拍摄图像个数
+	private boolean deleteFile = true;
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -71,18 +72,15 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		return_index_bt.setOnClickListener(this);
 
 		detector = new GestureDetector(this);
-
+		
 		mSaveRoot_left = "left";
 		mSaveRoot_right = "right";
 		setPath(leftOrRight);
 
-		String rootPath_left = getFolderPath(this, mSaveRoot_left);
-		deleteFolder(rootPath_left);
-		String rootPath_right = getFolderPath(this, mSaveRoot_right);
-		deleteFolder(rootPath_right);
-
-		int i = dip2px(162);
-		Log.e(TAG, "" + i);
+		int i = dip2px(10);
+		int m = px2dip(20);
+		Log.e(TAG, "i:" + i);
+		Log.e(TAG, "m:" + m);
 		// mHeaderBar.getBackground().setAlpha(204);//透明0~255透明度 ，越小越透明
 	}
 
@@ -97,11 +95,10 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			mContainer.setRootPath(mSaveRoot_left);
 		else
 			mContainer.setRootPath(mSaveRoot_right);
-
 	}
 
 	/**
-	 * dip转px
+	 * 根据手机的分辨率从 dip 的单位 转成为 px(像素)
 	 * 
 	 * @param dipValue
 	 * @return
@@ -109,6 +106,14 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private int dip2px(float dipValue) {
 		final float scale = getResources().getDisplayMetrics().density;
 		return (int) (dipValue * scale + 0.5f);
+	}
+	
+	/**
+	 * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
+	 */
+	public int px2dip(float pxValue) {
+		 final float scale = getResources().getDisplayMetrics().density;
+		 return (int) (pxValue / scale + 0.5f);
 	}
 
 	/**
@@ -133,44 +138,10 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		return pathBuilder.toString();
 	}
 
-//	Handler handler = new Handler() {
-//		public void handleMessage(Message msg) {
-//			dialog.setProgress(msg.arg1);
-//			handler.post(updateThread);
-//		}
-//	};
-//	Runnable updateThread = new Runnable() {
-//		int i = 0;
-//		public void run() {
-//			mContainer.takePicture(this);
-//			
-//			i = i + 1;
-//			Message msg = handler.obtainMessage();
-//			msg.arg1 = i;
-//			try {
-//				Thread.sleep(100);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//			handler.sendMessage(msg);
-//			if (i == 100) {
-//				handler.removeCallbacks(updateThread);
-////				dialog.dismiss();
-////				Toast.makeText(getApplicationContext(), "下载完成!",
-////						Toast.LENGTH_SHORT).show();
-//			}
-//		}
-//	};
-
 	@Override
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.photos_iv:
-//			final Intent intent = new Intent(this, AlbumAty.class);
-//			Bundle bundle = new Bundle();
-//			int mexposureNum = mExposureNum; // 曝光
-//			bundle.putInt("mexposureNum", mexposureNum);
-//			intent.putExtras(bundle);
 			if ((i_left >= 6 && leftOrRight) || (i_right >= 6 && !leftOrRight)) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setMessage("单侧眼睛最多拍摄六张图片,是否重拍?")
@@ -188,7 +159,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 							public void onClick(DialogInterface dialog,
 									int which) {
 								dialog.dismiss();
-//								startActivityForResult(intent, 0);
 								startAlbumAty();
 							}
 						});
@@ -214,7 +184,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 						}
 					}
 					i_left++;
-					Log.e("i_left", String.valueOf(i_left));
 				} else {
 					String thumbFolder = FileOperateUtil.getFolderPath(this,
 							FileOperateUtil.TYPE_THUMBNAIL, mSaveRoot_right);
@@ -235,16 +204,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 						}
 					}
 					i_right++;
-					Log.e("i_right", String.valueOf(i_right));
 				}
 				photos_iv.setClickable(false);
 				mContainer.takePicture(this);
-//				try {
-//					Thread.sleep(500);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//				startActivityForResult(intent, 0);
 			}
 			break;
 		case R.id.iso_iv:
@@ -377,8 +339,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	@Override
 	public void onTakePictureEnd(Bitmap bm) {
 		photos_iv.setClickable(true);
-		
-		startAlbumAty();
+		startAlbumAty();  //拍照完成跳转
 	}
 	
 	/**
@@ -395,7 +356,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 	@Override
 	public void onAnimtionEnd(Bitmap bm, boolean isVideo) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -407,23 +367,33 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		Log.e(TAG,"222222:");
+		Log.e(TAG,"");
 		switch (resultCode) { // resultCode为回传的标记，回传的是RESULT_OK
 		case 0:
+			Log.e(TAG,"0");
 			Bundle b = data.getExtras();
 			if(b!=null){
 				mExposureNum = b.getInt("mexposureNum");
+				deleteFile = b.getBoolean("deleteFile");
 			}
 			mContainer.setCameraISO_int(mExposureNum);
 			break;
 		case 5:
+			Log.e(TAG,"5");
 			Intent intent = new Intent();
 			Bundle b1 = data.getExtras();
-			
 			// 把返回数据存入Intent
 			intent.putExtras(b1);
 			// 设置返回数据
 			this.setResult(5, intent);
+			this.finish();
+			break;
+		case 6:
+			Log.e(TAG,"6");
+			Intent intent1 = new Intent();
+			Bundle b11 = data.getExtras();
+			intent1.putExtras(b11);
+			this.setResult(6, intent1);
 			this.finish();
 			break;
 		default:
@@ -431,6 +401,17 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		}
 	}
 
+	/**
+	 * 重新打开activity
+	 */
+	public void reload() {
+	    Intent intent = getIntent();
+	    overridePendingTransition(0, 0);
+	    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+	    finish();
+	    overridePendingTransition(0, 0);
+	    startActivity(intent);
+	}
 	@Override
 	public boolean onDown(MotionEvent e) {
 		// TODO Auto-generated method stub
@@ -502,6 +483,19 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	
 	@Override
 	protected void onResume() {		
+		Bundle bundle = getIntent().getExtras();
+		if(bundle!=null){
+//			mExposureNum = bundle.getInt("mexposureNum");
+			deleteFile = bundle.getBoolean("deleteFile");
+//			mContainer.setCameraISO_int(mExposureNum);
+		}
+//		Log.e(TAG, ""+deleteFile);
+		if(deleteFile){
+			String rootPath_left = getFolderPath(this, mSaveRoot_left);
+			deleteFolder(rootPath_left);
+			String rootPath_right = getFolderPath(this, mSaveRoot_right);
+			deleteFolder(rootPath_right);
+		}
 		super.onResume();
 	}
 

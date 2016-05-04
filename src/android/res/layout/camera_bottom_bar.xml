@@ -35,8 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:paddingLeft="50dp"
-                 >
+                android:paddingLeft="50dp" >
 
                 <TextView
                     android:id="@+id/eyeright_tv"

@@ -1,7 +1,6 @@
 package com.terrydr.eyeScope;
 
 import java.lang.reflect.Field;
-
 import android.graphics.BitmapFactory.Options;
 import android.util.DisplayMetrics;
 import android.view.ViewGroup.LayoutParams;

@@ -3,14 +3,11 @@ package com.terrydr.eyeScope;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -133,8 +130,7 @@ public class AlbumGridView extends GridView {
 
 		/** 当前选中的文件的集合 */
 		Set<String> itemSelectedSet = new HashSet<String>();
-//		Set<String> itemSelectedSet1 = new HashSet<String>();
-		boolean fal = false;
+		Set<String> itemSelectedSet1 = new HashSet<String>();
 
 		/** 选中图片后执行的回调函数 */
 		AlbumGridView.OnCheckedChangeListener listener = null;
@@ -147,9 +143,7 @@ public class AlbumGridView extends GridView {
 		public AlbumViewAdapter(List<String> paths,Set<String> _itemSelectedSet) {
 			super();
 			this.mPaths = paths;
-			this.itemSelectedSet = _itemSelectedSet;
-			this.fal = true;
-			Log.e("this.itemSelectedSet:", itemSelectedSet.toString());
+			this.itemSelectedSet1 = _itemSelectedSet;
 		}
 
 		/**
@@ -161,8 +155,8 @@ public class AlbumGridView extends GridView {
 				AlbumGridView.OnCheckedChangeListener listener) {
 			// 重置map
 			itemSelectedSet = new HashSet<String>();
+			itemSelectedSet1 = new HashSet<String>();
 			this.listener = listener;
-			this.fal = false;
 			super.notifyDataSetChanged();
 		}
 
@@ -203,19 +197,16 @@ public class AlbumGridView extends GridView {
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
 			return mPaths.size();
 		}
 
 		@Override
 		public String getItem(int position) {
-			// TODO Auto-generated method stub
 			return mPaths.get(position);
 		}
 
 		@Override
 		public long getItemId(int position) {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 
@@ -229,12 +220,8 @@ public class AlbumGridView extends GridView {
 			// 设置点击事件，将ItemClick事件转化为AlbumItemView的Click事件
 			albumItemView.setOnClickListener(this);
 			String path = getItem(position);
-			Log.e("itemSelectedSet:", this.itemSelectedSet.toString());
-			Log.e("path:", path);
 			albumItemView.setTags(path, position, mEditable,
-					itemSelectedSet.contains(path));
-//			albumItemView.setTags(path, position, mEditable,
-//					true);
+					itemSelectedSet1.contains(path));
 			return albumItemView;
 		}
 
@@ -253,7 +240,7 @@ public class AlbumGridView extends GridView {
 		@Override
 		public void onCheckedChanged(final CompoundButton buttonView,
 				boolean isChecked) {
-			if(itemSelectedSet.size()>=2 && isChecked && !fal){
+			if(itemSelectedSet.size()>=2 && isChecked){
 				AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 				builder.setMessage("单侧眼睛最多选择两张图片")
 						.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
@@ -264,14 +251,15 @@ public class AlbumGridView extends GridView {
 							}
 						});
 				builder.create().show();
-				
 			}else{
 				if (buttonView.getTag() == null)
 					return;
-				if (isChecked)
+				if (isChecked){
 					itemSelectedSet.add(buttonView.getTag().toString());
-				else
+				}
+				else{
 					itemSelectedSet.remove(buttonView.getTag().toString());
+				}
 				if (listener != null)
 					listener.onCheckedChanged(itemSelectedSet);
 			}

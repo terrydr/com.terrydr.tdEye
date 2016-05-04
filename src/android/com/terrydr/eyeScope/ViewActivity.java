@@ -1,7 +1,6 @@
 package com.terrydr.eyeScope;
 
 import org.apache.cordova.CordovaActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 

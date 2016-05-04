@@ -12,7 +12,6 @@ import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
 import android.media.ThumbnailUtils;
-import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -105,7 +104,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
-			Log.e("Path", mSavePath);
 			if (mSavePath == null)
 				throw new RuntimeException("mSavePath is null");
 				mDataHandler = new DataHandler();
@@ -238,8 +236,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	
 	/**
 	 * 拍照返回的byte数据处理
-	 * 
-	 * @author linj
 	 * 
 	 */
 	private final class DataHandler {

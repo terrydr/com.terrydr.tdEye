@@ -6,7 +6,6 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -56,8 +55,13 @@ public class Plugin_intent extends CordovaPlugin {
 	 */
 	private void startAlbumAty() {
 		Log.e(TAG, "startAlbumAty");
+		Log.e(TAG, "callbackContext:" + callbackContext);
 		Intent intent = new Intent(cordova.getActivity(), AlbumAty.class);
-		cordova.getActivity().startActivity(intent);
+//		cordova.getActivity().startActivity(intent);
+		Bundle bundle = new Bundle();
+		bundle.putBoolean("isPlugin", true);
+		intent.putExtras(bundle);
+		cordova.startActivityForResult((CordovaPlugin) this, intent, 6);
 	}
 
 	/**
@@ -80,16 +84,15 @@ public class Plugin_intent extends CordovaPlugin {
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-
+		
 		super.onActivityResult(requestCode, resultCode, intent);
 		switch (resultCode) { // resultCode为回传的标记，回传的是RESULT_OK
 		case 0:
-			Log.e(TAG, "r1111111:");
 			break;
 		case 5:
+			Log.e(TAG, "5");
 			Bundle b = intent.getExtras();
 			String result_Json = b.getString("result_Json");
-			Log.e(TAG, "result_Json String:" + result_Json);
 			// PluginResult mPlugin = new PluginResult(PluginResult.Status.OK,
 			// result_Json);
 			// mPlugin.setKeepCallback(true);
@@ -103,6 +106,14 @@ public class Plugin_intent extends CordovaPlugin {
 			}
 			Log.e(TAG, "callbackContext:" + callbackContext);
 			callbackContext.success(result);
+			break;
+		case 6:
+			Log.e(TAG, "6");
+			Intent intent1 = new Intent(cordova.getActivity(), CameraActivity.class);
+			Bundle bundle = new Bundle();
+			bundle.putBoolean("deleteFile", false);
+			intent1.putExtras(bundle);
+			cordova.startActivityForResult((CordovaPlugin) this, intent1, 0);
 			break;
 		default:
 			break;

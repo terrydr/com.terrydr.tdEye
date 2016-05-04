@@ -93,7 +93,7 @@ public class DisplayImageOptions {
 		 * @return
 		 */
 		public DisplayImageOptions build() {
-			//在这里做builder�?有字段的非空判断
+			//在这里做builder有字段的非空判断
 			return new DisplayImageOptions(this);
 		}
 

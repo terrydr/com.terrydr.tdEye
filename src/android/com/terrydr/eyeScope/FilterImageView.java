@@ -80,7 +80,6 @@ public class FilterImageView extends ImageView implements
 
 	@Override
 	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -94,7 +93,6 @@ public class FilterImageView extends ImageView implements
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 			float distanceY) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -107,7 +105,6 @@ public class FilterImageView extends ImageView implements
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

@@ -27,30 +27,6 @@
             android:layout_centerInParent="true"
             android:background="@color/white" />
 
-        <!--
-             <ImageView
-            android:id="@+id/albumitem_selected_iv"
-            android:layout_below="@+id/album_item_header_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="15dip"
-			android:layout_marginTop="15dip"
-            android:src="@drawable/item_album_grid_selected" />
-        -->
-
-<!--         <CheckBox
-            android:id="@+id/albumitem_selected_cb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/album_item_header_bar"
-            android:layout_marginRight="15dip"
-            android:layout_marginTop="15dip"
-            android:background="@drawable/item_album_grid_checkbox"
-            android:button="@null"
-            android:checked="false"
-            android:focusable="false" /> -->
 
         <include
             android:id="@+id/album_item_bottom_bar"

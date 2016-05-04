@@ -23,24 +23,11 @@ public class ThumbnaiImageView extends FrameLayout  {
 	private int mPosition;
 	private CheckBox checkBox;
 	
-
 	public ThumbnaiImageView(Context context,ImageLoader imageLoader,DisplayImageOptions options) {
 		super(context);
 		inflate(context, R.layout.item_album_grid, this);
 		FilterImageView imageView=(FilterImageView) findViewById(R.id.imgThumbnail);
 		checkBox=(CheckBox) findViewById(R.id.checkbox);
-//		checkBox.setOnClickListener(new OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View v) {
-//				// TODO Auto-generated method stub
-//				if(checkBox.isChecked())
-//					checkBox.setChecked(true);
-//				else
-//					checkBox.setChecked(false);
-//				
-//			}
-//		});
 		mViewHolder=new ViewHolder(imageView,checkBox,null);
 		this.mImageLoader=imageLoader;
 		this.mOptions=options;
@@ -53,13 +40,7 @@ public class ThumbnaiImageView extends FrameLayout  {
 	 *  @param checked  checkbox是否选中
 	 */
 	public void setTags(String path,int position,boolean editable,boolean checked){
-		//可编辑状态，显示checkbox
-		if (editable) {
-			mViewHolder.checkBox.setVisibility(View.VISIBLE);
-			mViewHolder.checkBox.setChecked(checked);
-		}else {
-			mViewHolder.checkBox.setVisibility(View.GONE);
-		}
+
 		//原路径和当前路径不同，更新图
 		if (mPath==null||!mPath.equals(path)) {
 			mImageLoader.loadImage(path, mViewHolder.imageView, mOptions);
@@ -68,6 +49,13 @@ public class ThumbnaiImageView extends FrameLayout  {
 			mViewHolder.checkBox.setTag(path);
 			setTag(path);
 			mPosition=position;
+		}
+		//可编辑状态，显示checkbox
+		if (editable) {
+			mViewHolder.checkBox.setVisibility(View.VISIBLE);
+			mViewHolder.checkBox.setChecked(checked);
+		}else {
+			mViewHolder.checkBox.setVisibility(View.GONE);
 		}
 	}
 
@@ -80,11 +68,6 @@ public class ThumbnaiImageView extends FrameLayout  {
 	 */
 	public void setOnCheckedChangeListener(OnCheckedChangeListener listener){
 		mViewHolder.checkBox.setOnCheckedChangeListener(listener);
-//		if(mViewHolder.checkBox.getVisibility()==View.GONE){
-//			mViewHolder.checkBox.setVisibility(View.VISIBLE);
-//		}else{
-//			mViewHolder.checkBox.setVisibility(View.GONE);
-//		}
 	}
 
 	@Override

@@ -2,9 +2,7 @@ package com.terrydr.eyeScope;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
-
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.Point;

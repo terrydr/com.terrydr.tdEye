@@ -1,6 +1,5 @@
 package com.terrydr.eyeScope;
 
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
