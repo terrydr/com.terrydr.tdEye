@@ -200,11 +200,8 @@
                      target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/CameraView.java"
                      target-dir="src/com/terrydr/eyeScope"/>
-		<source-file src="src/android/com/terrydr/eyeScope/FocusImageView.java"
-                     target-dir="src/com/terrydr/eyeScope"/>	
 		<source-file src="src/android/com/terrydr/eyeScope/FileOperateUtil.java"
                      target-dir="src/com/terrydr/eyeScope"/>		 
-		<source-file src="src/android/res/anim/focusview_show.xml" target-dir="res/anim"/>
 		<source-file src="src/android/res/drawable/item_album_grid_checkbox.xml" target-dir="res/drawable"/>
 		<source-file src="src/android/res/drawable/whitebalance_setting_progressbar.xml" target-dir="res/drawable"/>	
 		<source-file src="src/android/res/drawable-hdpi/albumitem_selected.png" target-dir="res/drawable-hdpi"/>

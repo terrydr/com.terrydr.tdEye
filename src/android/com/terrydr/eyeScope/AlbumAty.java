@@ -215,7 +215,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 					}
 				}
 			}
-			Log.e(TAG, "5");
+//			Log.e(TAG, "5");
 			Intent intent1 = new Intent();
 			Bundle bundle1 = new Bundle();
 			bundle1.putString("result_Json", result_Json.toString());

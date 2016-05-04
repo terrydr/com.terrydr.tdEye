@@ -69,7 +69,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 				int height) {
 			updateCameraOrientation();
 		}
-
+		
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
 			if (mCamera != null) {
@@ -79,6 +79,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 			}
 
 		}
+		
 	};
 
 
@@ -88,13 +89,12 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	private void setCameraParameters() {
 		Camera.Parameters parameters = mCamera.getParameters();
 //		parameters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_CLOUDY_DAYLIGHT);
-		
-		boolean m = parameters.isAutoWhiteBalanceLockSupported();
-		String i = parameters.getWhiteBalance();
+//		boolean m = parameters.isAutoWhiteBalanceLockSupported();
+//		String i = parameters.getWhiteBalance();
 //		Log.e( "是否支持自动白平衡：", String.valueOf(m));
 //		Log.e( "当前白平衡：", String.valueOf(i));
-		parameters.setAutoWhiteBalanceLock(false);
-		String n = parameters.getWhiteBalance();
+//		parameters.setAutoWhiteBalanceLock(false);
+//		String n = parameters.getWhiteBalance();
 //		int m = parameters.getMaxExposureCompensation();
 
 		// 选择合的预览尺寸
@@ -122,13 +122,21 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		parameters.setPictureFormat(ImageFormat.JPEG);
 		parameters.setJpegQuality(100);
 		parameters.setJpegThumbnailQuality(100);
-		// 自动聚焦模式
-//		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
 		mCamera.setParameters(parameters);
-//		mCamera.cancelAutoFocus();
 		// 启屏幕朝向监
 		startOrientationChangeListener();
 	}
+	
+	/**
+	 * 自动对焦
+	 */
+	AutoFocusCallback autoFocusCallback = new AutoFocusCallback(){
+		  @Override
+		  public void onAutoFocus(boolean success, Camera arg1) {
+			  if(success){
+				  Log.i(TAG, "自动对焦成功");  
+			  }
+		  }};
 
 	/**
 	 * 启动屏幕朝向改变监听函数 用于在屏幕横竖屏切换时改变保存的图片的方
@@ -177,6 +185,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 			parameters.setRotation(rotation);// 生成的图片转90°
 			// 预览图片旋转90°
 			mCamera.setDisplayOrientation(90);// 预览
+			mCamera.autoFocus(autoFocusCallback);  //添加自动对焦
 			mCamera.setParameters(parameters);
 			
 		}
@@ -266,4 +275,5 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		parameters.setExposureCompensation(iso);
 		mCamera.setParameters(parameters);
 	}
+	
 }

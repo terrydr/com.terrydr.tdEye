@@ -50,12 +50,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_camera);
-
 		mContainer = (CameraContainer) findViewById(R.id.container);
-
 		eyeleft_tv = (TextView) findViewById(R.id.eyeleft_tv);
 		eyeleft_tv1 = (TextView) findViewById(R.id.eyeleft_tv1);
-
 		return_index_bt = (ImageView) findViewById(R.id.return_index_bt);
 		photos_iv = (ImageView) findViewById(R.id.photos_iv);
 		iso_iv = (ImageView) findViewById(R.id.iso_iv);
@@ -79,8 +76,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 		int i = dip2px(10);
 		int m = px2dip(20);
-		Log.e(TAG, "i:" + i);
-		Log.e(TAG, "m:" + m);
+//		Log.e(TAG, "i:" + i);
+//		Log.e(TAG, "m:" + m);
 		// mHeaderBar.getBackground().setAlpha(204);//透明0~255透明度 ，越小越透明
 	}
 
@@ -367,10 +364,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		Log.e(TAG,"");
 		switch (resultCode) { // resultCode为回传的标记，回传的是RESULT_OK
 		case 0:
-			Log.e(TAG,"0");
+//			Log.e(TAG,"0");
 			Bundle b = data.getExtras();
 			if(b!=null){
 				mExposureNum = b.getInt("mexposureNum");
@@ -379,17 +375,15 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			mContainer.setCameraISO_int(mExposureNum);
 			break;
 		case 5:
-			Log.e(TAG,"5");
+//			Log.e(TAG,"5");
 			Intent intent = new Intent();
 			Bundle b1 = data.getExtras();
-			// 把返回数据存入Intent
 			intent.putExtras(b1);
-			// 设置返回数据
 			this.setResult(5, intent);
 			this.finish();
 			break;
 		case 6:
-			Log.e(TAG,"6");
+//			Log.e(TAG,"6");
 			Intent intent1 = new Intent();
 			Bundle b11 = data.getExtras();
 			intent1.putExtras(b11);
@@ -414,7 +408,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	}
 	@Override
 	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -426,14 +419,12 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		// Log.e("1111111111", "8888888888888");
 		return false;
 	}
 
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 			float distanceY) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

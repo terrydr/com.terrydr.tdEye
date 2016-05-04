@@ -2,14 +2,10 @@ package com.terrydr.eyeScope;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 public class Plugin_intent extends CordovaPlugin {
 	private final static String TAG = "Plugin_intent";
@@ -54,10 +50,8 @@ public class Plugin_intent extends CordovaPlugin {
 	 * 跳转到相册缩略图界面
 	 */
 	private void startAlbumAty() {
-		Log.e(TAG, "startAlbumAty");
-		Log.e(TAG, "callbackContext:" + callbackContext);
+		Log.i(TAG, "startAlbumAty");
 		Intent intent = new Intent(cordova.getActivity(), AlbumAty.class);
-//		cordova.getActivity().startActivity(intent);
 		Bundle bundle = new Bundle();
 		bundle.putBoolean("isPlugin", true);
 		intent.putExtras(bundle);
@@ -69,7 +63,6 @@ public class Plugin_intent extends CordovaPlugin {
 	 */
 	private void startAlbumItemAty(String args) {
 		// cordova.getActivity() 获取当前activity的this
-		Log.e(TAG, "startAlbumItemAty:" + args);
 		Intent intent = new Intent(cordova.getActivity(),
 				AlbumItemAtyForJs.class);
 		Bundle bundle = new Bundle();
@@ -78,13 +71,8 @@ public class Plugin_intent extends CordovaPlugin {
 		cordova.startActivityForResult((CordovaPlugin) this, intent, 0);
 	}
 
-	public void jrEyeTakePhotos(String result) {
-		callbackContext.success(result);
-	}
-
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		
 		super.onActivityResult(requestCode, resultCode, intent);
 		switch (resultCode) { // resultCode为回传的标记，回传的是RESULT_OK
 		case 0:
@@ -93,22 +81,18 @@ public class Plugin_intent extends CordovaPlugin {
 			Log.e(TAG, "5");
 			Bundle b = intent.getExtras();
 			String result_Json = b.getString("result_Json");
-			// PluginResult mPlugin = new PluginResult(PluginResult.Status.OK,
-			// result_Json);
-			// mPlugin.setKeepCallback(true);
-			// callbackContext.sendPluginResult(mPlugin);
 			org.json.JSONObject result = null;
 			try {
 				result = new org.json.JSONObject(result_Json);
-				Log.e(TAG, "result:" + result);
+//				Log.e(TAG, "result:" + result);
 			} catch (JSONException e) {
 				Log.e(TAG, "String to Json error!");
 			}
-			Log.e(TAG, "callbackContext:" + callbackContext);
+//			Log.e(TAG, "callbackContext:" + callbackContext);
 			callbackContext.success(result);
 			break;
 		case 6:
-			Log.e(TAG, "6");
+//			Log.e(TAG, "6");
 			Intent intent1 = new Intent(cordova.getActivity(), CameraActivity.class);
 			Bundle bundle = new Bundle();
 			bundle.putBoolean("deleteFile", false);

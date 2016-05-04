@@ -7,16 +7,10 @@ import java.io.FileOutputStream;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.hardware.Camera;
-import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
 import android.media.ThumbnailUtils;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnTouchListener;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import com.terrydr.eyeScope.R;
@@ -30,8 +24,8 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	/** 相机绑定的SurfaceView */
 	private CameraView mCameraView;
 
-	/** 触摸屏幕时显示的聚焦图案 */
-	private FocusImageView mFocusImageView;
+//	/** 触摸屏幕时显示的聚焦图案 */
+//	private FocusImageView mFocusImageView;
 
 	/** 拍照监听接口，用以在拍照始和结束后执行相应操*/
 	private TakePictureListener mListener;
@@ -46,7 +40,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		super(context, attrs);
 		initView(context);
 //		mHandler = new Handler();
-//		 setOnTouchListener(new TouchListener());
+//		setOnTouchListener(new TouchListener());
 		
 	}
 
@@ -58,7 +52,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	private void initView(final Context context) {
 		inflate(context, R.layout.cameracontainer, this);
 		mCameraView = (CameraView) findViewById(R.id.cameraView);
-		mFocusImageView = (FocusImageView) findViewById(R.id.focusImageView);
+//		mFocusImageView = (FocusImageView) findViewById(R.id.focusImageView);
 //		mCameraView.setOnTouchListener(this);
 	}
 
@@ -82,24 +76,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 //		mCameraView.onFocus(point,autoFocusCallback);
 	}
 	
-	private final AutoFocusCallback autoFocusCallback=new AutoFocusCallback() {
-
-		@Override
-		public void onAutoFocus(boolean success, Camera camera) {
-			//聚焦之后根据结果修改图片
-			if (success) {
-//				mFocusImageView.onFocusSuccess();
-				Log.e("123", "111");
-				takePicture(pictureCallback, mListener);
-
-			}else {
-				//聚焦失败显示的图片，由于未找到合适的资源，这里仍显示同一张图片
-//				mFocusImageView.onFocusFailed();
-
-			}
-		}
-	};
-
 	private final PictureCallback pictureCallback = new PictureCallback() {
 
 		@Override
@@ -142,97 +118,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		public void onAnimtionEnd(Bitmap bm, boolean isVideo);
 	}
 
-	private final class TouchListener implements OnTouchListener {
-
-		/** 记录是拖拉照片模式还是放大缩小照片模式 */
-
-		private static final int MODE_INIT = 0;
-		/** 放大缩小照片模式 */
-		private static final int MODE_ZOOM = 1;
-		private int mode = MODE_INIT;// 初始状态 
-
-		/** 用于记录拖拉图片移动的坐标位置 */
-
-		private float startDis;
-
-
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			/** 通过与运算保留最后八位 MotionEvent.ACTION_MASK = 255 */
-//			Log.e("1111111111", "12333333333333");
-			if(event.getAction()==MotionEvent.ACTION_UP){  
-				Log.e("1111111111", "123");
-				Point point=new Point((int)event.getX(), (int)event.getY());
-//				mCameraView.onFocus(point,autoFocusCallback);
-//				
-				} 
-//			switch (event.getAction() & MotionEvent.ACTION_MASK) {
-			// 手指压下屏幕
-//			case MotionEvent.ACTION_DOWN:
-//				mode = MODE_INIT;
-//				break;
-//			case MotionEvent.ACTION_POINTER_DOWN:
-//				//如果mZoomSeekBar为null 表示该设备不支持缩放 直接跳过设置mode Move指令也无法执行
-//				if(mZoomSeekBar==null) return true;
-//				//移除token对象为mZoomSeekBar的延时任务
-//				mHandler.removeCallbacksAndMessages(mZoomSeekBar);
-//				mZoomSeekBar.setVisibility(View.VISIBLE);
-//
-//				mode = MODE_ZOOM;
-//				/** 计算两个手指间的距离 */
-//				startDis = distance(event);
-//				break;
-//			case MotionEvent.ACTION_MOVE:
-//				if (mode == MODE_ZOOM) {
-//					//只有同时触屏两个点的时候才执行
-//					if(event.getPointerCount()<2) return true;
-//					float endDis = distance(event);// 结束距离
-//					//每变化10f zoom变1
-//					int scale=(int) ((endDis-startDis)/10f);
-//					if(scale>=1||scale<=-1){
-//						int zoom=mCameraView.getZoom()+scale;
-//						//zoom不能超出范围
-//						if(zoom>mCameraView.getMaxZoom()) zoom=mCameraView.getMaxZoom();
-//						if(zoom<0) zoom=0;
-//						mCameraView.setZoom(zoom);
-//						mZoomSeekBar.setProgress(zoom);
-//						//将最后一次的距离设为当前距离
-//						startDis=endDis;
-//					}
-//				}
-//				break;
-				// 手指离开屏幕
-//			case MotionEvent.ACTION_UP:
-////				if(mode!=MODE_ZOOM){
-//					//设置聚焦
-//					Point point=new Point((int)event.getX(), (int)event.getY());
-//					mCameraView.onFocus(point,autoFocusCallback);
-//					Log.e("1111111111", "123");
-//					mFocusImageView.startFocus(point);
-//				}else {
-//					//ZOOM模式下 在结束两秒后隐藏seekbar 设置token为mZoomSeekBar用以在连续点击时移除前一个定时任务
-//					mHandler.postAtTime(new Runnable() {
-//
-//						@Override
-//						public void run() {
-//							// TODO Auto-generated method stub
-//							mZoomSeekBar.setVisibility(View.GONE);
-//						}
-//					}, mZoomSeekBar,SystemClock.uptimeMillis()+2000);
-//				}
-//				break;
-//			}
-			return true;
-		}
-		/** 计算两个手指间的距离 */
-		private float distance(MotionEvent event) {
-			float dx = event.getX(1) - event.getX(0);
-			float dy = event.getY(1) - event.getY(0);
-			/** 使用勾股定理返回两点之间的距离 */
-			return (float) Math.sqrt(dx * dx + dy * dy);
-		}
-
-	}
 	
 	/**
 	 * 拍照返回的byte数据处理
@@ -297,7 +182,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 					bufferos.close();
 					return bm;
 				} catch (Exception e) {
-					Log.e(TAG, e.toString());
 					Toast.makeText(getContext(), "解析相机返回流失败",
 							Toast.LENGTH_SHORT).show();
 
@@ -330,7 +214,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 				if (options < 0) {
 					break;
 				}
-				Log.i(TAG, baos.toByteArray().length / 1024 + "");
+//				Log.i(TAG, baos.toByteArray().length / 1024 + "");
 				baos.reset();// 重置baos即清空baos
 				bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);// 这里压缩options%，把压缩后的数据存放到baos
 			}
