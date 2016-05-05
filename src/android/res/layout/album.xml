@@ -15,100 +15,120 @@
         layout="@layout/album_header_bar" />
 
     <LinearLayout
+        android:id="@+id/linearLayou_left"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:gravity="center_vertical"
-        android:paddingLeft="10dip" >
+        android:layout_weight="1"
+        android:visibility="gone"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dip" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/icon_left" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="50dip"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dip"
+                android:text="@string/eye_left"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size" />
+        </LinearLayout>
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/icon_left" />
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:background="@color/line_bg" />
 
-        <TextView
+        <com.terrydr.eyeScope.AlbumGridView
+            android:id="@+id/albumview"
             android:layout_width="fill_parent"
-            android:layout_height="50dip"
-            android:gravity="center_vertical"
-            android:paddingLeft="10dip"
-            android:text="@string/eye_left"
-            android:textColor="@android:color/black"
-            android:textSize="18sp" />
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:cacheColorHint="@android:color/transparent"
+            android:descendantFocusability="blocksDescendants"
+            android:gravity="center"
+            android:horizontalSpacing="10dip"
+            android:listSelector="@android:color/transparent"
+            android:numColumns="3"
+            android:padding="10dip"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="10dip" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:background="@color/line_bg" />
     </LinearLayout>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1dip"
-        android:background="@color/line_bg" />
-
-    <com.terrydr.eyeScope.AlbumGridView
-        android:id="@+id/albumview"
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        android:background="@color/white"
-        android:cacheColorHint="@android:color/transparent"
-        android:gravity="center"
-        android:horizontalSpacing="10dip"
-        android:listSelector="@android:color/transparent"
-        android:numColumns="3"
-        android:padding="10dip"
-        android:stretchMode="columnWidth"
-        android:descendantFocusability="blocksDescendants" 
-        android:verticalSpacing="10dip" />
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1dip"
-        android:background="@color/line_bg" />
 
     <LinearLayout
+        android:id="@+id/linearLayou_right"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:gravity="center_vertical"
-        android:paddingLeft="10dip" >
+        android:layout_weight="1"
+        android:visibility="gone"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dip" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/icon_right" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="50dip"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dip"
+                android:text="@string/eye_right"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size" />
+        </LinearLayout>
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/icon_right" />
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:background="@color/line_bg" />
 
-        <TextView
+        <com.terrydr.eyeScope.AlbumGridView
+            android:id="@+id/albumview_right"
             android:layout_width="fill_parent"
-            android:layout_height="50dip"
-            android:gravity="center_vertical"
-            android:paddingLeft="10dip"
-            android:text="@string/eye_right"
-            android:textColor="@android:color/black"
-            android:textSize="18sp" />
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:cacheColorHint="@android:color/transparent"
+            android:descendantFocusability="blocksDescendants"
+            android:gravity="center"
+            android:horizontalSpacing="10dip"
+            android:listSelector="@android:color/transparent"
+            android:numColumns="3"
+            android:padding="10dip"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="10dip" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:background="@color/line_bg" />
     </LinearLayout>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1dip"
-        android:background="@color/line_bg" />
-
-    <com.terrydr.eyeScope.AlbumGridView
-        android:id="@+id/albumview_right"
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        android:background="@color/white"
-        android:cacheColorHint="@android:color/transparent"
-        android:gravity="center"
-        android:horizontalSpacing="10dip"
-        android:listSelector="@android:color/transparent"
-        android:numColumns="3"
-        android:padding="10dip"
-        android:stretchMode="columnWidth"
-        android:descendantFocusability="blocksDescendants" 
-        android:verticalSpacing="10dip" />
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1dip"
-        android:background="@color/line_bg" />
 
     <Button
         android:id="@+id/commit_bt"
@@ -119,8 +139,9 @@
         android:layout_marginLeft="20dip"
         android:layout_marginRight="20dip"
         android:layout_marginTop="20dip"
-        android:background="@color/common_title_bg"
+        android:background="@drawable/commit_bt_bg"
         android:scaleType="centerCrop"
+        android:textSize="@dimen/text_size_20"
         android:text="@string/commit_bt"
         android:textColor="@android:color/white"
         android:visibility="invisible" />

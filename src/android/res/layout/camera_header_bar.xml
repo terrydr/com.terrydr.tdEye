@@ -4,27 +4,36 @@
     android:layout_height="@dimen/top_menu_bar_height"
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true"
+    android:layout_weight="3"
     android:background="@color/transparent_background"
     android:clickable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal" >
 
-    <ImageView
+    <TextView
         android:id="@+id/return_index_bt"
-        android:layout_width="40.0dip"
-        android:layout_height="35.0dip"
-        
-        android:layout_marginLeft="10dip"
-        
-        android:layout_weight="1.0"
-        android:contentDescription="@string/app_name"
-        android:src="@drawable/top_left_but" />
-
-    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="2.0"
-        android:gravity="center" >
-    </RelativeLayout>
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dip"
+        android:text="@string/cance_bt_tv"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size" />
+
+    <TextView
+        android:id="@+id/camera_camera_tv"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/camera_tv"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size_20" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1" />
 
 </LinearLayout>

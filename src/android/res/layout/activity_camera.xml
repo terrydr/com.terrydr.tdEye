@@ -10,6 +10,8 @@
 
     <com.terrydr.eyeScope.CameraContainer
         android:id="@+id/container"
+        android:layout_below="@+id/camera_header_bar"
+        android:layout_above="@+id/camera_bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -39,6 +41,7 @@
         android:layout_below="@+id/iso_iv"
         android:layout_marginRight="10dip"
         android:layout_marginTop="10dip"
+        android:visibility="gone"
         android:src="@drawable/icon_whitebalance_iv_bright" />
 
 </RelativeLayout>

@@ -7,20 +7,39 @@
     <RelativeLayout
         android:id="@+id/header_bar_navi"
         android:layout_width="fill_parent"
-        android:layout_height="@dimen/album_header_bar_height"
+        android:layout_height="@dimen/top_menu_bar_height"
         android:background="@color/common_title_bg"
         android:orientation="horizontal" >
 
         <ImageView
-            android:id="@+id/header_bar_back"
+            android:id="@+id/header_bar_back_iv"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="20dp"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:paddingLeft="@dimen/title_view_left_back_padding_left"
-            android:paddingRight="@dimen/title_view_left_back_padding_right"
             android:scaleType="fitCenter"
             android:src="@drawable/top_left_but" />
 
+        <TextView
+            android:id="@+id/header_bar_back"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_toRightOf="@id/header_bar_back_iv"
+            android:gravity="center_vertical"
+            android:text="@string/camera_tv"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size" />
+
+        <TextView
+            android:id="@+id/album_image_browse_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center_vertical"
+            android:text="@string/image_browse_tv"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_20" />
 
         <TextView
             android:id="@+id/header_bar_enter_selection"
@@ -28,32 +47,50 @@
             android:layout_height="fill_parent"
             android:layout_alignParentRight="true"
             android:gravity="center"
-            android:paddingLeft="8.0dip"
-            android:paddingRight="8.0dip"
+            android:paddingRight="10.0dip"
             android:singleLine="true"
             android:text="@string/header_bar_enter_selection_tv"
             android:textColor="@android:color/white"
-            android:textSize="18.0sp" />
+            android:textSize="@dimen/text_size" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/header_bar_select"
         android:layout_width="fill_parent"
-        android:layout_height="@dimen/album_header_bar_height"
+        android:layout_height="@dimen/top_menu_bar_height"
         android:background="@color/common_title_bg"
-        android:visibility="gone"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:visibility="gone" >
 
         <ImageView
-            android:id="@+id/cance_back_iv"
+            android:id="@+id/header_bar_back_iv1"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="20dp"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:paddingLeft="@dimen/title_view_left_back_padding_left"
-            android:paddingRight="@dimen/title_view_left_back_padding_right"
             android:scaleType="fitCenter"
             android:src="@drawable/top_left_but" />
 
+        <TextView
+            android:id="@+id/cance_back_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="center_vertical"
+            android:layout_toRightOf="@id/header_bar_back_iv1"
+            android:text="@string/camera_tv"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size" />
+
+        <TextView
+            android:id="@+id/album_image_browse_tv1"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center_vertical"
+            android:text="@string/image_browse_tv"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_20" />
 
         <TextView
             android:id="@+id/cance_bt"
@@ -61,12 +98,11 @@
             android:layout_height="fill_parent"
             android:layout_alignParentRight="true"
             android:gravity="center"
-            android:paddingRight="8.0dip"
+            android:paddingRight="10.0dip"
             android:singleLine="true"
             android:text="@string/cance_bt_tv"
             android:textColor="@android:color/white"
-            android:textSize="18.0sp" />
+            android:textSize="@dimen/text_size" />
     </RelativeLayout>
-
 
 </LinearLayout>

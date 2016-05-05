@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,8 +26,7 @@ import com.terrydr.eyeScope.R;
 public class AlbumItemAtyForJs extends Activity implements OnClickListener,OnSingleTapListener{
 	public final static String TAG="AlbumItemAtyForJs";
 	private AlbumViewPager mViewPager;//显示大图
-	private ImageView mBackView;
-	private TextView mCountView;
+	private TextView mCountView,mBackView;
 	private View mHeaderBar,mBottomBar;
 	private String data;
 	@Override
@@ -35,12 +35,15 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,OnSin
 		setContentView(R.layout.albumitem_for_js);
 
 		mViewPager=(AlbumViewPager)findViewById(R.id.albumviewpager);
-		mBackView=(ImageView)findViewById(R.id.header_bar_photo_back);
+		mBackView=(TextView)findViewById(R.id.header_bar_photo_back);
 		mCountView=(TextView)findViewById(R.id.header_bar_photo_count);
 		mHeaderBar=findViewById(R.id.album_item_header_bar);
 
 		mBackView.setOnClickListener(this);
 		mCountView.setOnClickListener(this);
+		
+		TextPaint tp = mCountView.getPaint();  //安体加粗
+	    tp.setFakeBoldText(true);
 
 		data=getIntent().getExtras().getString("data");
 		mViewPager.setOnPageChangeListener(pageChangeListener);
@@ -64,9 +67,9 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,OnSin
         	if(!paths.isEmpty()){
 	        	mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(paths,true));
 				mViewPager.setCurrentItem(index);
-				mCountView.setText((index+1)+"/"+paths.size());
+				mCountView.setText((index+1)+" / "+paths.size());
         	}else{
-        		mCountView.setText("0/0");
+        		mCountView.setText("0 / 0");
         	}
         } catch (JSONException e) {   
             Log.e(TAG, e.toString());
@@ -80,10 +83,10 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,OnSin
 		@Override
 		public void onPageSelected(int position) {
 			if(mViewPager.getAdapter()!=null){
-				String text=(position+1)+"/"+mViewPager.getAdapter().getCount();
+				String text=(position+1)+" / "+mViewPager.getAdapter().getCount();
 				mCountView.setText(text);
 			}else {
-				mCountView.setText("0/0");
+				mCountView.setText("0 / 0");
 			}
 		}
 

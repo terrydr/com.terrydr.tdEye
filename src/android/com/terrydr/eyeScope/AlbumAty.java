@@ -11,11 +11,13 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import com.terrydr.eyeScope.R;
@@ -37,12 +39,14 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	private String mSaveRoot_right = "right";
 
 	private TextView mEnterView;
-	private TextView cance_bt;
+	private TextView cance_bt,mBackView,album_image_browse_tv,album_image_browse_tv1;
 	private Button commit_bt;
-	private ImageView mBackView, cance_back_iv;
+	private TextView cance_back_iv;
 	private Bundle bundle;
 	private boolean isPlugin = false;  //标记是否是plugin传过来的,默认为false:否;ure:是
-	ThumbnaiImageView view;
+	private ThumbnaiImageView view;
+	private LinearLayout linearLayou_left,linearLayou_right;
+	private ImageView header_bar_back_iv,header_bar_back_iv1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,20 +57,32 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		if (bundle != null) {
 			isPlugin = bundle.getBoolean("isPlugin");
 		}
-
+		linearLayou_left = (LinearLayout) findViewById(R.id.linearLayou_left);
+		linearLayou_right = (LinearLayout) findViewById(R.id.linearLayou_right);
 		mAlbumView = (AlbumGridView) findViewById(R.id.albumview); // 左眼
 		mAlbumView_right = (AlbumGridView) findViewById(R.id.albumview_right); // 右眼
 		mEnterView = (TextView) findViewById(R.id.header_bar_enter_selection);
 		cance_bt = (TextView) findViewById(R.id.cance_bt);
 		commit_bt = (Button) findViewById(R.id.commit_bt);
-		mBackView = (ImageView) findViewById(R.id.header_bar_back);
-		cance_back_iv = (ImageView) findViewById(R.id.cance_back_iv);
+		mBackView = (TextView) findViewById(R.id.header_bar_back);
+		cance_back_iv = (TextView) findViewById(R.id.cance_back_iv);
+		header_bar_back_iv = (ImageView) findViewById(R.id.header_bar_back_iv);
+		header_bar_back_iv1 = (ImageView) findViewById(R.id.header_bar_back_iv1);
+		
+		album_image_browse_tv = (TextView) findViewById(R.id.album_image_browse_tv);
+		album_image_browse_tv1 = (TextView) findViewById(R.id.album_image_browse_tv1);
+		TextPaint tp = album_image_browse_tv.getPaint();  //安体加粗
+	    tp.setFakeBoldText(true);
+		TextPaint tp1 = album_image_browse_tv1.getPaint();  //安体加粗
+	    tp1.setFakeBoldText(true);
 
 		mEnterView.setOnClickListener(this);
 		cance_back_iv.setOnClickListener(this);
 		cance_bt.setOnClickListener(this);
 		mBackView.setOnClickListener(this);
 		commit_bt.setOnClickListener(this);
+		header_bar_back_iv.setOnClickListener(this);
+		header_bar_back_iv1.setOnClickListener(this);
 
 		mAlbumView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -191,7 +207,11 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			enterEdit();
 			break;
 		case R.id.cance_back_iv:
-			leaveEdit();
+//			leaveEdit();
+			backPrevious();
+			break;
+		case R.id.header_bar_back_iv1:
+			backPrevious();
 			break;
 		case R.id.cance_bt:
 			leaveEdit();
@@ -241,6 +261,9 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			this.finish();
 			break;
 		case R.id.header_bar_back:
+			backPrevious();
+			break;
+		case R.id.header_bar_back_iv:
 			backPrevious();
 			break;
 		default:
@@ -333,12 +356,24 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		String thumbFolder = FileOperateUtil.getFolderPath(this, FileOperateUtil.TYPE_THUMBNAIL, rootPath);
 		List<File> files = FileOperateUtil.listFiles(thumbFolder, format);
 		if (files != null && files.size() > 0) {
+			if(rootPath.equals(mSaveRoot_left)){
+				linearLayou_left.setVisibility(View.VISIBLE);
+			}else if(rootPath.equals(mSaveRoot_right)){
+				linearLayou_right.setVisibility(View.VISIBLE);
+			}
 			List<String> paths = new ArrayList<String>();
 			for (File file : files) {
 				paths.add(file.getAbsolutePath());
 			}
 			alvumGridView.setAdapter(alvumGridView.new AlbumViewAdapter(paths, _itemSelectedSet));
 		}
+//		else{
+//			if(rootPath.equals(mSaveRoot_left)){
+//				linearLayou_left.setVisibility(View.GONE);
+//			}else if(rootPath.equals(mSaveRoot_right)){
+//				linearLayou_right.setVisibility(View.GONE);
+//			}
+//		}
 	}
 
 	@Override

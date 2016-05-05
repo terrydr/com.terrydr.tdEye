@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
@@ -31,12 +32,12 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 	public final static String TAG = "CameraActivity";
 	private CameraContainer mContainer;
-	private ImageView photos_iv, return_index_bt;
+	private ImageView photos_iv;
 	private String mSaveRoot_left, mSaveRoot_right;
 	private ImageView iso_iv, whitebalance_iv;
 	private int mExposureNum = 0;
 	private RelativeLayout whitebalance_rl;
-	private TextView eyeleft_tv, eyeleft_tv1;
+	private TextView eyeleft_tv, eyeleft_tv1,return_index_bt,camera_camera_tv;
 	private LinearLayout linearlayou_left, linearlayou_right;
 	private GestureDetector detector;
 	private boolean leftOrRight = true; // 默认为左 true:左眼，false:右眼
@@ -53,13 +54,16 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		mContainer = (CameraContainer) findViewById(R.id.container);
 		eyeleft_tv = (TextView) findViewById(R.id.eyeleft_tv);
 		eyeleft_tv1 = (TextView) findViewById(R.id.eyeleft_tv1);
-		return_index_bt = (ImageView) findViewById(R.id.return_index_bt);
+		return_index_bt = (TextView) findViewById(R.id.return_index_bt);
 		photos_iv = (ImageView) findViewById(R.id.photos_iv);
 		iso_iv = (ImageView) findViewById(R.id.iso_iv);
 		whitebalance_iv = (ImageView) findViewById(R.id.whitebalance_iv);
 		whitebalance_rl = (RelativeLayout) findViewById(R.id.whitebalance_rl);
 		linearlayou_left = (LinearLayout) findViewById(R.id.linearlayou_left);
 		linearlayou_right = (LinearLayout) findViewById(R.id.linearlayou_right);
+		camera_camera_tv = (TextView) findViewById(R.id.camera_camera_tv);
+		TextPaint tp = camera_camera_tv.getPaint();  //安体加粗
+	    tp.setFakeBoldText(true);
 
 		photos_iv.setOnClickListener(this);
 		iso_iv.setOnClickListener(this);

@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.text.TextPaint;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AlphaAnimation;
@@ -24,25 +25,30 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	public final static String TAG="AlbumDetailAty";
 	private String mSaveRoot;
 	private AlbumViewPager mViewPager;//显示大图
-	private ImageView mBackView;
+	private TextView mBackView;
 	private TextView mCountView,selected_tv,leftorright_tv;
 	private View mHeaderBar,mBottomBar;
+	private ImageView header_bar_photo_back_iv;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.albumitem);
 
 		mViewPager=(AlbumViewPager)findViewById(R.id.albumviewpager);
-		mBackView=(ImageView)findViewById(R.id.header_bar_photo_back);
+		mBackView=(TextView)findViewById(R.id.header_bar_photo_back);
+		header_bar_photo_back_iv=(ImageView)findViewById(R.id.header_bar_photo_back_iv);
 		mCountView=(TextView)findViewById(R.id.header_bar_photo_count);
 		mHeaderBar=findViewById(R.id.album_item_header_bar);
 		mBottomBar=findViewById(R.id.album_item_bottom_bar);
 		leftorright_tv=(TextView)findViewById(R.id.leftorright_tv);
-		
 		selected_tv= (TextView)findViewById(R.id.selected_tv);
+		
+		TextPaint tp = mCountView.getPaint();  //安体加粗
+	    tp.setFakeBoldText(true);
 
 		mBackView.setOnClickListener(this);
 		mCountView.setOnClickListener(this);
+		header_bar_photo_back_iv.setOnClickListener(this);
 
 		mSaveRoot=getIntent().getExtras().getString("root");
 		if(mSaveRoot.equals("left")){
@@ -96,10 +102,10 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 //			mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(paths));
 			mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(this,paths));
 			mViewPager.setCurrentItem(currentItem);
-			mCountView.setText((currentItem+1)+"/"+paths.size());
+			mCountView.setText((currentItem+1)+" / "+paths.size());
 		}
 		else {
-			mCountView.setText("0/0");
+			mCountView.setText("0 / 0");
 		}
 	}
 
@@ -109,10 +115,10 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		@Override
 		public void onPageSelected(int position) {
 			if(mViewPager.getAdapter()!=null){
-				String text=(position+1)+"/"+mViewPager.getAdapter().getCount();
+				String text=(position+1)+" / "+mViewPager.getAdapter().getCount();
 				mCountView.setText(text);
 			}else {
-				mCountView.setText("0/0");
+				mCountView.setText("0 / 0");
 			}
 		}
 
@@ -167,6 +173,10 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.header_bar_photo_back:
+			backPrevious();
+			finish();
+			break;
+		case R.id.header_bar_photo_back_iv:
 			backPrevious();
 			finish();
 			break;
