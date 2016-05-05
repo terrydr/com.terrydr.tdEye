@@ -134,14 +134,16 @@ public class AlbumGridView extends GridView {
 
 		/** 选中图片后执行的回调函数 */
 		AlbumGridView.OnCheckedChangeListener listener = null;
+		AlbumAty albumAty;
 
 		public AlbumViewAdapter(List<String> paths) {
 			super();
 			this.mPaths = paths;
 		}
 		
-		public AlbumViewAdapter(List<String> paths,Set<String> _itemSelectedSet) {
+		public AlbumViewAdapter(Context c,List<String> paths,Set<String> _itemSelectedSet) {
 			super();
+			this.albumAty = (AlbumAty) c;
 			this.mPaths = paths;
 			this.itemSelectedSet1 = _itemSelectedSet;
 		}
@@ -260,6 +262,11 @@ public class AlbumGridView extends GridView {
 				if (listener != null)
 					listener.onCheckedChanged(itemSelectedSet);
 			}
+//			if(!itemSelectedSet.isEmpty()){
+//				albumAty.commit_bt.setVisibility(View.VISIBLE);
+//			}else{
+//				albumAty.commit_bt.setVisibility(View.GONE);
+//			}
 		}
 	}
 }

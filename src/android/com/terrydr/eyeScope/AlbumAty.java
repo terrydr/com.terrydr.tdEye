@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
+
 import com.terrydr.eyeScope.R;
 
 /**
@@ -40,7 +42,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 
 	private TextView mEnterView;
 	private TextView cance_bt,mBackView,album_image_browse_tv,album_image_browse_tv1;
-	private Button commit_bt;
+	public Button commit_bt;
 	private TextView cance_back_iv;
 	private Bundle bundle;
 	private boolean isPlugin = false;  //标记是否是plugin传过来的,默认为false:否;ure:是
@@ -195,7 +197,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		if (mAlbumView_right.getChildCount() > 0) {
 			mAlbumView_right.setEditable(false);
 		}
-		commit_bt.setVisibility(View.INVISIBLE);
+		commit_bt.setVisibility(View.GONE);
 		findViewById(R.id.header_bar_navi).setVisibility(View.VISIBLE);
 		findViewById(R.id.header_bar_select).setVisibility(View.GONE);
 	}
@@ -251,6 +253,10 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 						Log.e(TAG, e.toString());
 					}
 				}
+			}
+			if(result_Json.length()==0){
+				Toast.makeText(getApplicationContext(), "请选择图片再提交!",Toast.LENGTH_SHORT).show();
+				return;
 			}
 //			Log.e(TAG, "5");
 			Intent intent1 = new Intent();
@@ -365,7 +371,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			for (File file : files) {
 				paths.add(file.getAbsolutePath());
 			}
-			alvumGridView.setAdapter(alvumGridView.new AlbumViewAdapter(paths, _itemSelectedSet));
+			alvumGridView.setAdapter(alvumGridView.new AlbumViewAdapter(this,paths, _itemSelectedSet));
 		}
 //		else{
 //			if(rootPath.equals(mSaveRoot_left)){
@@ -380,6 +386,13 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	public void onCheckedChanged(Set<String> set) {
 		// Log.e(TAG, "onCheckedChanged" + set.toString());
 		// mAlbumView.getSelectedItem();
+//		Set<String> left_mAlbumView = mAlbumView.getSelectedItems();
+//		Set<String> right_mAlbumView = mAlbumView_right.getSelectedItems();
+//		if(!set.isEmpty()){
+//			commit_bt.setVisibility(View.VISIBLE);
+//		}else{
+//			commit_bt.setVisibility(View.GONE);
+//		}
 	}
 
 }
