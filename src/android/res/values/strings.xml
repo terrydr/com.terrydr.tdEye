@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">EyeScope</string>
-    <string name="title_activity_camera">CameraActivity</string>   
+    <string name="title_activity_camera">EyeScope</string>   
     <string name="eye_right">右眼</string>
     <string name="eye_left">左眼</string>
     <string name="header_bar_enter_selection_tv">选择</string>

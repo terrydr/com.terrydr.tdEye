@@ -8,12 +8,16 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -50,10 +54,22 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	private LinearLayout linearLayou_left,linearLayou_right;
 	private ImageView header_bar_back_iv,header_bar_back_iv1;
 
+	/**
+	 * 透明状态栏,透明导航栏
+	 */
+	@TargetApi(19)
+	private void initWindow(){
+	     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+	         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+	         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);   
+	     }
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.album);
+
+//		initWindow();
 
 		bundle = getIntent().getExtras();
 		if (bundle != null) {
@@ -373,26 +389,12 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			}
 			alvumGridView.setAdapter(alvumGridView.new AlbumViewAdapter(this,paths, _itemSelectedSet));
 		}
-//		else{
-//			if(rootPath.equals(mSaveRoot_left)){
-//				linearLayou_left.setVisibility(View.GONE);
-//			}else if(rootPath.equals(mSaveRoot_right)){
-//				linearLayou_right.setVisibility(View.GONE);
-//			}
-//		}
 	}
 
 	@Override
 	public void onCheckedChanged(Set<String> set) {
 		// Log.e(TAG, "onCheckedChanged" + set.toString());
 		// mAlbumView.getSelectedItem();
-//		Set<String> left_mAlbumView = mAlbumView.getSelectedItems();
-//		Set<String> right_mAlbumView = mAlbumView_right.getSelectedItems();
-//		if(!set.isEmpty()){
-//			commit_bt.setVisibility(View.VISIBLE);
-//		}else{
-//			commit_bt.setVisibility(View.GONE);
-//		}
 	}
 
 }

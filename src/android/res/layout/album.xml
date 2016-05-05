@@ -1,6 +1,5 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/FrameLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/album_background"
@@ -9,17 +8,19 @@
     <!-- 显示预览图形 -->
 
     <include
+        android:id="@+id/layou_top"
+        android:layout_alignParentTop="true"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         layout="@layout/album_header_bar" />
 
     <LinearLayout
+        android:layout_below="@id/layou_top"
         android:id="@+id/linearLayou_left"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:layout_weight="1"
         android:visibility="gone"
         android:orientation="vertical" >
 
@@ -73,11 +74,11 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_below="@id/linearLayou_left"
         android:id="@+id/linearLayou_right"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:layout_weight="1"
         android:visibility="gone"
         android:orientation="vertical" >
 
@@ -131,6 +132,7 @@
     </LinearLayout>
 
     <Button
+        android:layout_alignParentBottom="true"
         android:id="@+id/commit_bt"
         android:layout_width="match_parent"
         android:layout_height="54dip"
@@ -138,12 +140,11 @@
         android:layout_marginBottom="30dip"
         android:layout_marginLeft="20dip"
         android:layout_marginRight="20dip"
-        android:layout_marginTop="20dip"
         android:background="@drawable/commit_bt_bg"
         android:scaleType="centerCrop"
         android:textSize="@dimen/text_size_20"
         android:text="@string/commit_bt"
         android:textColor="@android:color/white"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
-</LinearLayout>
+</RelativeLayout>

@@ -262,11 +262,6 @@ public class AlbumGridView extends GridView {
 				if (listener != null)
 					listener.onCheckedChanged(itemSelectedSet);
 			}
-//			if(!itemSelectedSet.isEmpty()){
-//				albumAty.commit_bt.setVisibility(View.VISIBLE);
-//			}else{
-//				albumAty.commit_bt.setVisibility(View.GONE);
-//			}
 		}
 	}
 }
