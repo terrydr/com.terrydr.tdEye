@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -28,7 +29,7 @@ import android.widget.TextView;
 import com.terrydr.eyeScope.R;
 
 public class CameraActivity extends Activity implements View.OnClickListener,
-		TakePictureListener, OnGestureListener {
+		TakePictureListener, OnGestureListener, OnTouchListener {
 
 	public final static String TAG = "CameraActivity";
 	private CameraContainer mContainer;
@@ -71,6 +72,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		eyeleft_tv.setOnClickListener(this);
 		eyeleft_tv1.setOnClickListener(this);
 		return_index_bt.setOnClickListener(this);
+		
+		mContainer.setOnTouchListener(this);
+		
 
 		detector = new GestureDetector(this);
 		
@@ -493,5 +497,18 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		}
 		super.onResume();
 	}
+	
+	@Override
+	  public boolean onTouch(View arg0, MotionEvent event) {
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			mContainer.setOnFocus(new Point((int)event.getX(), (int)event.getY())); 
+			break;
+
+		default:
+			break;
+		}
+	    return false;
+	  }
 
 }

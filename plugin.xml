@@ -200,6 +200,8 @@
                      target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/CameraOperation.java"
                      target-dir="src/com/terrydr/eyeScope"/>
+		<source-file src="src/android/com/terrydr/eyeScope/CameraSize.java"
+                     target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/CameraView.java"
                      target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/FileOperateUtil.java"

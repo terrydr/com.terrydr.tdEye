@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.media.ThumbnailUtils;
@@ -207,17 +208,17 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		public ByteArrayOutputStream compress(Bitmap bitmap) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);// 质量压缩方法，这表示不压缩，把压缩后的数据存放到baos
-			int options = 99;
-			while (baos.toByteArray().length / 1024 > maxSize) { // 循环判断如果压缩后图片是否大100kb,大于继续压缩
-				options -= 3;// 每次都减
-				// 压缩比小，不再压
-				if (options < 0) {
-					break;
-				}
-//				Log.i(TAG, baos.toByteArray().length / 1024 + "");
-				baos.reset();// 重置baos即清空baos
-				bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);// 这里压缩options%，把压缩后的数据存放到baos
-			}
+//			int options = 99;
+//			while (baos.toByteArray().length / 1024 > maxSize) { // 循环判断如果压缩后图片是否大100kb,大于继续压缩
+//				options -= 3;// 每次都减
+//				// 压缩比小，不再压
+//				if (options < 0) {
+//					break;
+//				}
+////				Log.i(TAG, baos.toByteArray().length / 1024 + "");
+//				baos.reset();// 重置baos即清空baos
+//				bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);// 这里压缩options%，把压缩后的数据存放到baos
+//			}
 			return baos;
 		}
 
@@ -247,6 +248,10 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	 */
 	public void setCameraISO_int(int iso) {
 		setCameraISO(iso);
+	}
+	
+	public void setOnFocus(Point point) {		
+		mCameraView.onFocus(point, null);
 	}
 
 }

@@ -1,8 +1,12 @@
 package com.terrydr.eyeScope;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
+import com.terrydr.eyeScope.CameraSize.CameraSizeComparator;
+
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.Point;
@@ -14,6 +18,7 @@ import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.SurfaceHolder;
@@ -94,33 +99,25 @@ public class CameraView extends SurfaceView implements CameraOperation {
 //		parameters.setAutoWhiteBalanceLock(false);
 //		String n = parameters.getWhiteBalance();
 //		int m = parameters.getMaxExposureCompensation();
-
+		
 		// 选择合的预览尺寸
 		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
-		if (sizeList.size() > 0) {
-			Size cameraSize = sizeList.get(0);
-			// 预览图片大小
-			parameters.setPreviewSize(cameraSize.width, cameraSize.height);
-		}
-
+	    Size pictureS = CameraSize.getInstance().getPreviewSize(sizeList, 1200);  
+	    parameters.setPreviewSize(pictureS.width, pictureS.height);  
+	    Log.e(TAG, "w:" + pictureS.width +"-h:" + pictureS.height);  
 		// 设置生成的图片大
-		sizeList = parameters.getSupportedPictureSizes();
-		if (sizeList.size() > 0) {
-			Size cameraSize = sizeList.get(0);
-			for (Size size : sizeList) {
-				// 小于100W像素
-				if (size.width * size.height < 100 * 10000) {
-					cameraSize = size;
-					break;
-				}
-			}
-			parameters.setPictureSize(cameraSize.width, cameraSize.height);
-		}
+	    List<Camera.Size> sizeList1 = parameters.getSupportedPictureSizes();
+		Size pictureS1 = CameraSize.getInstance().getPictureSize(sizeList1, 1200);  
+	    parameters.setPictureSize(pictureS1.width, pictureS1.height);  
+	    Log.e(TAG, "w1:" + pictureS1.width +"-h1:" + pictureS1.height);  
+		
+		
 		// 设置图片格式
 		parameters.setPictureFormat(ImageFormat.JPEG);
 		parameters.setJpegQuality(100);
 		parameters.setJpegThumbnailQuality(100);
 		mCamera.setParameters(parameters);
+		
 		// 启屏幕朝向监
 		startOrientationChangeListener();
 	}
@@ -132,7 +129,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		  @Override
 		  public void onAutoFocus(boolean success, Camera arg1) {
 			  if(success){
-				  Log.i(TAG, "自动对焦成功");  
+//				  Log.d(TAG, "自动对焦成功");  
 			  }
 		  }};
 
@@ -233,7 +230,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		Camera.Parameters parameters=mCamera.getParameters();
 		//不支持设置自定义聚焦，则使用自动聚焦，返回
 		if (parameters.getMaxNumFocusAreas()<=0) {
-			mCamera.autoFocus(callback);
+			mCamera.autoFocus(autoFocusCallback);
 			return;
 		}
 		List<Area> areas=new ArrayList<Camera.Area>();
@@ -253,7 +250,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		} catch (Exception e) {
 			Log.e(TAG,"手动聚焦失败", e);
 		}
-		mCamera.autoFocus(callback);
+		mCamera.autoFocus(autoFocusCallback);
 	}
 	
 	@Override
