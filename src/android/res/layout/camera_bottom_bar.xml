@@ -12,14 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <ImageView
+      <!--   <ImageView
             android:id="@+id/imageView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
-            android:src="@drawable/eyeright_iv" />
+            android:visibility="gone"
+            android:src="@drawable/eyeright_iv" /> -->
 
         <LinearLayout
             android:id="@+id/linearlayou"
@@ -35,11 +36,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:paddingLeft="50dp" >
+                android:paddingLeft="70dp" >
 
                 <TextView
                     android:id="@+id/eyeright_tv"
-                    android:layout_width="50dp"
+                    android:layout_width="70dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/eye_left"
@@ -48,7 +49,7 @@
 
                 <TextView
                     android:id="@+id/eyeleft_tv"
-                    android:layout_width="50dp"
+                    android:layout_width="70dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/eye_right"
@@ -62,11 +63,11 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:visibility="gone"
-                android:paddingRight="50dp" >
+                android:paddingRight="70dp" >
 
                 <TextView
                     android:id="@+id/eyeleft_tv1"
-                    android:layout_width="50dp"
+                    android:layout_width="70dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/eye_left"
@@ -75,7 +76,7 @@
 
                 <TextView
                     android:id="@+id/eyeright_tv1"
-                    android:layout_width="50dp"
+                    android:layout_width="70dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/eye_right"
@@ -91,6 +92,8 @@
             android:layout_alignParentBottom="true"
             android:layout_below="@+id/linearlayou"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+             android:layout_marginBottom="5dp"
             android:src="@drawable/photos_iv" />
     </RelativeLayout>
 

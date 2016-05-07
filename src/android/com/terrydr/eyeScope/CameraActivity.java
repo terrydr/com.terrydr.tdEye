@@ -216,7 +216,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			break;
 		case R.id.iso_iv:
 			if (mExposureNum == 0) {
-				mExposureNum = 3;
+				mExposureNum = 5;
 				iso_iv.setImageResource(R.drawable.icon_iso_iv_dark);
 			} else {
 				mExposureNum = 0;
