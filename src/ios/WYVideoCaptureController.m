@@ -30,6 +30,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     AVPlayer *_player;
     AVPlayerLayer *_playerLayer;
     BOOL _isLeftEye;
+    BOOL _isLeftTouchDown;
+    BOOL _isRightTouchDown;
+    BOOL _isLeftTouchUpInside;
+    BOOL _isRightToucUpInside;
     int _leftTakenPictureCount;
     int _rightTakenPictureCount;
 }
@@ -61,7 +65,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"拍照";
     
     [self setupUI];
     [self initTakenParameters];
@@ -263,7 +266,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     _cameraBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_cameraBtn setImage:[UIImage imageNamed:@"takePhoto"] forState:UIControlStateNormal];
-    [_cameraBtn addTarget:self action:@selector(cameraBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    [_cameraBtn addTarget:self action:@selector(cameraBtnTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+    [_cameraBtn addTarget:self action:@selector(cameraBtnTouchDown:) forControlEvents:UIControlEventTouchDown];
 }
 
 #pragma mark - View
@@ -314,7 +318,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat width = 553.0f/2.0f;
         CGFloat height = 70.0f/2.0f;
         CGFloat originX = (APP_WIDTH-width)/2.0f;
-        CGFloat originY = APP_HEIGHT - CGRectGetHeight(self.toolView.bounds) - (62.0f+44.0f)/2.0f;
+        CGFloat originY = APP_HEIGHT - (324.0f+62.0f+44.0f)/2.0f;
         _whiteBalanceView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
         _whiteBalanceView.hidden = YES;
         _whiteBalanceView.backgroundColor = RGB(0x000000);
@@ -425,17 +429,60 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [self ChangeToLeft:NO];
     }];
 }
-- (void)cameraBtnClick:(UIButton *)btn {
+- (void)cameraBtnTouchUpInside:(UIButton *)btn {
+    if (_isLeftEye) {
+        if (_isLeftTouchDown) {
+            _isLeftTouchDown = NO;
+            [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                                     selector:@selector(takePictureMethod)
+                                                       object:nil];
+            [self pushToPictureScan:YES];
+        }else{
+            if (_leftTakenPictureCount == 6) {
+                [self showBeyondLimitTakenCount];
+            }else{
+                _isLeftTouchUpInside = YES;
+                [self takePictureMethod];
+            }
+        }
+    }else{
+        if (_isRightTouchDown) {
+            _isRightTouchDown = NO;
+            [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                                     selector:@selector(takePictureMethod)
+                                                       object:nil];
+            [self pushToPictureScan:YES];
+        }else{
+            if (_rightTakenPictureCount == 6) {
+                [self showBeyondLimitTakenCount];
+            }else{
+                _isRightToucUpInside = YES;
+                [self takePictureMethod];
+            }
+        }
+    }
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(cameraBtnTouchDownMethod)
+                                               object:nil];
+}
+
+- (void)cameraBtnTouchDown:(UIButton *)btn{
+    [self performSelector:@selector(cameraBtnTouchDownMethod) withObject:nil afterDelay:1.0f];
+}
+
+- (void)cameraBtnTouchDownMethod{
     if (_isLeftEye) {
         if (_leftTakenPictureCount == 6) {
             [self showBeyondLimitTakenCount];
         }else{
+            _isLeftTouchDown = YES;
             [self takePictureMethod];
         }
     }else{
         if (_rightTakenPictureCount == 6) {
             [self showBeyondLimitTakenCount];
         }else{
+            _isRightTouchDown = YES;
             [self takePictureMethod];
         }
     }
@@ -519,7 +566,35 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                                        contents:saveImgData
                                      attributes:nil];
     NSLog(@"result:%d",result);
-    [self pushToPictureScan:YES];
+    if (_isLeftEye) {
+        self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
+        if (_isLeftTouchDown) {
+            if (_leftTakenPictureCount==6) {
+                _isLeftTouchDown = NO;
+                [self pushToPictureScan:YES];
+            }else{
+                [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.5f];
+            }
+        }else{
+            if(_isLeftTouchUpInside){
+                [self pushToPictureScan:YES];
+            }
+        }
+    }else{
+        self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
+        if (_isRightTouchDown) {
+            if (_rightTakenPictureCount==6) {
+                _isRightTouchDown = NO;
+                [self pushToPictureScan:YES];
+            }else{
+                [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.5f];
+            }
+        }else{
+            if (_isRightToucUpInside) {
+                [self pushToPictureScan:YES];
+            }
+        }
+    }
 }
 
 #pragma mark - private
@@ -531,6 +606,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)initTakenParameters{
+    _isLeftTouchDown = NO;
+    _isRightTouchDown = NO;
+    _isLeftTouchUpInside = NO;
+    _isRightToucUpInside = NO;
     _leftTakenPictureCount = 0;
     _rightTakenPictureCount = 0;
 }
@@ -540,6 +619,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)ChangeToLeft:(BOOL)isLeft{
     [self restoreBtn];
     _isLeftEye = isLeft;
+    self.title = [NSString stringWithFormat:@"%d/6",isLeft?_leftTakenPictureCount:_rightTakenPictureCount];
     NSString *centerTitle = isLeft ? @"左眼" : @"右眼";
     [_centerBtn setTitle:centerTitle forState:UIControlStateNormal];
     _leftBtn.hidden = isLeft;
