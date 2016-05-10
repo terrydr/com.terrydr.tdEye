@@ -549,7 +549,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)saveTakenPictureData:(NSData *)imgData{
     UIImage *image = [UIImage imageWithData:imgData];
-    UIImage *saveImg = [UIImage imageWithCGImage:[self handleImage:image]];
+    UIImage *saveImg = [self cropImage:image withCropSize:self.viewContainer.size];
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
     
     JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
@@ -626,12 +626,59 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _rightBtn.hidden = !isLeft;
 }
 
-- (CGImageRef)handleImage:(UIImage *)image {
-    UIGraphicsBeginImageContextWithOptions(self.view.size, NO, 1.0);
-    [image drawInRect:CGRectMake(0, 0, self.view.width, self.view.height)];
-    CGImageRef imageRef = UIGraphicsGetImageFromCurrentImageContext().CGImage;
-    CGImageRef subRef = CGImageCreateWithImageInRect(imageRef, CGRectOffset(_viewContainer.frame, 0, 88));
-    return subRef;
+#pragma mark 裁剪照片尺寸
+- (UIImage *)cropImage:(UIImage *)image withCropSize:(CGSize)cropSize{
+    UIImage *newImage = nil;
+    
+    CGSize imageSize = image.size;
+    CGFloat width = imageSize.width;
+    CGFloat height = imageSize.height;
+    
+    CGFloat targetWidth = cropSize.width;
+    CGFloat targetHeight = cropSize.height;
+    
+    CGFloat scaleFactor = 0;
+    CGFloat scaledWidth = targetWidth;
+    CGFloat scaledHeight = targetHeight;
+    
+    CGPoint thumbnailPoint = CGPointMake(0, 0);
+    
+    if (CGSizeEqualToSize(imageSize, cropSize) == NO) {
+        CGFloat widthFactor = targetWidth / width;
+        CGFloat heightFactor = targetHeight / height;
+        
+        if (widthFactor > heightFactor) {
+            scaleFactor = widthFactor;
+        } else {
+            scaleFactor = heightFactor;
+        }
+        
+        scaledWidth  = width * scaleFactor;
+        scaledHeight = height * scaleFactor;
+        
+        
+        if (widthFactor > heightFactor) {
+            thumbnailPoint.y = (targetHeight - scaledHeight) * .5f;
+        } else {
+            if (widthFactor < heightFactor) {
+                thumbnailPoint.x = (targetWidth - scaledWidth) * .5f;
+            }
+        }
+    }
+    
+    UIGraphicsBeginImageContextWithOptions(cropSize, YES, 0);
+    
+    CGRect thumbnailRect = CGRectZero;
+    thumbnailRect.origin = thumbnailPoint;
+    thumbnailRect.size.width  = scaledWidth;
+    thumbnailRect.size.height = scaledHeight;
+    
+    [image drawInRect:thumbnailRect];
+    newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return newImage;
 }
 
 @end
