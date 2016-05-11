@@ -21,6 +21,8 @@
 
 @property(nonatomic,strong) UIButton *commitBtn;
 @property(nonatomic)BOOL isCollectionSelected;
+@property(nonatomic)BOOL isLeftValid;
+@property(nonatomic)BOOL isRightValid;
 @property(nonatomic,strong) UICollectionView *collectionView;
 @property(nonatomic, strong) NSMutableArray *sectionArr;
 @property(nonatomic, strong) NSMutableArray *selectedModelsArr;
@@ -153,6 +155,7 @@
     NSArray *leftFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:leftFilePath error:&le];
     NSLog(@"leftFileArr:%@",leftFileArr);
     if ([leftFileArr isValid]) {
+        _isLeftValid = YES;
         for (NSString *fileName in leftFileArr) {
             JRPictureModel *picture = [[JRPictureModel alloc] init];
             picture.pictureName = fileName;
@@ -165,6 +168,8 @@
         typeModel.typeName = @"左眼";
         typeModel.pictureArr = leftEyeDataArr;
         [_sectionArr addObject:typeModel];
+    }else{
+        _isLeftValid = NO;
     }
     
     NSString *rightFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:NO];
@@ -172,6 +177,7 @@
     NSArray *rightFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:rightFilePath error:&re];
     NSLog(@"rightFileArr:%@",rightFileArr);
     if ([rightFileArr isValid]) {
+        _isRightValid = YES;
         for (NSString *fileName in rightFileArr) {
             JRPictureModel *picture = [[JRPictureModel alloc] init];
             picture.pictureName = fileName;
@@ -184,6 +190,8 @@
         typeModel.typeName = @"右眼";
         typeModel.pictureArr = rightEyeDataArr;
         [_sectionArr addObject:typeModel];
+    }else{
+        _isRightValid = NO;
     }
 }
 
@@ -303,17 +311,51 @@
     }else{
         MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
         if ([typeModel.typeName isEqualToString:@"左眼"]) {
-            browserVc.isLeftEye = YES;
             browserVc.selectedArr = _leftSelectedPictureModelArr;
         }else{
-            browserVc.isLeftEye = NO;
             browserVc.selectedArr = _rightSelectedPictureModelArr;
         }
         browserVc.selectedModelArr = _selectedModelsArr;
         [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
         browserVc.isModelData = YES;
-        browserVc.currentPage = indexPath.row;
-        browserVc.photos = typeModel.pictureArr;
+        
+        if (indexPath.section==0) {
+            browserVc.currentPage = indexPath.row;
+        }else{
+            JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:0];
+            NSInteger pageIndex = typeModel.pictureArr.count + indexPath.row;
+            browserVc.currentPage = pageIndex;
+        }
+        
+        NSMutableArray *tempMutableArr = [[NSMutableArray alloc] initWithCapacity:0];
+        if (_isLeftValid) {
+            JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:0];
+            [tempMutableArr addObjectsFromArray:typeModel.pictureArr];
+            
+            browserVc.leftCount = typeModel.pictureArr.count;
+            
+            if (_isRightValid) {
+                JREyeTypeModel *rTypeModel = [_sectionArr objectAtIndex:1];
+                [tempMutableArr addObjectsFromArray:rTypeModel.pictureArr];
+                
+                browserVc.rightCount = rTypeModel.pictureArr.count;
+            }else{
+                browserVc.rightCount = 0;
+            }
+        }else{
+            browserVc.leftCount = 0;
+            
+            if (_isRightValid) {
+                JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:0];
+                [tempMutableArr addObjectsFromArray:typeModel.pictureArr];
+                
+                browserVc.rightCount = typeModel.pictureArr.count;
+            }else{
+                browserVc.rightCount = 0;
+            }
+        }
+        
+        browserVc.photos = [NSArray arrayWithArray:tempMutableArr];
         browserVc.deleteCallBack = ^(NSArray *assets){
         };
         [self.navigationController pushViewController:browserVc animated:YES];

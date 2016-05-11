@@ -439,8 +439,18 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         cell.backgroundColor = [UIColor clearColor];
         UIImage *photo; //[self.dataSource photoBrowser:self photoAtIndex:indexPath.item];
         if (_isModelData) {
+            BOOL isLeftEye;
+            if (_leftCount>0) {
+                if (indexPath.row+1<=_leftCount) {
+                    isLeftEye=YES;
+                }else{
+                    isLeftEye=NO;
+                }
+            }else{
+                isLeftEye=NO;
+            }
             JRPictureModel *pictureModel = self.photos[indexPath.item];
-            NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:_isLeftEye];
+            NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:isLeftEye];
             photo = [UIImage imageWithContentsOfFile:imgPath];
         }else{
             NSDictionary *paramDic = self.photos[indexPath.item];
@@ -552,7 +562,16 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 - (void)setPageLabelPage:(NSInteger)page{
-    self.title = [NSString stringWithFormat:@"%ld / %ld",page + 1, self.photos.count];
+    if (_leftCount>0) {
+        if (page+1<=_leftCount) {
+            self.title = @"左眼";
+        }else{
+            self.title = @"右眼";
+        }
+    }else{
+        self.title = @"右眼";
+    }
+    
     if (_isModelData) {
         _selectedBtn.hidden = NO;
         JRPictureModel *pictureModel = self.photos[page];
