@@ -39,7 +39,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 @property (strong,nonatomic)    UIButton *doneBtn;
 
 @property (strong,nonatomic)    UIView *infoView;
-@property (strong,nonatomic)    UILabel *selectedLabel;
 
 @property (strong,nonatomic)    NSMutableDictionary *deleteAssets;
 @property (strong,nonatomic)    NSMutableArray *doneAssets;
@@ -90,7 +89,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         [self.view addSubview:collectionView];
         if (_isModelData) {
             [self.view addSubview:self.infoView];
-            [self.view addSubview:self.selectedBtn];
+            [self.infoView addSubview:self.selectedBtn];
         }
         self.collectionView = collectionView;
         
@@ -133,19 +132,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         eyeTypeLab.textAlignment = NSTextAlignmentLeft;
         eyeTypeLab.textColor = [UIColor whiteColor];
         [_infoView addSubview:eyeTypeLab];
-        
-        CGFloat selectedWidth = 158.0f/2.0f;
-        CGFloat selectedHeight = 52.0f/2.0f;
-        CGFloat selectedOriginX = infoWidth - selectedWidth - 32.0f/2.0f;
-        CGFloat selectedOriginY = (infoHeight - selectedHeight)/2.0f;
-        _selectedLabel = [[UILabel alloc] initWithFrame:CGRectMake(selectedOriginX, selectedOriginY, selectedWidth, selectedHeight)];
-        _selectedLabel.backgroundColor = RGB(0x78be23);
-        _selectedLabel.layer.cornerRadius = 5.0f;
-        _selectedLabel.layer.masksToBounds = YES;
-        _selectedLabel.text = @"已选 0 张";
-        _selectedLabel.textColor = [UIColor whiteColor];
-        _selectedLabel.textAlignment = NSTextAlignmentCenter;
-        [_infoView addSubview:_selectedLabel];
     }
     return _infoView;
 }
@@ -173,10 +159,10 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 - (UIButton *)selectedBtn{
     if (!_selectedBtn) {
         UIImage *selectedImg = [UIImage imageNamed:@"unselectedicon"];
-        CGFloat selectedWidth = selectedImg.size.width;
-        CGFloat selectedHeight = selectedImg.size.height;
-        CGFloat selectedOriginX = CGRectGetWidth(self.view.bounds)-selectedWidth-22.0f/2.0f;
-        CGFloat selectedOriginY = 64 +22.0f/2.0f;
+        CGFloat selectedWidth = 38.0f;
+        CGFloat selectedHeight = 38.0f;
+        CGFloat selectedOriginX = CGRectGetWidth(self.view.bounds)-selectedWidth-30.0f/2.0f;
+        CGFloat selectedOriginY = (CGRectGetHeight(self.infoView.bounds)-selectedHeight)/2.0f;
         _selectedBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _selectedBtn.frame = CGRectMake(selectedOriginX, selectedOriginY, selectedWidth, selectedHeight);
         [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
@@ -200,7 +186,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             [_selectedArr addObject:imgPath];
             [_selectedModelArr addObject:pictureModel];
             pictureModel.isSelected = YES;
-            _selectedLabel.text = [NSString stringWithFormat:@"已选 %d 张",_selectedCount];
             [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
         }
     }else{
@@ -208,7 +193,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         [_selectedArr removeObject:imgPath];
         [_selectedModelArr addObject:pictureModel];
         pictureModel.isSelected = NO;
-        _selectedLabel.text = [NSString stringWithFormat:@"已选 %d 张",_selectedCount];
         [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
     }
 }
