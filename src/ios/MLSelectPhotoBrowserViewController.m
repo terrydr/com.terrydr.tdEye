@@ -176,7 +176,19 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     UIButton *btn = (UIButton *)sender;
     btn.selected = !btn.isSelected;
     JRPictureModel *pictureModel = self.photos[_currentPage];
-    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:_isLeftEye];
+    
+    BOOL isLeftEye;
+    if (_leftCount>0) {
+        if (_currentPage+1<=_leftCount) {
+            isLeftEye=YES;
+        }else{
+            isLeftEye=NO;
+        }
+    }else{
+        isLeftEye=NO;
+    }
+    
+    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:isLeftEye];
     UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
     UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
     if (btn.selected) {
