@@ -193,22 +193,38 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
     UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
     if (btn.selected) {
-        if (_leftSelectedCount == 2 || _rightSelectedCount == 2) {
-            [self mlShowBeyondLimitSelectedCount];
-        }else{
-            if (_leftCount>0) {
-                if (_currentPage+1<=_leftCount) {
-                    _leftSelectedCount++;
+        if (_leftCount>0) {
+            if (_currentPage+1<=_leftCount) {
+                if (_leftSelectedCount == 2) {
+                    [self mlShowBeyondLimitSelectedCount];
                 }else{
-                    _rightSelectedCount++;
+                    _leftSelectedCount++;
+                    [_selectedArr addObject:imgPath];
+                    [_selectedModelArr addObject:pictureModel];
+                    pictureModel.isSelected = YES;
+                    [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
                 }
             }else{
-                _rightSelectedCount++;
+                if (_rightSelectedCount == 2) {
+                    [self mlShowBeyondLimitSelectedCount];
+                }else{
+                    _rightSelectedCount++;
+                    [_selectedArr addObject:imgPath];
+                    [_selectedModelArr addObject:pictureModel];
+                    pictureModel.isSelected = YES;
+                    [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
+                }
             }
-            [_selectedArr addObject:imgPath];
-            [_selectedModelArr addObject:pictureModel];
-            pictureModel.isSelected = YES;
-            [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
+        }else{
+            if (_rightSelectedCount == 2) {
+                [self mlShowBeyondLimitSelectedCount];
+            }else{
+                _rightSelectedCount++;
+                [_selectedArr addObject:imgPath];
+                [_selectedModelArr addObject:pictureModel];
+                pictureModel.isSelected = YES;
+                [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
+            }
         }
     }else{
         if (_leftCount>0) {
