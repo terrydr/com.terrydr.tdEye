@@ -562,7 +562,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     }
     
     if (_isModelData) {
-        _selectedBtn.hidden = NO;
         JRPictureModel *pictureModel = self.photos[page];
         UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
         UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
@@ -573,12 +572,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             _selectedBtn.selected = NO;
             [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
         }
-    }
-}
-
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
-    if (_isModelData) {
-        _selectedBtn.hidden = YES;
     }
 }
 
