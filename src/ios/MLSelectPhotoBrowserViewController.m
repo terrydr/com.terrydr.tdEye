@@ -110,23 +110,28 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 - (UIView *)infoView{
     if (!_infoView) {
         CGFloat infoWidth = CGRectGetWidth(self.view.bounds);
-        CGFloat infoHeight = 98.0f/2.0f;
+        CGFloat infoHeight = 120.0f/2.0f;
         CGFloat infoOriginX = 0.0f;
         CGFloat infoOriginY = CGRectGetHeight(self.view.bounds)-infoHeight;
         _infoView = [[UIView alloc] initWithFrame:CGRectMake(infoOriginX, infoOriginY, infoWidth, infoHeight)];
-        _infoView.backgroundColor = RGB(0xf6f6f6);
+        _infoView.backgroundColor = RGB(0x3691e6);
         
-        CGFloat typeOriginX = 32.0f/2.0f;
+        CGFloat typeOriginX = 30.0f/2.0f;
         CGFloat typeOriginY = 0.0f;
-        CGFloat typeWidth = 60.0f;
+        CGFloat typeWidth = 160.0f;
         CGFloat typeHeight = infoHeight;
         UILabel *eyeTypeLab = [[UILabel alloc] initWithFrame:CGRectMake(typeOriginX, typeOriginY, typeWidth, typeHeight)];
-        if (_isLeftEye) {
-            eyeTypeLab.text = @"左眼";
+        if (_leftCount>0) {
+            if (_rightCount>0) {
+                eyeTypeLab.text = @"左眼 0/2   右眼 0/2";
+            }else{
+                eyeTypeLab.text = @"左眼 0/2";
+            }
         }else{
-            eyeTypeLab.text = @"右眼";
+            eyeTypeLab.text = @"右眼 0/2";
         }
         eyeTypeLab.textAlignment = NSTextAlignmentLeft;
+        eyeTypeLab.textColor = [UIColor whiteColor];
         [_infoView addSubview:eyeTypeLab];
         
         CGFloat selectedWidth = 158.0f/2.0f;
