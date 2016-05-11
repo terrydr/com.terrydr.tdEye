@@ -39,6 +39,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 @property (strong,nonatomic)    UIButton *doneBtn;
 
 @property (strong,nonatomic)    UIView *infoView;
+@property (strong,nonatomic)    UILabel *eyeTypeLab;
 
 @property (strong,nonatomic)    NSMutableDictionary *deleteAssets;
 @property (strong,nonatomic)    NSMutableArray *doneAssets;
@@ -119,19 +120,19 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         CGFloat typeOriginY = 0.0f;
         CGFloat typeWidth = 160.0f;
         CGFloat typeHeight = infoHeight;
-        UILabel *eyeTypeLab = [[UILabel alloc] initWithFrame:CGRectMake(typeOriginX, typeOriginY, typeWidth, typeHeight)];
+        self.eyeTypeLab = [[UILabel alloc] initWithFrame:CGRectMake(typeOriginX, typeOriginY, typeWidth, typeHeight)];
         if (_leftCount>0) {
             if (_rightCount>0) {
-                eyeTypeLab.text = @"左眼 0/2   右眼 0/2";
+                _eyeTypeLab.text = @"左眼 0/2   右眼 0/2";
             }else{
-                eyeTypeLab.text = @"左眼 0/2";
+                _eyeTypeLab.text = @"左眼 0/2";
             }
         }else{
-            eyeTypeLab.text = @"右眼 0/2";
+            _eyeTypeLab.text = @"右眼 0/2";
         }
-        eyeTypeLab.textAlignment = NSTextAlignmentLeft;
-        eyeTypeLab.textColor = [UIColor whiteColor];
-        [_infoView addSubview:eyeTypeLab];
+        _eyeTypeLab.textAlignment = NSTextAlignmentLeft;
+        _eyeTypeLab.textColor = [UIColor whiteColor];
+        [_infoView addSubview:_eyeTypeLab];
     }
     return _infoView;
 }
