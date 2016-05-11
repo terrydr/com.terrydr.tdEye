@@ -23,7 +23,8 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 @interface MLSelectPhotoBrowserViewController () <UIScrollViewDelegate,ZLPhotoPickerPhotoScrollViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDataSource,UICollectionViewDelegate>{
     
     UIBarButtonItem *_leftItem;
-    int _selectedCount;
+    int _leftSelectedCount;
+    int _rightSelectedCount;
 }
 
 // 控件
@@ -192,17 +193,33 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
     UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
     if (btn.selected) {
-        if (_selectedCount == 2) {
+        if (_leftSelectedCount == 2 || _rightSelectedCount == 2) {
             [self mlShowBeyondLimitSelectedCount];
         }else{
-            _selectedCount++;
+            if (_leftCount>0) {
+                if (_currentPage+1<=_leftCount) {
+                    _leftSelectedCount++;
+                }else{
+                    _rightSelectedCount++;
+                }
+            }else{
+                _rightSelectedCount++;
+            }
             [_selectedArr addObject:imgPath];
             [_selectedModelArr addObject:pictureModel];
             pictureModel.isSelected = YES;
             [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
         }
     }else{
-        _selectedCount--;
+        if (_leftCount>0) {
+            if (_currentPage+1<=_leftCount) {
+                _leftSelectedCount--;
+            }else{
+                _rightSelectedCount--;
+            }
+        }else{
+            _rightSelectedCount--;
+        }
         [_selectedArr removeObject:imgPath];
         [_selectedModelArr addObject:pictureModel];
         pictureModel.isSelected = NO;
@@ -303,7 +320,8 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     
     self.view.backgroundColor = [UIColor blackColor];
     self.extendedLayoutIncludesOpaqueBars = YES;
-    _selectedCount = 0;
+    _leftSelectedCount = 0;
+    _rightSelectedCount = 0;
     if (!_isModelData) {
         [self configureNavgationBar];
     }
