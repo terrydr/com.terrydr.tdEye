@@ -377,10 +377,18 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [_captureDevice lockForConfiguration:nil];
     if (btn.isSelected) {
         [_ISOBtn setBackgroundImage:ISOClickImg forState:UIControlStateNormal];
-        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:40.0 completionHandler:nil];
+        
+        float isoValue = 40.0>_captureDevice.activeFormat.minISO?40.0:_captureDevice.activeFormat.minISO;
+        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000)
+                                                      ISO:isoValue
+                                        completionHandler:nil];
     }else{
         [_ISOBtn setBackgroundImage:ISOImg forState:UIControlStateNormal];
-        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:80.0 completionHandler:nil];
+        
+        float isoValue = 80.0<_captureDevice.activeFormat.maxISO?80.0:_captureDevice.activeFormat.maxISO;
+        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000)
+                                                      ISO:isoValue
+                                        completionHandler:nil];
     }
     [_captureDevice unlockForConfiguration];
 }
