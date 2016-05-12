@@ -23,6 +23,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 @interface MLSelectPhotoBrowserViewController () <UIScrollViewDelegate,ZLPhotoPickerPhotoScrollViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDataSource,UICollectionViewDelegate>{
     
     UIBarButtonItem *_leftItem;
+    UIBarButtonItem *_rightItem;
     int _leftSelectedCount;
     int _rightSelectedCount;
 }
@@ -339,21 +340,32 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     self.extendedLayoutIncludesOpaqueBars = YES;
     _leftSelectedCount = 0;
     _rightSelectedCount = 0;
-    if (!_isModelData) {
-        [self configureNavgationBar];
-    }
+    [self configureNavgationBar];
 }
 
 - (void)configureNavgationBar{
     _leftItem = [[UIBarButtonItem alloc] initWithTitle:@"取消"
                                                  style:UIBarButtonItemStylePlain
                                                 target:self
-                                                action:@selector(leftBarButtonItemAction)];
-    self.navigationItem.leftBarButtonItem = _leftItem;
+                                                action:@selector(mlLeftBarButtonItemAction)];
+    _rightItem = [[UIBarButtonItem alloc] initWithTitle:@"提交"
+                                                  style:UIBarButtonItemStylePlain
+                                                 target:self
+                                                 action:@selector(mlRightBarButtonItemAction)];
+    
+    if (_isModelData) {
+        self.navigationItem.rightBarButtonItem = _rightItem;
+    }else{
+        self.navigationItem.leftBarButtonItem = _leftItem;
+    }
 }
 
-- (void)leftBarButtonItemAction{
+- (void)mlLeftBarButtonItemAction{
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)mlRightBarButtonItemAction{
+    
 }
 
 #pragma mark -初始化底部ToorBar
