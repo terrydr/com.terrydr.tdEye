@@ -41,6 +41,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 @property (weak,nonatomic)      UILabel *makeView;
 @property (strong,nonatomic)    UIButton *doneBtn;
 
+@property (strong,nonatomic)    UIView *pageControl;
 @property (strong,nonatomic)    UIView *infoView;
 @property (strong,nonatomic)    UILabel *eyeTypeLab;
 
@@ -93,6 +94,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         [self.view addSubview:collectionView];
         if (_isModelData) {
             [self.view addSubview:self.infoView];
+            [self.view addSubview:self.pageControl];
             [self.infoView addSubview:self.selectedBtn];
         }
         self.collectionView = collectionView;
@@ -108,6 +110,30 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         }
     }
     return _collectionView;
+}
+
+- (UIView *)pageControl{
+    if (!_pageControl) {
+        CGFloat mainWidth = CGRectGetWidth(self.view.bounds);
+        _pageControl = [[UIView alloc] initWithFrame:CGRectMake(0, 100, mainWidth, 7)];
+        CGFloat padding = (mainWidth-((7+10)*_photos.count-10))/2;
+        for (int i=0; i<_photos.count; i++) {
+            CGFloat dotOriginX = padding+(7+10)*i;
+            CGFloat dotOriginY = 0.0f;
+            CGFloat dotWidth = 7.0f;
+            CGFloat dotHeight = 7.0f;
+            
+            UIView *dotView = [[UIView alloc] initWithFrame:CGRectMake(dotOriginX, dotOriginY, dotWidth, dotHeight)];
+            dotView.layer.cornerRadius = 3.5f;
+            if (i==_currentPage) {
+                dotView.backgroundColor = RGB(0x3691e6);
+            }else{
+                dotView.backgroundColor = [UIColor whiteColor];
+            }
+            [_pageControl addSubview:dotView];
+        }
+    }
+    return _pageControl;
 }
 
 - (UIView *)infoView{
