@@ -27,7 +27,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     UIBarButtonItem *_rightItem;
     int _leftSelectedCount;
     int _rightSelectedCount;
-    UIView *_currentPageView;
 }
 
 // 控件
@@ -128,7 +127,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             dotView.layer.cornerRadius = 3.5f;
             if (i==_currentPage) {
                 dotView.backgroundColor = RGB(0x3691e6);
-                _currentPageView = dotView;
             }else{
                 dotView.backgroundColor = [UIColor whiteColor];
             }
@@ -672,16 +670,23 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         self.title = @"右眼";
     }
     
+    NSMutableArray *indexArr = [[NSMutableArray alloc] initWithCapacity:0];
     for (JRPictureModel *model in _selectedModelArr) {
         NSUInteger index = [_photos indexOfObject:model];
-        UIView *dotView = [_pageControl.subviews objectAtIndex:index];
-        dotView.backgroundColor = [UIColor redColor];
+        [indexArr addObject:[NSNumber numberWithUnsignedInteger:index]];
     }
     
-    _currentPageView.backgroundColor = [UIColor whiteColor];
+    for (int i=0; i<_photos.count; i++) {
+        UIView *dotView = [_pageControl.subviews objectAtIndex:i];
+        if ([indexArr containsObject:[NSNumber numberWithInt:i]]) {
+            dotView.backgroundColor = [UIColor redColor];
+        }else{
+            dotView.backgroundColor = [UIColor whiteColor];
+        }
+    }
+    
     UIView *dotView = [_pageControl.subviews objectAtIndex:page];
     dotView.backgroundColor = RGB(0x3691e6);
-    _currentPageView = dotView;
     
     if (_isModelData) {
         JRPictureModel *pictureModel = self.photos[page];
