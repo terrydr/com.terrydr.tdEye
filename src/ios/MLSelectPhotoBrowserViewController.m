@@ -679,7 +679,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     for (int i=0; i<_photos.count; i++) {
         UIView *dotView = [_pageControl.subviews objectAtIndex:i];
         if ([indexArr containsObject:[NSNumber numberWithInt:i]]) {
-            dotView.backgroundColor = [UIColor redColor];
+            dotView.backgroundColor = RGB(0x76c000);
         }else{
             dotView.backgroundColor = [UIColor whiteColor];
         }
