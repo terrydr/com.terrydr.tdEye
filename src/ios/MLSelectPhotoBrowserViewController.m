@@ -15,6 +15,7 @@
 #import "MLSelectPhotoCommon.h"
 #import "UIImage+MLTint.h"
 #import "JRMediaFileManage.h"
+#import "ZQBaseClassesExtended.h"
 
 // 分页控制器的高度
 static NSInteger ZLPickerColletionViewPadding = 20;
@@ -367,7 +368,18 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 - (void)mlRightBarButtonItemAction{
-    
+    NSMutableDictionary *temDic = [[NSMutableDictionary alloc] initWithCapacity:0];
+    if ([_mlLeftselectedArr isValid]) {
+        [temDic setObject:_mlLeftselectedArr forKey:@"leftEye"];
+    }
+    if ([_mlRightselectedArr isValid]) {
+        [temDic setObject:_mlRightselectedArr forKey:@"rightEye"];
+    }
+    NSDictionary *pathDic = [NSDictionary dictionaryWithDictionary:temDic];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TakePhotosFinishedNotification"
+                                                        object:nil
+                                                      userInfo:pathDic];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark -初始化底部ToorBar
