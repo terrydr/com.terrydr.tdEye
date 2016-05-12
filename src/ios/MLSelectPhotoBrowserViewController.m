@@ -672,6 +672,12 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         self.title = @"右眼";
     }
     
+    for (JRPictureModel *model in _selectedModelArr) {
+        NSUInteger index = [_photos indexOfObject:model];
+        UIView *dotView = [_pageControl.subviews objectAtIndex:index];
+        dotView.backgroundColor = [UIColor redColor];
+    }
+    
     _currentPageView.backgroundColor = [UIColor whiteColor];
     UIView *dotView = [_pageControl.subviews objectAtIndex:page];
     dotView.backgroundColor = RGB(0x3691e6);
