@@ -66,6 +66,10 @@
     browserVc.deleteCallBack = ^(NSArray *assets){
     };
     TDNavgationController *nav = [[TDNavgationController alloc] initWithRootViewController:browserVc];
+    nav.navigationBar.translucent = NO;
+    nav.navigationBar.barTintColor = RGB(0x3691e6);
+    nav.navigationBar.tintColor = [UIColor whiteColor];
+    [nav.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, [UIFont boldSystemFontOfSize:18.f], NSFontAttributeName, nil]];
     [self.viewController presentViewController:nav animated:YES completion:^{
     }];
 }
