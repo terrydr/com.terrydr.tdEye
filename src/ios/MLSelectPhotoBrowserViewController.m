@@ -200,7 +200,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
                     [self mlShowBeyondLimitSelectedCount];
                 }else{
                     _leftSelectedCount++;
-                    [_selectedArr addObject:imgPath];
+                    [_mlLeftselectedArr addObject:imgPath];
                     [_selectedModelArr addObject:pictureModel];
                     pictureModel.isSelected = YES;
                     [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
@@ -210,7 +210,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
                     [self mlShowBeyondLimitSelectedCount];
                 }else{
                     _rightSelectedCount++;
-                    [_selectedArr addObject:imgPath];
+                    [_mlRightselectedArr addObject:imgPath];
                     [_selectedModelArr addObject:pictureModel];
                     pictureModel.isSelected = YES;
                     [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
@@ -221,7 +221,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
                 [self mlShowBeyondLimitSelectedCount];
             }else{
                 _rightSelectedCount++;
-                [_selectedArr addObject:imgPath];
+                [_mlRightselectedArr addObject:imgPath];
                 [_selectedModelArr addObject:pictureModel];
                 pictureModel.isSelected = YES;
                 [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
@@ -231,14 +231,16 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         if (_leftCount>0) {
             if (_currentPage+1<=_leftCount) {
                 _leftSelectedCount--;
+                [_mlLeftselectedArr removeObject:imgPath];
             }else{
                 _rightSelectedCount--;
+                [_mlRightselectedArr removeObject:imgPath];
             }
         }else{
             _rightSelectedCount--;
+            [_mlRightselectedArr removeObject:imgPath];
         }
-        [_selectedArr removeObject:imgPath];
-        [_selectedModelArr addObject:pictureModel];
+        [_selectedModelArr removeObject:pictureModel];
         pictureModel.isSelected = NO;
         [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
     }
@@ -574,7 +576,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     
     self.navigationController.navigationBar.hidden = NO;
     self.toolBar.hidden = NO;
-    if (_selectedArr && _selectedArr.count>0) {
+    if (_mlLeftselectedArr.count>0 || _mlRightselectedArr.count>0) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"DidSelectedPictures"
                                                             object:nil];
     }

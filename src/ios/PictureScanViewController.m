@@ -310,11 +310,8 @@
         [self calculateSelectedPictureCount];
     }else{
         MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
-        if ([typeModel.typeName isEqualToString:@"左眼"]) {
-            browserVc.selectedArr = _leftSelectedPictureModelArr;
-        }else{
-            browserVc.selectedArr = _rightSelectedPictureModelArr;
-        }
+        browserVc.mlLeftselectedArr = _leftSelectedPictureModelArr;
+        browserVc.mlRightselectedArr = _rightSelectedPictureModelArr;
         browserVc.selectedModelArr = _selectedModelsArr;
         [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
         browserVc.isModelData = YES;
