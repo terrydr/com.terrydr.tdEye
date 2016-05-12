@@ -241,6 +241,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         pictureModel.isSelected = NO;
         [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
     }
+    _eyeTypeLab.text = [NSString stringWithFormat:@"左眼 %d/2   右眼 %d/2",_leftSelectedCount,_rightSelectedCount];
 }
 
 - (void)mlShowBeyondLimitSelectedCount{
