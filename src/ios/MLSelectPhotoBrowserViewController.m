@@ -394,6 +394,10 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     if (_isModelData) {
         self.navigationItem.rightBarButtonItem = _rightItem;
     }else{
+        self.navigationController.navigationBar.translucent = NO;
+        self.navigationController.navigationBar.barTintColor = RGB(0x3691e6);
+        self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+        [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, [UIFont boldSystemFontOfSize:18.f], NSFontAttributeName, nil]];
         self.navigationItem.leftBarButtonItem = _leftItem;
     }
 }
@@ -660,35 +664,35 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 - (void)setPageLabelPage:(NSInteger)page{
-    if (_leftCount>0) {
-        if (page+1<=_leftCount) {
-            self.title = @"左眼";
+    if (_isModelData) {
+        if (_leftCount>0) {
+            if (page+1<=_leftCount) {
+                self.title = @"左眼";
+            }else{
+                self.title = @"右眼";
+            }
         }else{
             self.title = @"右眼";
         }
-    }else{
-        self.title = @"右眼";
-    }
-    
-    NSMutableArray *indexArr = [[NSMutableArray alloc] initWithCapacity:0];
-    for (JRPictureModel *model in _selectedModelArr) {
-        NSUInteger index = [_photos indexOfObject:model];
-        [indexArr addObject:[NSNumber numberWithUnsignedInteger:index]];
-    }
-    
-    for (int i=0; i<_photos.count; i++) {
-        UIView *dotView = [_pageControl.subviews objectAtIndex:i];
-        if ([indexArr containsObject:[NSNumber numberWithInt:i]]) {
-            dotView.backgroundColor = RGB(0x76c000);
-        }else{
-            dotView.backgroundColor = [UIColor whiteColor];
+        
+        NSMutableArray *indexArr = [[NSMutableArray alloc] initWithCapacity:0];
+        for (JRPictureModel *model in _selectedModelArr) {
+            NSUInteger index = [_photos indexOfObject:model];
+            [indexArr addObject:[NSNumber numberWithUnsignedInteger:index]];
         }
-    }
-    
-    UIView *dotView = [_pageControl.subviews objectAtIndex:page];
-    dotView.backgroundColor = RGB(0x3691e6);
-    
-    if (_isModelData) {
+        
+        for (int i=0; i<_photos.count; i++) {
+            UIView *dotView = [_pageControl.subviews objectAtIndex:i];
+            if ([indexArr containsObject:[NSNumber numberWithInt:i]]) {
+                dotView.backgroundColor = RGB(0x76c000);
+            }else{
+                dotView.backgroundColor = [UIColor whiteColor];
+            }
+        }
+        
+        UIView *dotView = [_pageControl.subviews objectAtIndex:page];
+        dotView.backgroundColor = RGB(0x3691e6);
+        
         JRPictureModel *pictureModel = self.photos[page];
         UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
         UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
@@ -699,6 +703,8 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             _selectedBtn.selected = NO;
             [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
         }
+    }else{
+        self.title = [NSString stringWithFormat:@"%ld / %ld",page + 1, self.photos.count];
     }
 }
 
