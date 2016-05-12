@@ -16,7 +16,8 @@ typedef void(^deleteCallBackBlock)();
 // 展示的图片 MLSelectAssets
 @property (strong,nonatomic) NSArray *photos;
 
-@property (strong,nonatomic) NSMutableArray *selectedArr;
+@property (strong,nonatomic) NSMutableArray *mlLeftselectedArr;
+@property (strong,nonatomic) NSMutableArray *mlRightselectedArr;
 @property (strong,nonatomic) NSMutableArray *selectedModelArr;
 // 当前提供的分页数
 @property (nonatomic , assign) NSInteger currentPage;
