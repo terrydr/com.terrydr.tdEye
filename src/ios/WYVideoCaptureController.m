@@ -476,7 +476,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)cameraBtnTouchDown:(UIButton *)btn{
-    [self performSelector:@selector(cameraBtnTouchDownMethod) withObject:nil afterDelay:1.0f];
+    [self performSelector:@selector(cameraBtnTouchDownMethod) withObject:nil afterDelay:0.5f];
 }
 
 - (void)cameraBtnTouchDownMethod{
@@ -583,7 +583,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                 _isLeftTouchDown = NO;
                 [self pushToPictureScan:YES];
             }else{
-                [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.5f];
+                [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
             }
         }else{
             if(_isLeftTouchUpInside){
@@ -597,7 +597,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                 _isRightTouchDown = NO;
                 [self pushToPictureScan:YES];
             }else{
-                [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.5f];
+                [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
             }
         }else{
             if (_isRightToucUpInside) {
