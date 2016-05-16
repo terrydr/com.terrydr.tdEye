@@ -602,34 +602,34 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 // 长按调用
-- (void) pickerPhotoScrollViewDidLongPress:(MLSelectPhotoPickerBrowserPhotoScrollView *)scrollView mlPhotoImageView:(MLSelectPhotoPickerBrowserPhotoImageView *)photoImageView{
-    if (!_isShowShowSheet) {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-        
-        // Create the actions.
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-        }];
-        
-        UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"保存到相册" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-            if([UIImagePickerController isSourceTypeAvailable: UIImagePickerControllerSourceTypeSavedPhotosAlbum]) {
-                UIImageWriteToSavedPhotosAlbum(photoImageView.image, nil, nil, nil);
-                if (photoImageView.image) {
-                    [scrollView showMessageWithText:@"保存成功"];
-                }
-            }else{
-                if (photoImageView.image) {
-                    [scrollView showMessageWithText:@"没有用户权限,保存失败"];
-                }
-            }
-        }];
-        
-        // Add the actions.
-        [alertController addAction:cancelAction];
-        [alertController addAction:sureAction];
-        
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
-}
+//- (void) pickerPhotoScrollViewDidLongPress:(MLSelectPhotoPickerBrowserPhotoScrollView *)scrollView mlPhotoImageView:(MLSelectPhotoPickerBrowserPhotoImageView *)photoImageView{
+//    if (!_isShowShowSheet) {
+//        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+//        
+//        // Create the actions.
+//        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+//        }];
+//        
+//        UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"保存到相册" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+//            if([UIImagePickerController isSourceTypeAvailable: UIImagePickerControllerSourceTypeSavedPhotosAlbum]) {
+//                UIImageWriteToSavedPhotosAlbum(photoImageView.image, nil, nil, nil);
+//                if (photoImageView.image) {
+//                    [scrollView showMessageWithText:@"保存成功"];
+//                }
+//            }else{
+//                if (photoImageView.image) {
+//                    [scrollView showMessageWithText:@"没有用户权限,保存失败"];
+//                }
+//            }
+//        }];
+//        
+//        // Add the actions.
+//        [alertController addAction:cancelAction];
+//        [alertController addAction:sureAction];
+//        
+//        [self presentViewController:alertController animated:YES completion:nil];
+//    }
+//}
 
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
