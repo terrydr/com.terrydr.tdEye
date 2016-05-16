@@ -211,8 +211,10 @@
         collectionHeaderView.typeNameLabel.text = model.typeName;
         if ([model.typeName isEqualToString:@"左眼"]) {
             collectionHeaderView.iconImgView.image = [UIImage imageNamed:@"leftEyeicon"];
+            collectionHeaderView.selectedLabel.text = [NSString stringWithFormat:@"%lu/2",(unsigned long)_leftSelectedPictureModelArr.count];
         }else{
             collectionHeaderView.iconImgView.image = [UIImage imageNamed:@"rightEyeicon"];
+            collectionHeaderView.selectedLabel.text = [NSString stringWithFormat:@"%lu/2",(unsigned long)_rightSelectedPictureModelArr.count];
         }
         if (indexPath.section==0) {
             collectionHeaderView.headerLineView.hidden = YES;
@@ -272,7 +274,6 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    ShootCollectionViewCell *cell = (ShootCollectionViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
     JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:indexPath.section];
     JRPictureModel *pictureModel = [typeModel.pictureArr objectAtIndex:indexPath.row];
     NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:typeModel.isLeftEye];
@@ -281,7 +282,6 @@
         if (pictureModel.isSelected) {
             if ([typeModel.typeName isEqualToString:@"左眼"]) {
                 if (_leftSelectedPictureModelArr.count<2) {
-                    cell.selectedImgView.hidden = NO;
                     [_selectedModelsArr addObject:pictureModel];
                     [_leftSelectedPictureModelArr addObject:imgPath];
                 }else{
@@ -290,7 +290,6 @@
                 }
             }else{
                 if (_rightSelectedPictureModelArr.count<2) {
-                    cell.selectedImgView.hidden = NO;
                     [_selectedModelsArr addObject:pictureModel];
                     [_rightSelectedPictureModelArr addObject:imgPath];
                 }else{
@@ -299,7 +298,6 @@
                 }
             }
         }else{
-            cell.selectedImgView.hidden = YES;
             [_selectedModelsArr removeObject:pictureModel];
             if ([typeModel.typeName isEqualToString:@"左眼"]) {
                 [_leftSelectedPictureModelArr removeObject:imgPath];
@@ -307,6 +305,7 @@
                 [_rightSelectedPictureModelArr removeObject:imgPath];
             }
         }
+        [self.collectionView reloadData];
         [self calculateSelectedPictureCount];
     }else{
         MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
