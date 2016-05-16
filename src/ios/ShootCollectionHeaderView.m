@@ -51,7 +51,7 @@
     CGFloat selectedOriginX = CGRectGetWidth(self.bounds)-selectedWidth-10.0f;
     CGFloat selectedOriginY = 0.0f;
     self.selectedLabel = [[UILabel alloc] initWithFrame:CGRectMake(selectedOriginX, selectedOriginY, selectedWidth, selectedHeight)];
-    self.selectedLabel.text = @"0/2";
+    self.selectedLabel.textColor = RGB(0x4c4c4c);
     self.selectedLabel.textAlignment = NSTextAlignmentRight;
     self.selectedLabel.font = [UIFont systemFontOfSize:16.0f];
     [self addSubview:_selectedLabel];
