@@ -318,7 +318,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat width = 553.0f/2.0f;
         CGFloat height = 70.0f/2.0f;
         CGFloat originX = (APP_WIDTH-width)/2.0f;
-        CGFloat originY = APP_HEIGHT - CGRectGetHeight(self.toolView.bounds) - (62.0f+44.0f)/2.0f;
+        CGFloat originY = APP_HEIGHT - (324.0f+62.0f+44.0f)/2.0f;
         _whiteBalanceView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
         _whiteBalanceView.hidden = YES;
         _whiteBalanceView.backgroundColor = RGB(0x000000);
@@ -377,18 +377,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [_captureDevice lockForConfiguration:nil];
     if (btn.isSelected) {
         [_ISOBtn setBackgroundImage:ISOClickImg forState:UIControlStateNormal];
-        
-        float isoValue = 40.0>_captureDevice.activeFormat.minISO?40.0:_captureDevice.activeFormat.minISO;
-        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000)
-                                                      ISO:isoValue
-                                        completionHandler:nil];
+        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:40.0 completionHandler:nil];
     }else{
         [_ISOBtn setBackgroundImage:ISOImg forState:UIControlStateNormal];
-        
-        float isoValue = 80.0<_captureDevice.activeFormat.maxISO?80.0:_captureDevice.activeFormat.maxISO;
-        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000)
-                                                      ISO:isoValue
-                                        completionHandler:nil];
+        [_captureDevice setExposureModeCustomWithDuration:CMTimeMakeWithSeconds(0.05, 1000) ISO:80.0 completionHandler:nil];
     }
     [_captureDevice unlockForConfiguration];
 }
@@ -540,6 +532,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         }else{
             _rightTakenPictureCount=0;
         }
+        self.title = @"0/6";
         //[[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
         //[wself takePictureMethod];
     }];
