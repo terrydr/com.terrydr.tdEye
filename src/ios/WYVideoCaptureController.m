@@ -138,6 +138,15 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _captureDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:_captureDevice error:&error];
     if (error) {
         NSLog(@"创建设备输入对象失败 -- error = %@", error);
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"未获得相机权限，请到设置中授权后再尝试。" message:nil preferredStyle:UIAlertControllerStyleAlert];
+        
+        // Create the actions.
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        }];
+        // Add the actions.
+        [alertController addAction:cancelAction];
+        [self presentViewController:alertController animated:YES completion:nil];
+        
         return;
     }
     // 初始化图片设备输出对象
