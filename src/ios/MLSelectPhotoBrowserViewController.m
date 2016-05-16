@@ -283,6 +283,16 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     }else{
         _eyeTypeLab.text = [NSString stringWithFormat:@"右眼 %d/2",_rightSelectedCount];
     }
+    
+    if (_selectedModelArr.count>0) {
+        if (_isModelData) {
+            self.navigationItem.rightBarButtonItem.enabled = YES;
+        }
+    }else{
+        if (_isModelData) {
+            self.navigationItem.rightBarButtonItem.enabled = NO;
+        }
+    }
 }
 
 - (void)mlShowBeyondLimitSelectedCount{
@@ -395,6 +405,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     
     if (_isModelData) {
         self.navigationItem.rightBarButtonItem = _rightItem;
+        self.navigationItem.rightBarButtonItem.enabled = NO;
     }else{
         self.navigationItem.leftBarButtonItem = _leftItem;
     }
