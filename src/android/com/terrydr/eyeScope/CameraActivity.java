@@ -587,6 +587,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		case MotionEvent.ACTION_UP:
 //			Log.d(TAG,"结束连继拍照..");
 			if(isLong){
+				photos_iv.setEnabled(false);
 				isLong = false;
 				switch (view.getId()) {
 				case R.id.photos_iv:
