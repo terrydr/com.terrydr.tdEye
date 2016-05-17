@@ -30,6 +30,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     AVPlayer *_player;
     AVPlayerLayer *_playerLayer;
     BOOL _isLeftEye;
+    BOOL _isLeftTouchDown;
+    BOOL _isRightTouchDown;
+    BOOL _isLeftTouchUpInside;
+    BOOL _isRightToucUpInside;
     int _leftTakenPictureCount;
     int _rightTakenPictureCount;
 }
@@ -61,7 +65,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"拍照";
     
     [self setupUI];
     [self initTakenParameters];
@@ -135,6 +138,15 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _captureDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:_captureDevice error:&error];
     if (error) {
         NSLog(@"创建设备输入对象失败 -- error = %@", error);
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"未获得相机权限，请到设置中授权后再尝试。" message:nil preferredStyle:UIAlertControllerStyleAlert];
+        
+        // Create the actions.
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        }];
+        // Add the actions.
+        [alertController addAction:cancelAction];
+        [self presentViewController:alertController animated:YES completion:nil];
+        
         return;
     }
     // 初始化图片设备输出对象
@@ -263,7 +275,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     _cameraBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_cameraBtn setImage:[UIImage imageNamed:@"takePhoto"] forState:UIControlStateNormal];
-    [_cameraBtn addTarget:self action:@selector(cameraBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    [_cameraBtn addTarget:self action:@selector(cameraBtnTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+    [_cameraBtn addTarget:self action:@selector(cameraBtnTouchDown:) forControlEvents:UIControlEventTouchDown];
 }
 
 #pragma mark - View
@@ -314,7 +327,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat width = 553.0f/2.0f;
         CGFloat height = 70.0f/2.0f;
         CGFloat originX = (APP_WIDTH-width)/2.0f;
-        CGFloat originY = APP_HEIGHT - CGRectGetHeight(self.toolView.bounds) - (62.0f+44.0f)/2.0f;
+        CGFloat originY = APP_HEIGHT - (324.0f+62.0f+44.0f)/2.0f;
         _whiteBalanceView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
         _whiteBalanceView.hidden = YES;
         _whiteBalanceView.backgroundColor = RGB(0x000000);
@@ -425,17 +438,60 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [self ChangeToLeft:NO];
     }];
 }
-- (void)cameraBtnClick:(UIButton *)btn {
+- (void)cameraBtnTouchUpInside:(UIButton *)btn {
+    if (_isLeftEye) {
+        if (_isLeftTouchDown) {
+            _isLeftTouchDown = NO;
+            [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                                     selector:@selector(takePictureMethod)
+                                                       object:nil];
+            [self pushToPictureScan:YES];
+        }else{
+            if (_leftTakenPictureCount == 6) {
+                [self showBeyondLimitTakenCount];
+            }else{
+                _isLeftTouchUpInside = YES;
+                [self takePictureMethod];
+            }
+        }
+    }else{
+        if (_isRightTouchDown) {
+            _isRightTouchDown = NO;
+            [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                                     selector:@selector(takePictureMethod)
+                                                       object:nil];
+            [self pushToPictureScan:YES];
+        }else{
+            if (_rightTakenPictureCount == 6) {
+                [self showBeyondLimitTakenCount];
+            }else{
+                _isRightToucUpInside = YES;
+                [self takePictureMethod];
+            }
+        }
+    }
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(cameraBtnTouchDownMethod)
+                                               object:nil];
+}
+
+- (void)cameraBtnTouchDown:(UIButton *)btn{
+    [self performSelector:@selector(cameraBtnTouchDownMethod) withObject:nil afterDelay:0.5f];
+}
+
+- (void)cameraBtnTouchDownMethod{
     if (_isLeftEye) {
         if (_leftTakenPictureCount == 6) {
             [self showBeyondLimitTakenCount];
         }else{
+            _isLeftTouchDown = YES;
             [self takePictureMethod];
         }
     }else{
         if (_rightTakenPictureCount == 6) {
             [self showBeyondLimitTakenCount];
         }else{
+            _isRightTouchDown = YES;
             [self takePictureMethod];
         }
     }
@@ -485,6 +541,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         }else{
             _rightTakenPictureCount=0;
         }
+        self.title = @"0/6";
         //[[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
         //[wself takePictureMethod];
     }];
@@ -502,7 +559,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)saveTakenPictureData:(NSData *)imgData{
     UIImage *image = [UIImage imageWithData:imgData];
-    UIImage *saveImg = [UIImage imageWithCGImage:[self handleImage:image]];
+    UIImage *saveImg = [self cropImage:image withCropSize:self.viewContainer.size];
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
     
     JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
@@ -519,7 +576,35 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                                        contents:saveImgData
                                      attributes:nil];
     NSLog(@"result:%d",result);
-    [self pushToPictureScan:YES];
+    if (_isLeftEye) {
+        self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
+        if (_isLeftTouchDown) {
+            if (_leftTakenPictureCount==6) {
+                _isLeftTouchDown = NO;
+                [self pushToPictureScan:YES];
+            }else{
+                [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
+            }
+        }else{
+            if(_isLeftTouchUpInside){
+                [self pushToPictureScan:YES];
+            }
+        }
+    }else{
+        self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
+        if (_isRightTouchDown) {
+            if (_rightTakenPictureCount==6) {
+                _isRightTouchDown = NO;
+                [self pushToPictureScan:YES];
+            }else{
+                [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
+            }
+        }else{
+            if (_isRightToucUpInside) {
+                [self pushToPictureScan:YES];
+            }
+        }
+    }
 }
 
 #pragma mark - private
@@ -531,6 +616,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)initTakenParameters{
+    _isLeftTouchDown = NO;
+    _isRightTouchDown = NO;
+    _isLeftTouchUpInside = NO;
+    _isRightToucUpInside = NO;
     _leftTakenPictureCount = 0;
     _rightTakenPictureCount = 0;
 }
@@ -540,18 +629,66 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)ChangeToLeft:(BOOL)isLeft{
     [self restoreBtn];
     _isLeftEye = isLeft;
+    self.title = [NSString stringWithFormat:@"%d/6",isLeft?_leftTakenPictureCount:_rightTakenPictureCount];
     NSString *centerTitle = isLeft ? @"左眼" : @"右眼";
     [_centerBtn setTitle:centerTitle forState:UIControlStateNormal];
     _leftBtn.hidden = isLeft;
     _rightBtn.hidden = !isLeft;
 }
 
-- (CGImageRef)handleImage:(UIImage *)image {
-    UIGraphicsBeginImageContextWithOptions(self.view.size, NO, 1.0);
-    [image drawInRect:CGRectMake(0, 0, self.view.width, self.view.height)];
-    CGImageRef imageRef = UIGraphicsGetImageFromCurrentImageContext().CGImage;
-    CGImageRef subRef = CGImageCreateWithImageInRect(imageRef, CGRectOffset(_viewContainer.frame, 0, 88));
-    return subRef;
+#pragma mark 裁剪照片尺寸
+- (UIImage *)cropImage:(UIImage *)image withCropSize:(CGSize)cropSize{
+    UIImage *newImage = nil;
+    
+    CGSize imageSize = image.size;
+    CGFloat width = imageSize.width;
+    CGFloat height = imageSize.height;
+    
+    CGFloat targetWidth = cropSize.width;
+    CGFloat targetHeight = cropSize.height;
+    
+    CGFloat scaleFactor = 0;
+    CGFloat scaledWidth = targetWidth;
+    CGFloat scaledHeight = targetHeight;
+    
+    CGPoint thumbnailPoint = CGPointMake(0, 0);
+    
+    if (CGSizeEqualToSize(imageSize, cropSize) == NO) {
+        CGFloat widthFactor = targetWidth / width;
+        CGFloat heightFactor = targetHeight / height;
+        
+        if (widthFactor > heightFactor) {
+            scaleFactor = widthFactor;
+        } else {
+            scaleFactor = heightFactor;
+        }
+        
+        scaledWidth  = width * scaleFactor;
+        scaledHeight = height * scaleFactor;
+        
+        
+        if (widthFactor > heightFactor) {
+            thumbnailPoint.y = (targetHeight - scaledHeight) * .5f;
+        } else {
+            if (widthFactor < heightFactor) {
+                thumbnailPoint.x = (targetWidth - scaledWidth) * .5f;
+            }
+        }
+    }
+    
+    UIGraphicsBeginImageContextWithOptions(cropSize, YES, 0);
+    
+    CGRect thumbnailRect = CGRectZero;
+    thumbnailRect.origin = thumbnailPoint;
+    thumbnailRect.size.width  = scaledWidth;
+    thumbnailRect.size.height = scaledHeight;
+    
+    [image drawInRect:thumbnailRect];
+    newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return newImage;
 }
 
 @end

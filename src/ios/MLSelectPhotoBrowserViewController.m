@@ -15,6 +15,7 @@
 #import "MLSelectPhotoCommon.h"
 #import "UIImage+MLTint.h"
 #import "JRMediaFileManage.h"
+#import "ZQBaseClassesExtended.h"
 
 // 分页控制器的高度
 static NSInteger ZLPickerColletionViewPadding = 20;
@@ -23,7 +24,10 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 @interface MLSelectPhotoBrowserViewController () <UIScrollViewDelegate,ZLPhotoPickerPhotoScrollViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDataSource,UICollectionViewDelegate>{
     
     UIBarButtonItem *_leftItem;
-    int _selectedCount;
+    UIBarButtonItem *_rightItem;
+    int _leftSelectedCount;
+    int _rightSelectedCount;
+    UIView *_currentPageView;
 }
 
 // 控件
@@ -38,8 +42,9 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 @property (weak,nonatomic)      UILabel *makeView;
 @property (strong,nonatomic)    UIButton *doneBtn;
 
+@property (strong,nonatomic)    UIView *pageControl;
 @property (strong,nonatomic)    UIView *infoView;
-@property (strong,nonatomic)    UILabel *selectedLabel;
+@property (strong,nonatomic)    UILabel *eyeTypeLab;
 
 @property (strong,nonatomic)    NSMutableDictionary *deleteAssets;
 @property (strong,nonatomic)    NSMutableArray *doneAssets;
@@ -90,7 +95,8 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         [self.view addSubview:collectionView];
         if (_isModelData) {
             [self.view addSubview:self.infoView];
-            [self.view addSubview:self.selectedBtn];
+            [self.view addSubview:self.pageControl];
+            [self.infoView addSubview:self.selectedBtn];
         }
         self.collectionView = collectionView;
         
@@ -107,40 +113,57 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     return _collectionView;
 }
 
+- (UIView *)pageControl{
+    if (!_pageControl) {
+        CGFloat mainWidth = CGRectGetWidth(self.view.bounds);
+        _pageControl = [[UIView alloc] initWithFrame:CGRectMake(0, 100, mainWidth, 7)];
+        CGFloat padding = (mainWidth-((7+10)*_photos.count-10))/2;
+        for (int i=0; i<_photos.count; i++) {
+            CGFloat dotOriginX = padding+(7+10)*i;
+            CGFloat dotOriginY = 0.0f;
+            CGFloat dotWidth = 7.0f;
+            CGFloat dotHeight = 7.0f;
+            
+            UIView *dotView = [[UIView alloc] initWithFrame:CGRectMake(dotOriginX, dotOriginY, dotWidth, dotHeight)];
+            dotView.layer.cornerRadius = 3.5f;
+            if (i==_currentPage) {
+                _currentPageView = dotView;
+                dotView.backgroundColor = RGB(0x3691e6);
+            }else{
+                dotView.backgroundColor = [UIColor whiteColor];
+            }
+            [_pageControl addSubview:dotView];
+        }
+    }
+    return _pageControl;
+}
+
 - (UIView *)infoView{
     if (!_infoView) {
         CGFloat infoWidth = CGRectGetWidth(self.view.bounds);
-        CGFloat infoHeight = 98.0f/2.0f;
+        CGFloat infoHeight = 120.0f/2.0f;
         CGFloat infoOriginX = 0.0f;
         CGFloat infoOriginY = CGRectGetHeight(self.view.bounds)-infoHeight;
         _infoView = [[UIView alloc] initWithFrame:CGRectMake(infoOriginX, infoOriginY, infoWidth, infoHeight)];
-        _infoView.backgroundColor = RGB(0xf6f6f6);
+        _infoView.backgroundColor = RGB(0x3691e6);
         
-        CGFloat typeOriginX = 32.0f/2.0f;
+        CGFloat typeOriginX = 30.0f/2.0f;
         CGFloat typeOriginY = 0.0f;
-        CGFloat typeWidth = 60.0f;
+        CGFloat typeWidth = 160.0f;
         CGFloat typeHeight = infoHeight;
-        UILabel *eyeTypeLab = [[UILabel alloc] initWithFrame:CGRectMake(typeOriginX, typeOriginY, typeWidth, typeHeight)];
-        if (_isLeftEye) {
-            eyeTypeLab.text = @"左眼";
+        self.eyeTypeLab = [[UILabel alloc] initWithFrame:CGRectMake(typeOriginX, typeOriginY, typeWidth, typeHeight)];
+        if (_leftCount>0) {
+            if (_rightCount>0) {
+                _eyeTypeLab.text = @"左眼 0/2   右眼 0/2";
+            }else{
+                _eyeTypeLab.text = @"左眼 0/2";
+            }
         }else{
-            eyeTypeLab.text = @"右眼";
+            _eyeTypeLab.text = @"右眼 0/2";
         }
-        eyeTypeLab.textAlignment = NSTextAlignmentLeft;
-        [_infoView addSubview:eyeTypeLab];
-        
-        CGFloat selectedWidth = 158.0f/2.0f;
-        CGFloat selectedHeight = 52.0f/2.0f;
-        CGFloat selectedOriginX = infoWidth - selectedWidth - 32.0f/2.0f;
-        CGFloat selectedOriginY = (infoHeight - selectedHeight)/2.0f;
-        _selectedLabel = [[UILabel alloc] initWithFrame:CGRectMake(selectedOriginX, selectedOriginY, selectedWidth, selectedHeight)];
-        _selectedLabel.backgroundColor = RGB(0x78be23);
-        _selectedLabel.layer.cornerRadius = 5.0f;
-        _selectedLabel.layer.masksToBounds = YES;
-        _selectedLabel.text = @"已选 0 张";
-        _selectedLabel.textColor = [UIColor whiteColor];
-        _selectedLabel.textAlignment = NSTextAlignmentCenter;
-        [_infoView addSubview:_selectedLabel];
+        _eyeTypeLab.textAlignment = NSTextAlignmentLeft;
+        _eyeTypeLab.textColor = [UIColor whiteColor];
+        [_infoView addSubview:_eyeTypeLab];
     }
     return _infoView;
 }
@@ -168,10 +191,10 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 - (UIButton *)selectedBtn{
     if (!_selectedBtn) {
         UIImage *selectedImg = [UIImage imageNamed:@"unselectedicon"];
-        CGFloat selectedWidth = selectedImg.size.width;
-        CGFloat selectedHeight = selectedImg.size.height;
-        CGFloat selectedOriginX = CGRectGetWidth(self.view.bounds)-selectedWidth-22.0f/2.0f;
-        CGFloat selectedOriginY = 64 +22.0f/2.0f;
+        CGFloat selectedWidth = 38.0f;
+        CGFloat selectedHeight = 38.0f;
+        CGFloat selectedOriginX = CGRectGetWidth(self.view.bounds)-selectedWidth-30.0f/2.0f;
+        CGFloat selectedOriginY = (CGRectGetHeight(self.infoView.bounds)-selectedHeight)/2.0f;
         _selectedBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _selectedBtn.frame = CGRectMake(selectedOriginX, selectedOriginY, selectedWidth, selectedHeight);
         [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
@@ -184,27 +207,91 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     UIButton *btn = (UIButton *)sender;
     btn.selected = !btn.isSelected;
     JRPictureModel *pictureModel = self.photos[_currentPage];
-    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:_isLeftEye];
+    
+    BOOL isLeftEye;
+    if (_leftCount>0) {
+        if (_currentPage+1<=_leftCount) {
+            isLeftEye=YES;
+        }else{
+            isLeftEye=NO;
+        }
+    }else{
+        isLeftEye=NO;
+    }
+    
+    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:isLeftEye];
     UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
     UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
     if (btn.selected) {
-        if (_selectedCount == 2) {
-            [self mlShowBeyondLimitSelectedCount];
+        if (_leftCount>0) {
+            if (_currentPage+1<=_leftCount) {
+                if (_leftSelectedCount == 2) {
+                    [self mlShowBeyondLimitSelectedCount];
+                }else{
+                    _leftSelectedCount++;
+                    [_mlLeftselectedArr addObject:imgPath];
+                    [_selectedModelArr addObject:pictureModel];
+                    pictureModel.isSelected = YES;
+                    [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
+                }
+            }else{
+                if (_rightSelectedCount == 2) {
+                    [self mlShowBeyondLimitSelectedCount];
+                }else{
+                    _rightSelectedCount++;
+                    [_mlRightselectedArr addObject:imgPath];
+                    [_selectedModelArr addObject:pictureModel];
+                    pictureModel.isSelected = YES;
+                    [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
+                }
+            }
         }else{
-            _selectedCount++;
-            [_selectedArr addObject:imgPath];
-            [_selectedModelArr addObject:pictureModel];
-            pictureModel.isSelected = YES;
-            _selectedLabel.text = [NSString stringWithFormat:@"已选 %d 张",_selectedCount];
-            [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
+            if (_rightSelectedCount == 2) {
+                [self mlShowBeyondLimitSelectedCount];
+            }else{
+                _rightSelectedCount++;
+                [_mlRightselectedArr addObject:imgPath];
+                [_selectedModelArr addObject:pictureModel];
+                pictureModel.isSelected = YES;
+                [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
+            }
         }
     }else{
-        _selectedCount--;
-        [_selectedArr removeObject:imgPath];
-        [_selectedModelArr addObject:pictureModel];
+        if (_leftCount>0) {
+            if (_currentPage+1<=_leftCount) {
+                _leftSelectedCount--;
+                [_mlLeftselectedArr removeObject:imgPath];
+            }else{
+                _rightSelectedCount--;
+                [_mlRightselectedArr removeObject:imgPath];
+            }
+        }else{
+            _rightSelectedCount--;
+            [_mlRightselectedArr removeObject:imgPath];
+        }
+        [_selectedModelArr removeObject:pictureModel];
         pictureModel.isSelected = NO;
-        _selectedLabel.text = [NSString stringWithFormat:@"已选 %d 张",_selectedCount];
         [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
+    }
+    
+    if (_leftCount>0) {
+        if (_rightCount>0) {
+            _eyeTypeLab.text = [NSString stringWithFormat:@"左眼 %d/2   右眼 %d/2",_leftSelectedCount,_rightSelectedCount];
+        }else{
+            _eyeTypeLab.text = [NSString stringWithFormat:@"左眼 %d/2",_leftSelectedCount];
+        }
+    }else{
+        _eyeTypeLab.text = [NSString stringWithFormat:@"右眼 %d/2",_rightSelectedCount];
+    }
+    
+    if (_selectedModelArr.count>0) {
+        if (_isModelData) {
+            self.navigationItem.rightBarButtonItem.enabled = YES;
+        }
+    }else{
+        if (_isModelData) {
+            self.navigationItem.rightBarButtonItem.enabled = NO;
+        }
     }
 }
 
@@ -301,21 +388,45 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     
     self.view.backgroundColor = [UIColor blackColor];
     self.extendedLayoutIncludesOpaqueBars = YES;
-    _selectedCount = 0;
-    if (!_isModelData) {
-        [self configureNavgationBar];
-    }
+    _leftSelectedCount = 0;
+    _rightSelectedCount = 0;
+    [self configureNavgationBar];
 }
 
 - (void)configureNavgationBar{
     _leftItem = [[UIBarButtonItem alloc] initWithTitle:@"取消"
                                                  style:UIBarButtonItemStylePlain
                                                 target:self
-                                                action:@selector(leftBarButtonItemAction)];
-    self.navigationItem.leftBarButtonItem = _leftItem;
+                                                action:@selector(mlLeftBarButtonItemAction)];
+    _rightItem = [[UIBarButtonItem alloc] initWithTitle:@"提交"
+                                                  style:UIBarButtonItemStylePlain
+                                                 target:self
+                                                 action:@selector(mlRightBarButtonItemAction)];
+    
+    if (_isModelData) {
+        self.navigationItem.rightBarButtonItem = _rightItem;
+        self.navigationItem.rightBarButtonItem.enabled = NO;
+    }else{
+        self.navigationItem.leftBarButtonItem = _leftItem;
+    }
 }
 
-- (void)leftBarButtonItemAction{
+- (void)mlLeftBarButtonItemAction{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)mlRightBarButtonItemAction{
+    NSMutableDictionary *temDic = [[NSMutableDictionary alloc] initWithCapacity:0];
+    if ([_mlLeftselectedArr isValid]) {
+        [temDic setObject:_mlLeftselectedArr forKey:@"leftEye"];
+    }
+    if ([_mlRightselectedArr isValid]) {
+        [temDic setObject:_mlRightselectedArr forKey:@"rightEye"];
+    }
+    NSDictionary *pathDic = [NSDictionary dictionaryWithDictionary:temDic];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TakePhotosFinishedNotification"
+                                                        object:nil
+                                                      userInfo:pathDic];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -439,8 +550,18 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         cell.backgroundColor = [UIColor clearColor];
         UIImage *photo; //[self.dataSource photoBrowser:self photoAtIndex:indexPath.item];
         if (_isModelData) {
+            BOOL isLeftEye;
+            if (_leftCount>0) {
+                if (indexPath.row+1<=_leftCount) {
+                    isLeftEye=YES;
+                }else{
+                    isLeftEye=NO;
+                }
+            }else{
+                isLeftEye=NO;
+            }
             JRPictureModel *pictureModel = self.photos[indexPath.item];
-            NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:_isLeftEye];
+            NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:isLeftEye];
             photo = [UIImage imageWithContentsOfFile:imgPath];
         }else{
             NSDictionary *paramDic = self.photos[indexPath.item];
@@ -481,41 +602,41 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 // 长按调用
-- (void) pickerPhotoScrollViewDidLongPress:(MLSelectPhotoPickerBrowserPhotoScrollView *)scrollView mlPhotoImageView:(MLSelectPhotoPickerBrowserPhotoImageView *)photoImageView{
-    if (!_isShowShowSheet) {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-        
-        // Create the actions.
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-        }];
-        
-        UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"保存到相册" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-            if([UIImagePickerController isSourceTypeAvailable: UIImagePickerControllerSourceTypeSavedPhotosAlbum]) {
-                UIImageWriteToSavedPhotosAlbum(photoImageView.image, nil, nil, nil);
-                if (photoImageView.image) {
-                    [scrollView showMessageWithText:@"保存成功"];
-                }
-            }else{
-                if (photoImageView.image) {
-                    [scrollView showMessageWithText:@"没有用户权限,保存失败"];
-                }
-            }
-        }];
-        
-        // Add the actions.
-        [alertController addAction:cancelAction];
-        [alertController addAction:sureAction];
-        
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
-}
+//- (void) pickerPhotoScrollViewDidLongPress:(MLSelectPhotoPickerBrowserPhotoScrollView *)scrollView mlPhotoImageView:(MLSelectPhotoPickerBrowserPhotoImageView *)photoImageView{
+//    if (!_isShowShowSheet) {
+//        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+//        
+//        // Create the actions.
+//        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+//        }];
+//        
+//        UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"保存到相册" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+//            if([UIImagePickerController isSourceTypeAvailable: UIImagePickerControllerSourceTypeSavedPhotosAlbum]) {
+//                UIImageWriteToSavedPhotosAlbum(photoImageView.image, nil, nil, nil);
+//                if (photoImageView.image) {
+//                    [scrollView showMessageWithText:@"保存成功"];
+//                }
+//            }else{
+//                if (photoImageView.image) {
+//                    [scrollView showMessageWithText:@"没有用户权限,保存失败"];
+//                }
+//            }
+//        }];
+//        
+//        // Add the actions.
+//        [alertController addAction:cancelAction];
+//        [alertController addAction:sureAction];
+//        
+//        [self presentViewController:alertController animated:YES completion:nil];
+//    }
+//}
 
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     
     self.navigationController.navigationBar.hidden = NO;
     self.toolBar.hidden = NO;
-    if (_selectedArr && _selectedArr.count>0) {
+    if (_mlLeftselectedArr.count>0 || _mlRightselectedArr.count>0) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"DidSelectedPictures"
                                                             object:nil];
     }
@@ -552,9 +673,40 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 - (void)setPageLabelPage:(NSInteger)page{
-    self.title = [NSString stringWithFormat:@"%ld / %ld",page + 1, self.photos.count];
     if (_isModelData) {
-        _selectedBtn.hidden = NO;
+        if (_leftCount>0) {
+            if (page+1<=_leftCount) {
+                self.title = @"左眼";
+            }else{
+                self.title = @"右眼";
+            }
+        }else{
+            self.title = @"右眼";
+        }
+        
+        if ([_selectedModelArr isValid]) {
+            NSMutableArray *indexArr = [[NSMutableArray alloc] initWithCapacity:0];
+            for (JRPictureModel *model in _selectedModelArr) {
+                NSUInteger index = [_photos indexOfObject:model];
+                [indexArr addObject:[NSNumber numberWithUnsignedInteger:index]];
+            }
+            
+            for (int i=0; i<_photos.count; i++) {
+                UIView *dotView = [_pageControl.subviews objectAtIndex:i];
+                if ([indexArr containsObject:[NSNumber numberWithInt:i]]) {
+                    dotView.backgroundColor = RGB(0x76c000);
+                }else{
+                    dotView.backgroundColor = [UIColor whiteColor];
+                }
+            }
+        }else{
+            _currentPageView.backgroundColor = [UIColor whiteColor];
+        }
+        
+        UIView *dotView = [_pageControl.subviews objectAtIndex:page];
+        dotView.backgroundColor = RGB(0x3691e6);
+        _currentPageView = dotView;
+        
         JRPictureModel *pictureModel = self.photos[page];
         UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
         UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
@@ -565,12 +717,8 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             _selectedBtn.selected = NO;
             [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
         }
-    }
-}
-
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
-    if (_isModelData) {
-        _selectedBtn.hidden = YES;
+    }else{
+        self.title = [NSString stringWithFormat:@"%ld / %ld",page + 1, self.photos.count];
     }
 }
 

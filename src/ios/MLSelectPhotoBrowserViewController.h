@@ -15,12 +15,14 @@ typedef void(^deleteCallBackBlock)();
 @interface MLSelectPhotoBrowserViewController : UIViewController
 // 展示的图片 MLSelectAssets
 @property (strong,nonatomic) NSArray *photos;
-// 左眼/右眼
-@property (nonatomic , assign) BOOL isLeftEye;
-@property (strong,nonatomic) NSMutableArray *selectedArr;
+
+@property (strong,nonatomic) NSMutableArray *mlLeftselectedArr;
+@property (strong,nonatomic) NSMutableArray *mlRightselectedArr;
 @property (strong,nonatomic) NSMutableArray *selectedModelArr;
 // 当前提供的分页数
 @property (nonatomic , assign) NSInteger currentPage;
+@property (nonatomic , assign) NSInteger leftCount;
+@property (nonatomic , assign) NSInteger rightCount;
 // 当前提供的分页数
 @property (nonatomic , assign) BOOL isModelData;
 

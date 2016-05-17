@@ -39,12 +39,22 @@
     
     CGFloat typeOriginX = CGRectGetMaxX(_iconImgView.frame) + 12.0f/2.0f;
     CGFloat typeOriginY = 0.0f;
-    CGFloat typeWidth = CGRectGetWidth(self.bounds)-typeOriginX-20.0f;
+    CGFloat typeWidth = 100.0f;
     CGFloat typeHeight = CGRectGetHeight(self.bounds);
     self.typeNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(typeOriginX, typeOriginY, typeWidth, typeHeight)];
     self.typeNameLabel.textAlignment = NSTextAlignmentLeft;
     self.typeNameLabel.font = [UIFont systemFontOfSize:16.0f];
     [self addSubview:_typeNameLabel];
+    
+    CGFloat selectedWidth = 60.0f;
+    CGFloat selectedHeight = CGRectGetHeight(self.bounds);
+    CGFloat selectedOriginX = CGRectGetWidth(self.bounds)-selectedWidth-10.0f;
+    CGFloat selectedOriginY = 0.0f;
+    self.selectedLabel = [[UILabel alloc] initWithFrame:CGRectMake(selectedOriginX, selectedOriginY, selectedWidth, selectedHeight)];
+    self.selectedLabel.textColor = RGB(0x4c4c4c);
+    self.selectedLabel.textAlignment = NSTextAlignmentRight;
+    self.selectedLabel.font = [UIFont systemFontOfSize:16.0f];
+    [self addSubview:_selectedLabel];
     
     CGFloat headerLineWidth = CGRectGetWidth(self.bounds);
     CGFloat headerLineHeight = 1.0f;
