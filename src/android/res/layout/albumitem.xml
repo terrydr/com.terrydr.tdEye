@@ -99,7 +99,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dip"
             android:layout_centerVertical="true"
-            android:background="@drawable/item_album_grid_checkbox"
+            android:background="@drawable/item_page_grid_checkbox"
             android:button="@null"
             android:checked="false"
             android:focusable="false" />

@@ -213,6 +213,7 @@
                      target-dir="src/com/terrydr/eyeScope"/>
 			 	 
 		<source-file src="src/android/res/drawable/item_album_grid_checkbox.xml" target-dir="res/drawable"/>
+		<source-file src="src/android/res/drawable/item_page_grid_checkbox.xml" target-dir="res/drawable"/>
 		<source-file src="src/android/res/drawable/shape.xml" target-dir="res/drawable"/>
 		<source-file src="src/android/res/drawable/whitebalance_setting_progressbar.xml" target-dir="res/drawable"/>	
 		<source-file src="src/android/res/drawable-xhdpi/albumitem_selected_current.png" target-dir="res/drawable-xhdpi"/>
@@ -230,7 +231,8 @@
 		<source-file src="src/android/res/drawable-xhdpi/icon_right.png" target-dir="res/drawable-xhdpi" />	
 		<source-file src="src/android/res/drawable-xhdpi/icon_whitebalance_iv_bright.png" target-dir="res/drawable-xhdpi" />	
 		<source-file src="src/android/res/drawable-xhdpi/icon_whitebalance_iv_dark.png" target-dir="res/drawable-xhdpi" />	
-		<source-file src="src/android/res/drawable-xhdpi/item_album_grid_selected.png" target-dir="res/drawable-xhdpi" />
+		<source-file src="src/android/res/drawable-xhdpi/pageitem_selected.png" target-dir="res/drawable-xhdpi" />	
+		<source-file src="src/android/res/drawable-xhdpi/pageitem_unselected.png" target-dir="res/drawable-xhdpi" />	
 		<source-file src="src/android/res/drawable-xhdpi/photos_iv.png" target-dir="res/drawable-xhdpi" />	
 		<source-file src="src/android/res/drawable-xhdpi/top_left_but.png" target-dir="res/drawable-xhdpi" />
 		<source-file src="src/android/res/drawable-xhdpi/whitebalance_background.png" target-dir="res/drawable-xhdpi" />
