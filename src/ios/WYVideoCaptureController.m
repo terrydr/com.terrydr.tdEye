@@ -542,7 +542,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             _rightTakenPictureCount=0;
         }
         self.title = @"0/6";
-        //[[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
+        [[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
         //[wself takePictureMethod];
     }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
@@ -566,9 +566,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     NSString *filePath = [fileManage getJRMediaPathWithType:_isLeftEye];
     NSString *imageName;
     if (_isLeftEye) {
-        imageName = [NSString stringWithFormat:@"%02d.png",_leftTakenPictureCount];
+        imageName = [NSString stringWithFormat:@"%02d.jpg",_leftTakenPictureCount];
     }else{
-        imageName = [NSString stringWithFormat:@"%02d.png",_rightTakenPictureCount];
+        imageName = [NSString stringWithFormat:@"%02d.jpg",_rightTakenPictureCount];
     }
     NSString *imgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
     NSFileManager *fileManager = [NSFileManager defaultManager];
