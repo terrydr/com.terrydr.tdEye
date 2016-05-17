@@ -142,6 +142,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         
         // Create the actions.
         UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                
+            }];
         }];
         // Add the actions.
         [alertController addAction:cancelAction];
@@ -442,10 +445,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     if (_isLeftEye) {
         if (_isLeftTouchDown) {
             _isLeftTouchDown = NO;
-            [NSObject cancelPreviousPerformRequestsWithTarget:self
-                                                     selector:@selector(takePictureMethod)
-                                                       object:nil];
-            [self pushToPictureScan:YES];
         }else{
             if (_leftTakenPictureCount == 6) {
                 [self showBeyondLimitTakenCount];
@@ -457,10 +456,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }else{
         if (_isRightTouchDown) {
             _isRightTouchDown = NO;
-            [NSObject cancelPreviousPerformRequestsWithTarget:self
-                                                     selector:@selector(takePictureMethod)
-                                                       object:nil];
-            [self pushToPictureScan:YES];
         }else{
             if (_rightTakenPictureCount == 6) {
                 [self showBeyondLimitTakenCount];
@@ -558,6 +553,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)saveTakenPictureData:(NSData *)imgData{
+    if (_isLeftEye) {
+        self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
+    }else{
+        self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
+    }
+    
     UIImage *image = [UIImage imageWithData:imgData];
     UIImage *saveImg = [self cropImage:image withCropSize:self.viewContainer.size];
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
@@ -577,7 +578,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                                      attributes:nil];
     NSLog(@"result:%d",result);
     if (_isLeftEye) {
-        self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
         if (_isLeftTouchDown) {
             if (_leftTakenPictureCount==6) {
                 _isLeftTouchDown = NO;
@@ -586,12 +586,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                 [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
             }
         }else{
-            if(_isLeftTouchUpInside){
-                [self pushToPictureScan:YES];
-            }
+            [self pushToPictureScan:YES];
         }
     }else{
-        self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
         if (_isRightTouchDown) {
             if (_rightTakenPictureCount==6) {
                 _isRightTouchDown = NO;
@@ -600,9 +597,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                 [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
             }
         }else{
-            if (_isRightToucUpInside) {
-                [self pushToPictureScan:YES];
-            }
+            [self pushToPictureScan:YES];
         }
     }
 }

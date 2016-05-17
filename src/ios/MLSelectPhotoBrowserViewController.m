@@ -643,17 +643,14 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 #pragma mark - <UIScrollViewDelegate>
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
+    return CGSizeMake(ZLPickerColletionViewPadding, self.view.frame.size.height);
+}
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
     CGRect tempF = self.collectionView.frame;
     NSInteger currentPage = (NSInteger)((scrollView.contentOffset.x / scrollView.ml_width) + 0.5);
     if (tempF.size.width < [UIScreen mainScreen].bounds.size.width){
         tempF.size.width = [UIScreen mainScreen].bounds.size.width;
-    }
-    
-    if ((currentPage < self.photos.count -1) || self.photos.count == 1) {
-        tempF.origin.x = 0;
-    }else if(scrollView.isDragging){
-        tempF.origin.x = -ZLPickerColletionViewPadding;
     }
     
     if([[self.deleteAssets allValues] count] == 0 || [self.deleteAssets valueForKeyPath:[NSString stringWithFormat:@"%ld",(currentPage)]] == nil){
@@ -723,10 +720,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
-    NSInteger currentPage = (NSInteger)scrollView.contentOffset.x / (scrollView.ml_width - ZLPickerColletionViewPadding);
-    if (currentPage == self.photos.count - 1 && currentPage != self.currentPage && [[[UIDevice currentDevice] systemVersion] doubleValue] >= 8.0) {
-        self.collectionView.contentOffset = CGPointMake(self.collectionView.contentOffset.x, self.collectionView.contentOffset.y);
-    }
+    NSInteger currentPage = (NSInteger)((scrollView.contentOffset.x / scrollView.ml_width) + 0.5);
     self.currentPage = currentPage;
     [self setPageLabelPage:currentPage];
 }
