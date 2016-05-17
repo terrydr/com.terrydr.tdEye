@@ -2,6 +2,7 @@ package com.terrydr.eyeScope;
 
 import java.io.File;
 import java.util.List;
+import org.apache.cordova.LOG;
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -19,13 +21,20 @@ import android.text.TextPaint;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
+import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
+import android.view.animation.RotateAnimation;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.terrydr.eyeScope.R;
 
 public class CameraActivity extends Activity implements View.OnClickListener,
@@ -41,10 +50,11 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private TextView eyeleft_tv, eyeleft_tv1,return_index_bt,camera_camera_tv;
 	private LinearLayout linearlayou_left, linearlayou_right;
 	private GestureDetector detector;
-	private boolean leftOrRight = true; // 默认为左 true:左眼，false:右眼
-	private int i_left = 0; // 记录单侧拍摄图像个数
-	private int i_right = 0; // 记录单侧拍摄图像个数
+	public boolean leftOrRight = true; // 默认为左 true:左眼，false:右眼
+	public int i_left = 0; // 记录单侧拍摄图像个数
+	public int i_right = 0; // 记录单侧拍摄图像个数
 	private boolean deleteFile = true;
+	private boolean isLong = false;
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -52,6 +62,13 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_camera);
+//	    PackageManager pm = getPackageManager();  
+//        boolean permission = (PackageManager.PERMISSION_GRANTED ==   
+//                pm.checkPermission("android.permission.CAMERA", "com.terrydr.eyeScope"));  
+//        if (!permission) {  
+//        	Toast.makeText(getApplicationContext(), "未获得相机权限，请到设置中授权后再尝试。",Toast.LENGTH_SHORT).show();
+//            finish(); 
+//        }
 		mContainer = (CameraContainer) findViewById(R.id.container);
 		eyeleft_tv = (TextView) findViewById(R.id.eyeleft_tv);
 		eyeleft_tv1 = (TextView) findViewById(R.id.eyeleft_tv1);
@@ -72,6 +89,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		eyeleft_tv.setOnClickListener(this);
 		eyeleft_tv1.setOnClickListener(this);
 		return_index_bt.setOnClickListener(this);
+		photos_iv.setOnLongClickListener(onLongClickListener);
+		photos_iv.setOnTouchListener(this);
 		
 		mContainer.setOnTouchListener(this);
 		
@@ -82,10 +101,10 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		mSaveRoot_right = "right";
 		setPath(leftOrRight);
 
-		int i = dip2px(10);
-		int m = px2dip(20);
-//		Log.e(TAG, "i:" + i);
-//		Log.e(TAG, "m:" + m);
+		int i = dip2px(30);
+		int m = px2dip(120);
+		Log.e(TAG, "i:" + i);
+		Log.e(TAG, "m:" + m);
 		// mHeaderBar.getBackground().setAlpha(204);//透明0~255透明度 ，越小越透明
 	}
 
@@ -147,6 +166,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.photos_iv:
+			LOG.d(TAG, "点击拍照按钮");
 			if ((i_left >= 6 && leftOrRight) || (i_right >= 6 && !leftOrRight)) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setMessage("单侧眼睛最多拍摄六张图片,是否重拍?")
@@ -170,47 +190,15 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 				builder.create().show();
 			} else {
 				if (leftOrRight) {
-					String thumbFolder = FileOperateUtil.getFolderPath(this,
-							FileOperateUtil.TYPE_THUMBNAIL, mSaveRoot_left);
-					List<File> files = FileOperateUtil.listFiles(thumbFolder,
-							".jpg");
-					String imgFolder = FileOperateUtil.getFolderPath(this,
-							FileOperateUtil.TYPE_IMAGE, mSaveRoot_left);
-					List<File> imgFiles = FileOperateUtil.listFiles(imgFolder,
-							".jpg");
-					if (files != null) {
-						if (files.size() >= 6) {
-							String deleteFilePath = files.get(5)
-									.getAbsolutePath();
-							deleteFile(deleteFilePath);
-							String deleteImgFilePath = imgFiles.get(5)
-									.getAbsolutePath();
-							deleteFile(deleteImgFilePath);
-						}
-					}
+					deleteMultiSelectFile(mSaveRoot_left);
 					i_left++;
 				} else {
-					String thumbFolder = FileOperateUtil.getFolderPath(this,
-							FileOperateUtil.TYPE_THUMBNAIL, mSaveRoot_right);
-					List<File> files = FileOperateUtil.listFiles(thumbFolder,
-							".jpg");
-					String imgFolder = FileOperateUtil.getFolderPath(this,
-							FileOperateUtil.TYPE_IMAGE, mSaveRoot_right);
-					List<File> imgFiles = FileOperateUtil.listFiles(imgFolder,
-							".jpg");
-					if (files != null) {
-						if (files.size() >= 6) {
-							String deleteFilePath = files.get(5)
-									.getAbsolutePath();
-							deleteFile(deleteFilePath);
-							String deleteImgFilePath = imgFiles.get(5)
-									.getAbsolutePath();
-							deleteFile(deleteImgFilePath);
-						}
-					}
+					deleteMultiSelectFile(mSaveRoot_right);
 					i_right++;
 				}
-				photos_iv.setClickable(false);
+				Log.e(TAG, "拍照.....");
+//				s = System.currentTimeMillis();
+				photos_iv.setEnabled(false);
 				mContainer.takePicture(this);
 			}
 			break;
@@ -252,6 +240,75 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			break;
 		}
 
+	}
+//	long s;
+//	long e;
+	
+	/**
+	 * 当拍照大于6张时删除多于图片
+	 * @leftOrRight 左、右眼图片路径
+	 */
+	public void deleteMultiSelectFile(String leftOrRight){
+		String thumbFolder = FileOperateUtil.getFolderPath(this,
+				FileOperateUtil.TYPE_THUMBNAIL, leftOrRight);
+		List<File> files = FileOperateUtil.listFiles(thumbFolder,".jpg");
+		String imgFolder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, leftOrRight);
+		List<File> imgFiles = FileOperateUtil.listFiles(imgFolder,".jpg");
+		if (files != null) {
+			if (files.size() >= 6) {
+				String deleteFilePath = files.get(5).getAbsolutePath();
+				deleteFile(deleteFilePath);
+				String deleteImgFilePath = imgFiles.get(5).getAbsolutePath();
+				deleteFile(deleteImgFilePath);
+			}
+		}
+	}
+	
+	/**
+	 * 当拍照大于6张时删除多于图片
+	 * @leftOrRight 左、右眼图片路径
+	 */
+	public void deleteMultiSelectFile2(String leftOrRight){
+		String thumbFolder = FileOperateUtil.getFolderPath(this,
+				FileOperateUtil.TYPE_THUMBNAIL, leftOrRight);
+		List<File> files = FileOperateUtil.listFiles(thumbFolder,".jpg");
+		String imgFolder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, leftOrRight);
+		List<File> imgFiles = FileOperateUtil.listFiles(imgFolder,".jpg");
+		if (files != null) {
+			if (files.size() > 6) {
+				String deleteFilePath = files.get(6).getAbsolutePath();
+				deleteFile(deleteFilePath);
+				String deleteImgFilePath = imgFiles.get(6).getAbsolutePath();
+				deleteFile(deleteImgFilePath);
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * 当拍照大于6张时删除多于图片
+	 * @leftOrRight 左、右眼图片路径
+	 */
+	public void deleteMultiSelectFile1(String leftOrRight){
+		String thumbFolder = FileOperateUtil.getFolderPath(this,
+				FileOperateUtil.TYPE_THUMBNAIL, leftOrRight);
+		List<File> files = FileOperateUtil.listFiles(thumbFolder,".jpg");
+		String imgFolder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, leftOrRight);
+		List<File> imgFiles = FileOperateUtil.listFiles(imgFolder,".jpg");
+		if (files != null) {
+			if (files.size() >= 6) {
+				for(int i=0;i<files.size();i++){
+					if(i>=6){
+						String deleteFilePath = files.get(i).getAbsolutePath();
+						deleteFile(deleteFilePath);
+						String deleteImgFilePath = imgFiles.get(i).getAbsolutePath();
+						deleteFile(deleteImgFilePath);
+					}
+				}
+				
+			}
+		}
 	}
 
 	/**
@@ -343,14 +400,14 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 */
 	@Override
 	public void onTakePictureEnd(Bitmap bm) {
-		photos_iv.setClickable(true);
+		Log.e(TAG, "拍照完成跳转");
 		startAlbumAty();  //拍照完成跳转
 	}
 	
 	/**
 	 * 拍照结束后跳转到AlbumAty
 	 */
-	private void startAlbumAty(){
+	public void startAlbumAty(){
 		Intent intent = new Intent(this, AlbumAty.class);
 		Bundle bundle = new Bundle();
 		int mexposureNum = mExposureNum; // 曝光
@@ -381,6 +438,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 				deleteFile = b.getBoolean("deleteFile");
 			}
 			mContainer.setCameraISO_int(mExposureNum);
+			photos_iv.setEnabled(true);
 			break;
 		case 5:
 //			Log.e(TAG,"5");
@@ -453,12 +511,14 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			linearlayou_right.setVisibility(View.VISIBLE);
 			leftOrRight = false;
 			setPath(leftOrRight);
+			setCameraText(leftOrRight);
 			return true;
 		} else if (e1.getX() - e2.getX() < -120) {
 			linearlayou_left.setVisibility(View.VISIBLE);
 			linearlayou_right.setVisibility(View.GONE);
 			leftOrRight = true;
 			setPath(leftOrRight);
+			setCameraText(leftOrRight);
 			return true;
 		}
 		return false;
@@ -471,17 +531,17 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	public boolean onTouchEvent(MotionEvent event) {
 
 		return this.detector.onTouchEvent(event);
-		// return false;
 	}
 
 	@Override
 	public void onBackPressed() {
-		this.finish();
+		finish();
 		super.onBackPressed();
 	}
 	
 	@Override
 	protected void onResume() {		
+		setCameraText(leftOrRight);
 		Bundle bundle = getIntent().getExtras();
 		if(bundle!=null){
 //			mExposureNum = bundle.getInt("mexposureNum");
@@ -498,17 +558,142 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		super.onResume();
 	}
 	
+	/**
+	 * 设置拍照界面的照片个数 '0/6'
+	 * @param trueOrFalse  
+	 */
+	private void setCameraText(boolean trueOrFalse) {
+		if (trueOrFalse) {
+			camera_camera_tv.setText(i_left + "/6");
+		} else {
+			camera_camera_tv.setText(i_right + "/6");
+		}
+	}
+	
+	/**
+	 * 触摸对焦
+	 * 
+	 */
 	@Override
-	  public boolean onTouch(View arg0, MotionEvent event) {
+	  public boolean onTouch(View view, MotionEvent event) {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			mContainer.setOnFocus(new Point((int)event.getX(), (int)event.getY())); 
+			switch (view.getId()) {
+			case R.id.container:
+				Log.d(TAG,"开始触摸对焦...");
+				mContainer.setOnFocus(new Point((int)event.getX(), (int)event.getY())); 
+				break;
+			}
 			break;
-
+		case MotionEvent.ACTION_UP:
+//			Log.d(TAG,"结束连继拍照..");
+			if(isLong){
+				isLong = false;
+				switch (view.getId()) {
+				case R.id.photos_iv:
+					Log.d(TAG,"结束连继拍照");
+					if (leftOrRight) {
+						mContainer.stop = i_left;
+					}else
+						mContainer.stop = i_right;
+					
+					stop();
+					break;
+				}
+			}
+			break;
 		default:
 			break;
 		}
 	    return false;
 	  }
 
+	/**
+	 * 长按连拍事件处理
+	 */
+	private OnLongClickListener onLongClickListener = new OnLongClickListener() {
+
+		@Override
+		public boolean onLongClick(View v) {
+			Log.e(TAG, "test");
+			isLong = true;
+			start();
+			return true;
+		}
+	};
+	
+	/**
+	 * 连拍时改变拍照张数
+	 */
+    public void setCount(){
+		if (leftOrRight) {
+			camera_camera_tv.setText(Integer.toString(++i_left) + "/6");
+		} else {
+			camera_camera_tv.setText(Integer.toString(++i_right) + "/6");
+		}
+		if ((i_left >= 6 && leftOrRight) || (i_right >= 6 && !leftOrRight)){
+			stop();
+        }
+    }
+    
+    public void delectMultiFile(){
+    	if (leftOrRight) {
+    		deleteMultiSelectFile(mSaveRoot_left);
+    	}else{
+    		deleteMultiSelectFile(mSaveRoot_right);
+    	}
+    }
+    public void delectMultiFile2(){
+    	if (leftOrRight) {
+    		deleteMultiSelectFile2(mSaveRoot_left);
+    	}else{
+    		deleteMultiSelectFile2(mSaveRoot_right);
+    	}
+    }
+    
+    /**
+     * 启动连拍
+     */
+    public void start() {
+		if ((i_left >= 6 && leftOrRight) || (i_right >= 6 && !leftOrRight)) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("单侧眼睛最多拍摄六张图片,是否重拍?")
+					.setPositiveButton("确认", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if (leftOrRight){
+								i_left = 0;
+								mContainer.mNumLeft = 0;
+							}
+							else{
+								i_right = 0;
+								mContainer.mNumright = 0;
+							}
+						}
+					}).setNegativeButton("取消", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							startAlbumAty();
+						}
+					});
+			builder.create().show();
+			stop();
+		} else {
+			if (leftOrRight){
+				mContainer.mNumLeft = i_left;
+			}else{
+				mContainer.mNumright = i_right;
+			}
+			mContainer.resumeShooting();
+		}
+	}
+    
+    /**
+     * 停止连拍
+     */
+    public void stop(){
+    	mContainer.stopShooting();
+
+    }
 }

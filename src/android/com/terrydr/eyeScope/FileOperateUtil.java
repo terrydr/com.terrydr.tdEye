@@ -158,10 +158,11 @@ public class FileOperateUtil {
 	 * @return
 	 */
 	public static String createFileNmae(String extension) {
-		DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss",
-				Locale.getDefault());
-		// 转换为字符串
-		String formatDate = format.format(new Date());
+//		DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss",
+//				Locale.getDefault());
+//		// 转换为字符串
+//		String formatDate = format.format(new Date());
+		long formatDate = System.currentTimeMillis();
 		// 查看是否
 		if (!extension.startsWith("."))
 			extension = "." + extension;

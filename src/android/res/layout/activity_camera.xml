@@ -1,9 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:descendantFocusability="blocksDescendants"
-    android:orientation="vertical"
     tools:context="com.terrydr.eyeScope.CameraActivity" >
 
     <!-- 显示预览图形 -->
@@ -29,8 +29,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/camera_header_bar"
-        android:layout_marginRight="10dip"
-        android:layout_marginTop="10dip"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/icon_iso_iv_bright" />
 
     <ImageView
@@ -39,8 +39,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/iso_iv"
-        android:layout_marginRight="10dip"
-        android:layout_marginTop="10dip"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
         android:visibility="gone"
         android:src="@drawable/icon_whitebalance_iv_bright" />
 

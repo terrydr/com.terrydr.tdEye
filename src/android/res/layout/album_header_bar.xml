@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:layout_height="@dimen/top_menu_bar_height"
+    android:orientation="vertical"
+    android:gravity="center_vertical" >
 
     <RelativeLayout
         android:id="@+id/header_bar_navi"
         android:layout_width="fill_parent"
         android:layout_height="@dimen/top_menu_bar_height"
-        android:background="@color/common_title_bg"
-        android:orientation="horizontal" >
+        android:background="@color/common_title_bg" >
 
         <ImageView
             android:id="@+id/header_bar_back_iv"
             android:layout_width="wrap_content"
-            android:layout_height="20dp"
+            android:layout_height="25dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:paddingLeft="@dimen/title_view_left_back_padding_left"
@@ -24,19 +24,19 @@
         <TextView
             android:id="@+id/header_bar_back"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/header_bar_back_iv"
-            android:gravity="center_vertical"
             android:text="@string/camera_tv"
+            android:layout_centerVertical="true"
             android:textColor="@android:color/white"
             android:textSize="@dimen/text_size" />
 
         <TextView
             android:id="@+id/album_image_browse_tv"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:gravity="center_vertical"
             android:text="@string/image_browse_tv"
             android:textColor="@android:color/white"
             android:textSize="@dimen/text_size_20" />
@@ -44,10 +44,10 @@
         <TextView
             android:id="@+id/header_bar_enter_selection"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:gravity="center"
-            android:paddingRight="10.0dip"
+            android:layout_centerVertical="true"
+            android:paddingRight="10.0dp"
             android:singleLine="true"
             android:text="@string/header_bar_enter_selection_tv"
             android:textColor="@android:color/white"
@@ -59,13 +59,12 @@
         android:layout_width="fill_parent"
         android:layout_height="@dimen/top_menu_bar_height"
         android:background="@color/common_title_bg"
-        android:orientation="horizontal"
         android:visibility="gone" >
 
         <ImageView
             android:id="@+id/header_bar_back_iv1"
             android:layout_width="wrap_content"
-            android:layout_height="20dp"
+            android:layout_height="25dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:paddingLeft="@dimen/title_view_left_back_padding_left"
@@ -75,8 +74,9 @@
         <TextView
             android:id="@+id/cance_back_iv"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:gravity="center_vertical"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_centerVertical="true"
             android:layout_toRightOf="@id/header_bar_back_iv1"
             android:text="@string/camera_tv"
             android:textColor="@android:color/white"
@@ -85,9 +85,8 @@
         <TextView
             android:id="@+id/album_image_browse_tv1"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:gravity="center_vertical"
             android:text="@string/image_browse_tv"
             android:textColor="@android:color/white"
             android:textSize="@dimen/text_size_20" />
@@ -95,11 +94,11 @@
         <TextView
             android:id="@+id/cance_bt"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:gravity="center"
-            android:paddingRight="10.0dip"
+            android:paddingRight="10.0dp"
             android:singleLine="true"
+            android:layout_centerVertical="true"
             android:text="@string/cance_bt_tv"
             android:textColor="@android:color/white"
             android:textSize="@dimen/text_size" />

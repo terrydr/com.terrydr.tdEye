@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.Size;
 import android.media.ThumbnailUtils;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
@@ -19,14 +20,9 @@ import com.terrydr.eyeScope.R;
 public class CameraContainer extends RelativeLayout implements CameraOperation{
 
 	public final static String TAG = "CameraContainer";
-	/** 用以执行定时任务的Handler对象 */
-//	private Handler mHandler;
 
 	/** 相机绑定的SurfaceView */
 	private CameraView mCameraView;
-
-//	/** 触摸屏幕时显示的聚焦图案 */
-//	private FocusImageView mFocusImageView;
 
 	/** 拍照监听接口，用以在拍照始和结束后执行相应操*/
 	private TakePictureListener mListener;
@@ -36,9 +32,20 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 
 	/** 照片字节流处理类 */
 	private DataHandler mDataHandler;
+	
+	private PreviewCallback mPreviewCallback = null;
+	private CameraActivity cActivity;
+	private boolean contShoot = false;
+	public int mMode = 0;     //是否连拍标识
+    public int mNumLeft=0;    //连拍左眼的张数
+    public int mNumright=0;    //连拍右眼的张数
+    public int stop = 0;      //触摸离开屏幕结束拍照的张数
+    
+	
 
 	public CameraContainer(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		cActivity = (CameraActivity) context;
 		initView(context);
 //		mHandler = new Handler();
 //		setOnTouchListener(new TouchListener());
@@ -53,8 +60,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	private void initView(final Context context) {
 		inflate(context, R.layout.cameracontainer, this);
 		mCameraView = (CameraView) findViewById(R.id.cameraView);
-//		mFocusImageView = (FocusImageView) findViewById(R.id.focusImageView);
-//		mCameraView.setOnTouchListener(this);
 	}
 
 	@Override
@@ -73,11 +78,78 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	public void takePicture(TakePictureListener listener) {
 		this.mListener = listener;
 		takePicture(pictureCallback, mListener);
-//		Point point=new Point(getWidth()/2, getHeight()/2);
-//		mCameraView.onFocus(point,autoFocusCallback);
 	}
+	/**
+	 * 开始连拍
+	 */
+    public void resumeShooting(){
+    	contShoot = true;
+		mMode = 1;
+		if(mPreviewCallback == null){
+			mPreviewCallback = new PreviewCallback();
+		}
+		if(mPreviewCallback != null){
+			
+    		if(mCameraView.mCamera != null){
+    			mCameraView.mCamera.startPreview();
+    			mCameraView.mCamera.setPreviewCallback(mPreviewCallback);
+    		}
+    	}
+    }
+    /**
+     * 结束连拍
+     */
+    public void stopShooting(){
+    	contShoot = false;
+		mMode = 0;
+    	if(mCameraView.mCamera!=null){
+    		mCameraView.mCamera.stopPreview();
+    		mCameraView.mCamera.setPreviewCallback(null);
+    		mCameraView.mCamera.startPreview();
+    	}
+    	
+    }
+    
+    /**
+     * 每一张连拍结束的回调函数
+     */
+    public void countShoot(){
+//    	LOG.e(TAG, "cActivity.i_left"+cActivity.i_left);
+    	cActivity.delectMultiFile2();
+        if(mMode == 1){
+        	if(mCameraView.mCamera!=null){
+        		mCameraView.mCamera.setPreviewCallback(mPreviewCallback);    
+        	}
+        }
+        if(!contShoot){
+        	stopShooting();
+        }
+//        LOG.e(TAG, "mNumLeft:"+mNumLeft + "------" + cActivity.leftOrRight);
+        if(cActivity.leftOrRight){
+        	mNumLeft++;
+            if(stop==mNumLeft){
+            	cActivity.startAlbumAty();
+            }else
+        	if(mNumLeft>=6){
+        		stopShooting();
+            	cActivity.startAlbumAty();
+        	}
+        }else{
+        	mNumright++;
+            if(stop==mNumright){
+            	cActivity.startAlbumAty();
+            }else
+        	if(mNumright>=6){
+        		stopShooting();
+            	cActivity.startAlbumAty();
+        	}
+        }
+    }
 	
-	private final PictureCallback pictureCallback = new PictureCallback() {
+    /**
+     * 拍照完返回调用函数
+     */
+	private PictureCallback pictureCallback = new PictureCallback() {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
@@ -92,6 +164,84 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 				mListener.onTakePictureEnd(bm);
 		}
 	};
+	
+	
+	/**
+	 * 连拍保存图片接口 
+	 * @author ty
+	 *
+	 */
+	public class PreviewCallback implements Camera.PreviewCallback {
+        PreviewCallback(){}
+		@Override
+        public void onPreviewFrame(final byte[] data, Camera camera) {
+        	camera.setPreviewCallback(null);
+                Thread t2 = new Thread(){
+                    public void run(){
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                        }
+                        if(mCameraView.mCamera != null){
+                            if(mMode == 1){
+                            	mCameraView.mCamera.setPreviewCallback(mPreviewCallback);  
+                            }
+                        }
+                    }
+                };
+                t2.start();
+			if (mSavePath == null)
+				throw new RuntimeException("mSavePath is null");
+			
+			String mImageFolder = FileOperateUtil.getFolderPath(getContext(),
+					FileOperateUtil.TYPE_IMAGE, mSavePath);
+			String mThumbnailFolder = FileOperateUtil.getFolderPath(getContext(),
+					FileOperateUtil.TYPE_THUMBNAIL, mSavePath);
+			File folder = new File(mImageFolder);
+			if (!folder.exists()) {
+				folder.mkdirs();
+			}
+			folder = new File(mThumbnailFolder);
+			if (!folder.exists()) {
+				folder.mkdirs();
+			}
+
+			// 产生新的文件
+			String imgName = FileOperateUtil.createFileNmae(".jpg");
+			String imagePath = mImageFolder + File.separator + imgName;
+			String thumbPath = mThumbnailFolder + File.separator + imgName;
+            
+//			Size bmSize = mCameraView.returnPictureSzie();
+			Size bmSize = convertPreviewSize(data);
+            final int width = bmSize.width;
+            final int height = bmSize.height;
+            Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888); 
+            cActivity.setCount();
+            ImageAsyncTask taskBmp = new ImageAsyncTask(CameraContainer.this,mCameraView, data, bmSize,imagePath,thumbPath);
+            taskBmp.execute(bmp);
+       }
+
+	}
+	
+	/**
+	 * 获取连拍保存图片大小
+	 * @param data
+	 * @return
+	 */
+    private Size convertPreviewSize(byte[] data){
+        double displaysize = data.length / 1.5;
+        Size size;
+        int x, y;
+        for(int i=0; i<mCameraView.returnSizeList().size(); i++){
+            size = mCameraView.returnSizeList().get(i);
+            x = size.width;
+            y = size.height;
+            if((x*y) == displaysize){
+                return size;
+            }
+        }
+        return null;
+    }
 
 	/**
 	 * @ClassName: TakePictureListener

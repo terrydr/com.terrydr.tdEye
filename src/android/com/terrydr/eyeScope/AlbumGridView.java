@@ -91,7 +91,7 @@ public class AlbumGridView extends GridView {
 	}
 
 	/**
-	 * 
+	 * 返回选中图片集合
 	 * @return
 	 */
 	public Set<String> getSelectedItems() {
@@ -99,7 +99,6 @@ public class AlbumGridView extends GridView {
 			return ((AlbumViewAdapter) getAdapter()).getSelectedItems();
 		}
 		return null;
-//		return ((AlbumViewAdapter) getAdapter()).getSelectedItems();
 	}
 
 	public void notifyDataSetChanged() {
@@ -255,13 +254,13 @@ public class AlbumGridView extends GridView {
 					return;
 				if (isChecked){
 					itemSelectedSet.add(buttonView.getTag().toString());
-				}
-				else{
+				}else{
 					itemSelectedSet.remove(buttonView.getTag().toString());
 				}
-				if (listener != null)
-					listener.onCheckedChanged(itemSelectedSet);
+//				if (listener != null)
+//					listener.onCheckedChanged(itemSelectedSet);
 			}
+			
 		}
 	}
 }

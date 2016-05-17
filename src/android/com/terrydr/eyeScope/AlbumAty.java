@@ -8,7 +8,6 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -43,8 +42,9 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 
 	private String mSaveRoot_left = "left";
 	private String mSaveRoot_right = "right";
-
-	private TextView mEnterView;
+	protected TextView left_count_tv,right_count_tv;
+	protected boolean isLeft = true;
+	private TextView header_bar_enter_selection;
 	private TextView cance_bt,mBackView,album_image_browse_tv,album_image_browse_tv1;
 	public Button commit_bt;
 	private TextView cance_back_iv;
@@ -53,6 +53,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	private ThumbnaiImageView view;
 	private LinearLayout linearLayou_left,linearLayou_right;
 	private ImageView header_bar_back_iv,header_bar_back_iv1;
+	
 
 	/**
 	 * 透明状态栏,透明导航栏
@@ -79,13 +80,19 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		linearLayou_right = (LinearLayout) findViewById(R.id.linearLayou_right);
 		mAlbumView = (AlbumGridView) findViewById(R.id.albumview); // 左眼
 		mAlbumView_right = (AlbumGridView) findViewById(R.id.albumview_right); // 右眼
-		mEnterView = (TextView) findViewById(R.id.header_bar_enter_selection);
+		header_bar_enter_selection = (TextView) findViewById(R.id.header_bar_enter_selection);  //选择
 		cance_bt = (TextView) findViewById(R.id.cance_bt);
 		commit_bt = (Button) findViewById(R.id.commit_bt);
 		mBackView = (TextView) findViewById(R.id.header_bar_back);
 		cance_back_iv = (TextView) findViewById(R.id.cance_back_iv);
 		header_bar_back_iv = (ImageView) findViewById(R.id.header_bar_back_iv);
 		header_bar_back_iv1 = (ImageView) findViewById(R.id.header_bar_back_iv1);
+		left_count_tv = (TextView) findViewById(R.id.left_count_tv);
+		right_count_tv = (TextView) findViewById(R.id.right_count_tv);
+		left_count_tv.setText("0/2");
+		right_count_tv.setText("0/2");
+		left_count_tv.setVisibility(View.GONE);
+		right_count_tv.setVisibility(View.GONE);
 		
 		album_image_browse_tv = (TextView) findViewById(R.id.album_image_browse_tv);
 		album_image_browse_tv1 = (TextView) findViewById(R.id.album_image_browse_tv1);
@@ -94,7 +101,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		TextPaint tp1 = album_image_browse_tv1.getPaint();  //安体加粗
 	    tp1.setFakeBoldText(true);
 
-		mEnterView.setOnClickListener(this);
+	    header_bar_enter_selection.setOnClickListener(this);
 		cance_back_iv.setOnClickListener(this);
 		cance_bt.setOnClickListener(this);
 		mBackView.setOnClickListener(this);
@@ -102,10 +109,11 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		header_bar_back_iv.setOnClickListener(this);
 		header_bar_back_iv1.setOnClickListener(this);
 
-		mAlbumView.setOnItemClickListener(new OnItemClickListener() {
-
+		mAlbumView.setOnItemClickListener(new OnItemClickListener() { 
+			
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+				isLeft = true;
 				if (mAlbumView.getEditable()){
 					view = (ThumbnaiImageView) arg1;
 					boolean isChecked  = view.checkBox.isChecked();
@@ -114,6 +122,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 					}else{
 						view.checkBox.setChecked(true);
 					}
+					left_count_tv.setText(mAlbumView.getSelectedItems().size() + "/2");
 					return;
 				}
 				Intent intent = new Intent(AlbumAty.this, AlbumItemAty.class);
@@ -127,6 +136,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+				isLeft = false;
 				if (mAlbumView_right.getEditable()){
 					view = (ThumbnaiImageView) arg1;
 					boolean isChecked  = view.checkBox.isChecked();
@@ -135,8 +145,10 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 					}else{
 						view.checkBox.setChecked(true);
 					}
+					right_count_tv.setText(mAlbumView_right.getSelectedItems().size() + "/2");
 					return;
 				}
+				
 				Intent intent = new Intent(AlbumAty.this, AlbumItemAty.class);
 				intent.putExtra("path", arg1.getTag().toString());
 				intent.putExtra("root", mSaveRoot_right);
@@ -154,6 +166,8 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 //		 return true;
 //		 }
 //		 });
+		
+		
 		Set<String> itemSelectedSet = new HashSet<String>();
 		loadAlbum1(mSaveRoot_left, ".jpg", mAlbumView, itemSelectedSet);
 		loadAlbum1(mSaveRoot_right, ".jpg", mAlbumView_right, itemSelectedSet);
@@ -198,6 +212,8 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		if (mAlbumView_right.getChildCount() > 0) {
 			mAlbumView_right.setEditable(true, this);
 		}
+		left_count_tv.setVisibility(View.VISIBLE);
+		right_count_tv.setVisibility(View.VISIBLE);
 		commit_bt.setVisibility(View.VISIBLE);
 		findViewById(R.id.header_bar_navi).setVisibility(View.GONE);
 		findViewById(R.id.header_bar_select).setVisibility(View.VISIBLE);
@@ -213,9 +229,13 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		if (mAlbumView_right.getChildCount() > 0) {
 			mAlbumView_right.setEditable(false);
 		}
+		left_count_tv.setVisibility(View.GONE);
+		right_count_tv.setVisibility(View.GONE);
 		commit_bt.setVisibility(View.GONE);
 		findViewById(R.id.header_bar_navi).setVisibility(View.VISIBLE);
 		findViewById(R.id.header_bar_select).setVisibility(View.GONE);
+		left_count_tv.setText("0/2");
+		right_count_tv.setText("0/2");
 	}
 
 	@Override
@@ -339,24 +359,55 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		case 0:
 			Bundle b = data.getExtras();
 			ArrayList<String> selectPaths = new ArrayList<String>();
+			ArrayList<String> selectPathsLeft = new ArrayList<String>();
+			ArrayList<String> selectPathsRight = new ArrayList<String>();
+			int selectPathsLeftSize = 0;
+			int selectPathsRightSize = 0;
+			
 			if (b != null) {
 				selectPaths = b.getStringArrayList("selectPaths");
+				selectPathsLeft = b.getStringArrayList("selectPathsLeft");
+				selectPathsRight = b.getStringArrayList("selectPathsRight");
+				selectPathsLeftSize = b.getInt("selectPathsLeftSize");
+				selectPathsRightSize = b.getInt("selectPathsRightSize");
 			}
 			String imageNmae = this.getString(R.string.Image);
 			String thumbnail = this.getString(R.string.Thumbnail);
 			Set<String> s = new HashSet<String>();
+			Set<String> sl = new HashSet<String>();
+			Set<String> sr = new HashSet<String>();
 			for (String path : selectPaths) {
 				String repImagePath = path.replace(imageNmae, thumbnail);
 				s.add(repImagePath);
+			}
+			for (String path : selectPathsLeft) {
+				String repImagePath = path.replace(imageNmae, thumbnail);
+				sl.add(repImagePath);
+			}
+			for (String path : selectPathsRight) {
+				String repImagePath = path.replace(imageNmae, thumbnail);
+				sr.add(repImagePath);
 			}
 			if (s.isEmpty()) {
 				leaveEdit();
 			} else {
 				enterEdit();
 			}
-			loadAlbum1(mSaveRoot_left, ".jpg", mAlbumView, s);
-			loadAlbum1(mSaveRoot_right, ".jpg", mAlbumView_right, s);
-
+			
+			loadAlbum1(mSaveRoot_left, ".jpg", mAlbumView, sl);
+			loadAlbum1(mSaveRoot_right, ".jpg", mAlbumView_right, sr);
+//			loadAlbum1(mSaveRoot_left, ".jpg", mAlbumView, s);
+//			loadAlbum1(mSaveRoot_right, ".jpg", mAlbumView_right, s);
+			left_count_tv.setText(selectPathsLeftSize + "/2");
+			right_count_tv.setText(selectPathsRightSize + "/2");
+			break;
+		case 5:
+//			Log.e(TAG,"5");
+			Intent intent = new Intent();
+			Bundle b1 = data.getExtras();
+			intent.putExtras(b1);
+			this.setResult(5, intent);
+			this.finish();
 			break;
 		case 6:
 			break;

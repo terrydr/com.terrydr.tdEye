@@ -28,6 +28,7 @@ public class ThumbnaiImageView extends FrameLayout  {
 		inflate(context, R.layout.item_album_grid, this);
 		FilterImageView imageView=(FilterImageView) findViewById(R.id.imgThumbnail);
 		checkBox=(CheckBox) findViewById(R.id.checkbox);
+//		checkBox.setVisibility(View.GONE);
 		mViewHolder=new ViewHolder(imageView,checkBox,null);
 		this.mImageLoader=imageLoader;
 		this.mOptions=options;
@@ -51,11 +52,19 @@ public class ThumbnaiImageView extends FrameLayout  {
 			mPosition=position;
 		}
 		//可编辑状态，显示checkbox
+//		if (editable) {
+//			mViewHolder.checkBox.setVisibility(View.VISIBLE);
+//			mViewHolder.checkBox.setChecked(checked);
+//		}else {
+//			mViewHolder.checkBox.setVisibility(View.GONE);
+//		}
 		if (editable) {
-			mViewHolder.checkBox.setVisibility(View.VISIBLE);
-			mViewHolder.checkBox.setChecked(checked);
+			checkBox.setChecked(checked);
+//			if(checked){
+				checkBox.setVisibility(View.VISIBLE);
+//			}
 		}else {
-			mViewHolder.checkBox.setVisibility(View.GONE);
+			checkBox.setVisibility(View.GONE);
 		}
 	}
 

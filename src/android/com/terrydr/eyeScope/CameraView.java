@@ -6,8 +6,9 @@ import java.util.Comparator;
 import java.util.List;
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
 import com.terrydr.eyeScope.CameraSize.CameraSizeComparator;
-
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -15,11 +16,15 @@ import android.hardware.Camera;
 import android.hardware.Camera.Area;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.CameraInfo;
+import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
+import android.media.ThumbnailUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -31,10 +36,16 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	public final static String TAG = "CameraView";
 	/** 和该View绑定的Camera对象 */
 	/** 当前屏幕旋转角度 */
-	private int mOrientation = 0;
-	private Camera mCamera;
+	public int mOrientation = 0;
+	public Camera mCamera;
 	/** 是否打开前置相机,true为前,false为后 */
 	private boolean mIsFrontCamera;   //这里为后置相
+	
+	public int mMode = 0;
+	public Size pictureS1,sizeSmorl;
+	private CameraSizeComparator sizeComparator = new CameraSizeComparator();
+	private List<Camera.Size> sizeList1;
+	private List<Size> mSupportList = null;
 
 	public CameraView(Context context) {
 		super(context);
@@ -55,6 +66,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 
 		@Override
 		public void surfaceCreated(SurfaceHolder holder) {
+			Log.d(TAG, "11");  
 			try {
 				if (mCamera == null) {
 					openCamera();
@@ -64,7 +76,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 			} catch (Exception e) {
 				Toast.makeText(getContext(), "打开相机失败", Toast.LENGTH_SHORT)
 						.show();
-				Log.e(TAG, e.getMessage());
+//				Log.e(TAG, "打开相机失败"+e.getMessage());
 			}
 			mCamera.startPreview();
 		}
@@ -72,11 +84,13 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
+			Log.d(TAG, "22");  
 			updateCameraOrientation();
 		}
 		
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
+			Log.d(TAG, "33");  
 			if (mCamera != null) {
 				mCamera.stopPreview();
 				mCamera.release();
@@ -88,6 +102,16 @@ public class CameraView extends SurfaceView implements CameraOperation {
 
 	/**
 	 * 设置照相机参
+	 * 白平衡设置 
+	    WHITE_BALANCE_AUTO              Constant Value: "auto" 				自动
+		WHITE_BALANCE_INCANDESCENT      Constant Value: "incandescent"    	白炽光
+		WHITE_BALANCE_FLUORESCENT		Constant Value: "fluorescent"  		日光
+		WHITE_BALANCE_WARM_FLUORESCENT	Constant Value: "warm-fluorescent"  荧光
+		WHITE_BALANCE_DAYLIGHT			Constant Value: "daylight" 			白天
+		WHITE_BALANCE_CLOUDY_DAYLIGHT	Constant Value: "cloudy-daylight" 	多云、阴天
+		WHITE_BALANCE_TWILIGHT			Constant Value: "twilight" 			黄昏
+		WHITE_BALANCE_SHADE				Constant Value: "shade" 			暧荧光灯
+	 *
 	 */
 	private void setCameraParameters() {
 		Camera.Parameters parameters = mCamera.getParameters();
@@ -106,16 +130,16 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	    parameters.setPreviewSize(pictureS.width, pictureS.height);  
 	    Log.e(TAG, "w:" + pictureS.width +"-h:" + pictureS.height);  
 		// 设置生成的图片大
-	    List<Camera.Size> sizeList1 = parameters.getSupportedPictureSizes();
-		Size pictureS1 = CameraSize.getInstance().getPictureSize(sizeList1, 1200);  
+	    sizeList1 = parameters.getSupportedPictureSizes();
+		pictureS1 = CameraSize.getInstance().getPictureSize(sizeList1, 1200);  
 	    parameters.setPictureSize(pictureS1.width, pictureS1.height);  
 	    Log.e(TAG, "w1:" + pictureS1.width +"-h1:" + pictureS1.height);  
-		
 		
 		// 设置图片格式
 		parameters.setPictureFormat(ImageFormat.JPEG);
 		parameters.setJpegQuality(100);
 		parameters.setJpegThumbnailQuality(100);
+		parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
 		mCamera.setParameters(parameters);
 		
 		// 启屏幕朝向监
@@ -129,7 +153,9 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		  @Override
 		  public void onAutoFocus(boolean success, Camera arg1) {
 			  if(success){
-//				  Log.d(TAG, "自动对焦成功");  
+				  Log.d(TAG, "对焦成功");  
+			  }else{
+				  Log.d(TAG, "对焦失败");  
 			  }
 		  }};
 
@@ -168,6 +194,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	private void updateCameraOrientation() {
 		if (mCamera != null) {
 			Camera.Parameters parameters = mCamera.getParameters();
+			parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
 			// rotation参数水平方向为
 			int rotation = 90 + mOrientation == 360 ? 0 : 90 + mOrientation;
 			// 前置摄像头需要对垂直方向做变换，否则照片是颠倒的
@@ -227,6 +254,8 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 *  @param point 触屏坐标
 	 */
 	protected void onFocus(Point point,AutoFocusCallback callback){
+		mCamera.cancelAutoFocus();
+
 		Camera.Parameters parameters=mCamera.getParameters();
 		//不支持设置自定义聚焦，则使用自动聚焦，返回
 		if (parameters.getMaxNumFocusAreas()<=0) {
@@ -243,9 +272,10 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		right=right>1000?1000:right;
 		bottom=bottom>1000?1000:bottom;
 		areas.add(new Area(new Rect(left,top,right,bottom), 100));
+		parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
+
 		parameters.setFocusAreas(areas);
 		try {
-			
 			mCamera.setParameters(parameters);
 		} catch (Exception e) {
 			Log.e(TAG,"手动聚焦失败", e);
@@ -257,9 +287,27 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	public void takePicture(PictureCallback callback,
 			TakePictureListener listener) {
 		mCamera.takePicture(null, null, callback);
-
 	}
-
+	
+	/**
+	 * 返回支持保存图片的大小List
+	 * @return  List
+	 */
+	public List<Size> returnSizeList(){
+		createSupportList();
+		return mSupportList;
+	}
+	private void createSupportList(){
+        if(mCamera == null){
+            return;
+        }
+        Camera.Parameters params = mCamera.getParameters();
+        mSupportList = Reflect.getSupportedPreviewSizes(params);
+        if (mSupportList != null && mSupportList.size() > 0) {
+            Collections.sort(mSupportList, sizeComparator);
+        }
+    }
+	
 	@Override
 	public void setCameraISO(int iso) {
 		if (mCamera == null) {
@@ -269,6 +317,20 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		Camera.Parameters parameters = mCamera.getParameters();
 		parameters.setExposureCompensation(iso);
 		mCamera.setParameters(parameters);
+	}
+	
+	public class CameraSizeComparator implements Comparator<Camera.Size> {
+		// 按升序排列
+		public int compare(Size lhs, Size rhs) {
+			if (lhs.width == rhs.width) {
+				return 0;
+			} else if (lhs.width > rhs.width) {
+				return 1;
+			} else {
+				return -1;
+			}
+		}
+
 	}
 	
 }

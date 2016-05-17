@@ -4,8 +4,10 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 public class Plugin_intent extends CordovaPlugin {
 	private final static String TAG = "Plugin_intent";
@@ -22,6 +24,15 @@ public class Plugin_intent extends CordovaPlugin {
 		this.callbackContext = callbackContext;
 		if (action.equals("jrEyeTakePhotos")) {
 			Log.e(TAG, "jrEyeTakePhotos:" + callbackContext);
+			
+//		    PackageManager pm = cordova.getActivity().getPackageManager(); 
+//	        boolean permission = (PackageManager.PERMISSION_GRANTED ==   
+//	                pm.checkPermission("android.permission.CAMERA", "com.terrydr.eyeScope"));  
+//	        Log.e(TAG, "permission:" + permission);
+//	        if (!permission) {  
+//	        	Toast.makeText(cordova.getActivity(), "未获得相机权限，请到设置中授权后再尝试。",Toast.LENGTH_SHORT).show();
+//	        	return true;
+//	        }
 			this.startCameraActivity();
 			return true;
 		} else if (action.equals("jrEyeSelectPhotos")) { // 相册缩略图界面

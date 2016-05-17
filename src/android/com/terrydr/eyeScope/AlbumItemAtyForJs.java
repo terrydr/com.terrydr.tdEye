@@ -17,75 +17,83 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.terrydr.eyeScope.MatrixImageView.OnSingleTapListener;
 import com.terrydr.eyeScope.R;
-/** 
- * @ClassName: AlbumItemAtyForJs 
+
+/**
+ * @ClassName: AlbumItemAtyForJs
  * @Description:点击JS查看相册大图Activity
  * @date 20160429
- *  
+ * 
  */
-public class AlbumItemAtyForJs extends Activity implements OnClickListener,OnSingleTapListener{
-	public final static String TAG="AlbumItemAtyForJs";
-	private AlbumViewPager mViewPager;//显示大图
-	private TextView mCountView,mBackView;
-	private View mHeaderBar,mBottomBar;
+public class AlbumItemAtyForJs extends Activity implements OnClickListener,
+		OnSingleTapListener {
+	public final static String TAG = "AlbumItemAtyForJs";
+	private AlbumViewPager mViewPager;// 显示大图
+	private TextView mCountView, mBackView, header_bar_photo_commit_bt;
+	private View mHeaderBar, mBottomBar;
 	private String data;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.albumitem_for_js);
 
-		mViewPager=(AlbumViewPager)findViewById(R.id.albumviewpager);
-		mBackView=(TextView)findViewById(R.id.header_bar_photo_back);
-		mCountView=(TextView)findViewById(R.id.header_bar_photo_count);
-		mHeaderBar=findViewById(R.id.album_item_header_bar);
+		mViewPager = (AlbumViewPager) findViewById(R.id.albumviewpager);
+		mBackView = (TextView) findViewById(R.id.header_bar_photo_back);
+		mCountView = (TextView) findViewById(R.id.header_bar_photo_count);
+		header_bar_photo_commit_bt = (TextView) findViewById(R.id.header_bar_photo_commit_bt);
+		header_bar_photo_commit_bt.setVisibility(View.GONE);
+		mHeaderBar = findViewById(R.id.album_item_header_bar);
 
 		mBackView.setOnClickListener(this);
 		mCountView.setOnClickListener(this);
-		
-		TextPaint tp = mCountView.getPaint();  //安体加粗
-	    tp.setFakeBoldText(true);
 
-		data=getIntent().getExtras().getString("data");
+		TextPaint tp = mCountView.getPaint(); // 安体加粗
+		tp.setFakeBoldText(true);
+
+		data = getIntent().getExtras().getString("data");
 		mViewPager.setOnPageChangeListener(pageChangeListener);
-		
-		parseJsonMulti(data);  //解析传过来的数据并且加载图片
-		
+
+		parseJsonMulti(data); // 解析传过来的数据并且加载图片
+
 	}
-	
-	//解析数据的Json  
-    private void parseJsonMulti(String strResult) {   
-        try {   
-        	JSONObject jsonObjs = new JSONObject(strResult);  
-        	JSONArray dataArray = jsonObjs.getJSONArray("data");
-        	int index = jsonObjs.getInt("index");
-        	List<String> paths=new ArrayList<String>();
-        	for(int i = 0;i<dataArray.length();i++){
-        		JSONObject jsonObj = (JSONObject)dataArray.get(i);   
-        		String path = jsonObj.getString("origin");
-        		paths.add(path);
-        	}
-        	if(!paths.isEmpty()){
-	        	mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(paths,true));
+
+	/**
+	 *  解析数据的Json
+	 * @param strResult
+	 */
+	private void parseJsonMulti(String strResult) {
+		try {
+			JSONObject jsonObjs = new JSONObject(strResult);
+			JSONArray dataArray = jsonObjs.getJSONArray("data");
+			int index = jsonObjs.getInt("index");
+			List<String> paths = new ArrayList<String>();
+			for (int i = 0; i < dataArray.length(); i++) {
+				JSONObject jsonObj = (JSONObject) dataArray.get(i);
+				String path = jsonObj.getString("origin");
+				paths.add(path);
+			}
+			if (!paths.isEmpty()) {
+				mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(paths,
+						true));
 				mViewPager.setCurrentItem(index);
-				mCountView.setText((index+1)+" / "+paths.size());
-        	}else{
-        		mCountView.setText("0 / 0");
-        	}
-        } catch (JSONException e) {   
-            Log.e(TAG, e.toString());
-        }   
-    }  
+				mCountView.setText((index + 1) + " / " + paths.size());
+			} else {
+				mCountView.setText("0 / 0");
+			}
+		} catch (JSONException e) {
+			Log.e(TAG, e.toString());
+		}
+	}
 
-
-
-	private OnPageChangeListener pageChangeListener=new OnPageChangeListener() {
+	private OnPageChangeListener pageChangeListener = new OnPageChangeListener() {
 
 		@Override
 		public void onPageSelected(int position) {
-			if(mViewPager.getAdapter()!=null){
-				String text=(position+1)+" / "+mViewPager.getAdapter().getCount();
+			if (mViewPager.getAdapter() != null) {
+				String text = (position + 1) + " / "
+						+ mViewPager.getAdapter().getCount();
 				mCountView.setText(text);
-			}else {
+			} else {
 				mCountView.setText("0 / 0");
 			}
 		}
@@ -105,21 +113,21 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,OnSin
 
 	@Override
 	public void onSingleTap() {
-		if(mHeaderBar.getVisibility()==View.VISIBLE){
-			AlphaAnimation animation=new AlphaAnimation(1, 0);
+		if (mHeaderBar.getVisibility() == View.VISIBLE) {
+			AlphaAnimation animation = new AlphaAnimation(1, 0);
 			animation.setDuration(300);
 			mHeaderBar.startAnimation(animation);
 			mBottomBar.startAnimation(animation);
 			mHeaderBar.setVisibility(View.GONE);
 			mBottomBar.setVisibility(View.GONE);
-		}else {
-			AlphaAnimation animation=new AlphaAnimation(0, 1);
+		} else {
+			AlphaAnimation animation = new AlphaAnimation(0, 1);
 			animation.setDuration(300);
 			mHeaderBar.startAnimation(animation);
 			mBottomBar.startAnimation(animation);
 			mHeaderBar.setVisibility(View.VISIBLE);
 			mBottomBar.setVisibility(View.VISIBLE);
-		}	
+		}
 	}
 
 	@Override
@@ -132,10 +140,12 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,OnSin
 			break;
 		}
 	}
+
 	@Override
 	public void onBackPressed() {
-			super.onBackPressed();
+		super.onBackPressed();
 	}
+
 	@Override
 	protected void onStop() {
 		super.onStop();

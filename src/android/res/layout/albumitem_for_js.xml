@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -5,7 +6,7 @@
 
     <!-- 点击js图片显示预览大图形 -->
 
-    <RelativeLayout
+    <RelativeLayout 
         android:id="@+id/albumitem_for_js_rl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,7 +15,7 @@
         <include
             android:id="@+id/album_item_header_bar"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/top_menu_bar_height"
             android:layout_alignParentTop="true"
             layout="@layout/album_item_header_bar" />
 

@@ -4,20 +4,20 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <!-- 顶栏高度 -->
-    <dimen name="top_menu_bar_height">45.0dip</dimen>
+    <dimen name="top_menu_bar_height">45.0dp</dimen>
     <dimen name="text_size">18.0sp</dimen>
     <dimen name="text_size_20">20.0sp</dimen>
     <!-- album相册底栏高度 -->
-    <dimen name="album_bottom_height">50.0dip</dimen>
+    <dimen name="album_bottom_height">50.0dp</dimen>
     <!-- 拍照界面底栏高度 -->
-    <dimen name="bottom_bar_height">120.0dip</dimen>
+    <dimen name="bottom_bar_height">120.0dp</dimen>
     
-    <dimen name="album_header_bar_height">50.0dip</dimen>
-    <dimen name="thumbnail_imageview_size">41.0dip</dimen>
-    <dimen name="shutter_bottom_size">62.0dip</dimen>
+    <dimen name="album_header_bar_height">50.0dp</dimen>
+    <dimen name="thumbnail_imageview_size">41.0dp</dimen>
+    <dimen name="shutter_bottom_size">62.0dp</dimen>
     
-    <dimen name="title_view_left_back_padding_left">10.0dip</dimen>
-    <dimen name="album_header_btn_width">48.0dip</dimen>
+    <dimen name="title_view_left_back_padding_left">10.0dp</dimen>
+    <dimen name="album_header_btn_width">48.0dp</dimen>
     
     <dimen name="album_rooter_bar_text_size">16.0sp</dimen>
 
