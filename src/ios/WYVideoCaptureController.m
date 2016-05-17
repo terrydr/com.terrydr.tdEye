@@ -566,9 +566,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     NSString *filePath = [fileManage getJRMediaPathWithType:_isLeftEye];
     NSString *imageName;
     if (_isLeftEye) {
-        imageName = [NSString stringWithFormat:@"%02d.png",_leftTakenPictureCount];
+        imageName = [NSString stringWithFormat:@"%02d.jpg",_leftTakenPictureCount];
     }else{
-        imageName = [NSString stringWithFormat:@"%02d.png",_rightTakenPictureCount];
+        imageName = [NSString stringWithFormat:@"%02d.jpg",_rightTakenPictureCount];
     }
     NSString *imgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
     NSFileManager *fileManager = [NSFileManager defaultManager];
