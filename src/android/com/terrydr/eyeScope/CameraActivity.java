@@ -14,26 +14,18 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.provider.MediaStore;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
-import android.view.animation.RotateAnimation;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.terrydr.eyeScope.R;
 
@@ -91,20 +83,18 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		return_index_bt.setOnClickListener(this);
 		photos_iv.setOnLongClickListener(onLongClickListener);
 		photos_iv.setOnTouchListener(this);
-		
 		mContainer.setOnTouchListener(this);
 		
-
 		detector = new GestureDetector(this);
 		
 		mSaveRoot_left = "left";
 		mSaveRoot_right = "right";
 		setPath(leftOrRight);
 
-		int i = dip2px(30);
-		int m = px2dip(120);
-		Log.e(TAG, "i:" + i);
-		Log.e(TAG, "m:" + m);
+//		int i = dip2px(30);
+//		int m = px2dip(120);
+//		Log.e(TAG, "i:" + i);
+//		Log.e(TAG, "m:" + m);
 		// mHeaderBar.getBackground().setAlpha(204);//透明0~255透明度 ，越小越透明
 	}
 
@@ -135,7 +125,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	/**
 	 * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
 	 */
-	public int px2dip(float pxValue) {
+	private int px2dip(float pxValue) {
 		 final float scale = getResources().getDisplayMetrics().density;
 		 return (int) (pxValue / scale + 0.5f);
 	}
@@ -166,7 +156,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.photos_iv:
-			LOG.d(TAG, "点击拍照按钮");
+//			LOG.d(TAG, "点击拍照按钮");
 			if ((i_left >= 6 && leftOrRight) || (i_right >= 6 && !leftOrRight)) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setMessage("单侧眼睛最多拍摄六张图片,是否重拍?")
@@ -197,8 +187,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 					deleteMultiSelectFile(mSaveRoot_right);
 					i_right++;
 				}
-				Log.e(TAG, "拍照.....");
-//				s = System.currentTimeMillis();
+//				Log.e(TAG, "拍照.....");
 				photos_iv.setEnabled(false);
 				mContainer.takePicture(this);
 			}
@@ -243,6 +232,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 	}
 
+	/**
+	 * 提示是否重拍时删除文件夹
+	 */
 	private void deleteFolder() {
 		String thumbFolder = this.getExternalFilesDir(null).getAbsolutePath()
 				+ File.separator + this.getString(R.string.Files);
@@ -331,8 +323,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	public boolean deleteFolder(String sPath) {
 		boolean flag = false;
 		File file = new File(sPath);
-		// 判断目录或文件是否存
-		if (!file.exists()) { // 不存在返�? false
+		// 判断目录或文件是否存在
+		if (!file.exists()) { // 不存在返回false
 			return flag;
 		} else {
 			// 判断是否为文
@@ -383,12 +375,12 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		// 删除文件夹下的所有文(包括子目)
 		File[] files = dirFile.listFiles();
 		for (int i = 0; i < files.length; i++) {
-			// 删除子文
+			// 删除子文件
 			if (files[i].isFile()) {
 				flag = deleteFile(files[i].getAbsolutePath());
 				if (!flag)
 					break;
-			} // 删除子目
+			} // 删除子目录
 			else {
 				flag = deleteDirectory(files[i].getAbsolutePath());
 				if (!flag)
@@ -410,7 +402,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 */
 	@Override
 	public void onTakePictureEnd(Bitmap bm) {
-		Log.e(TAG, "拍照完成跳转");
+//		Log.e(TAG, "拍照完成跳转");
 		startAlbumAty();  //拍照完成跳转
 	}
 	
@@ -554,11 +546,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		setCameraText(leftOrRight);
 		Bundle bundle = getIntent().getExtras();
 		if(bundle!=null){
-//			mExposureNum = bundle.getInt("mexposureNum");
 			deleteFile = bundle.getBoolean("deleteFile");
-//			mContainer.setCameraISO_int(mExposureNum);
 		}
-//		Log.e(TAG, ""+deleteFile);
 		if(deleteFile){
 			String rootPath_left = getFolderPath(this, mSaveRoot_left);
 			deleteFolder(rootPath_left);
@@ -590,7 +579,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		case MotionEvent.ACTION_DOWN:
 			switch (view.getId()) {
 			case R.id.container:
-				Log.d(TAG,"开始触摸对焦...");
+//				Log.d(TAG,"开始触摸对焦...");
 				mContainer.setOnFocus(new Point((int)event.getX(), (int)event.getY())); 
 				break;
 			}
@@ -601,12 +590,11 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 				isLong = false;
 				switch (view.getId()) {
 				case R.id.photos_iv:
-					Log.d(TAG,"结束连继拍照");
+//					Log.d(TAG,"结束连继拍照");
 					if (leftOrRight) {
 						mContainer.stop = i_left;
 					}else
 						mContainer.stop = i_right;
-					
 					stop();
 					break;
 				}
@@ -625,7 +613,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 		@Override
 		public boolean onLongClick(View v) {
-			Log.e(TAG, "test");
 			isLong = true;
 			start();
 			return true;

@@ -168,7 +168,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	
 	/**
 	 * 连拍保存图片接口 
-	 * @author ty
 	 *
 	 */
 	public class PreviewCallback implements Camera.PreviewCallback {
@@ -179,7 +178,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
                 Thread t2 = new Thread(){
                     public void run(){
                         try {
-                            Thread.sleep(500);
+                            Thread.sleep(500); //500毫秒拍一张
                         } catch (InterruptedException e) {
                         }
                         if(mCameraView.mCamera != null){

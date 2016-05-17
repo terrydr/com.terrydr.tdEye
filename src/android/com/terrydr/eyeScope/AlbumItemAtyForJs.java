@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AlphaAnimation;
-import android.widget.ImageView;
 import android.widget.TextView;
 import com.terrydr.eyeScope.MatrixImageView.OnSingleTapListener;
 import com.terrydr.eyeScope.R;
@@ -76,9 +75,9 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 				mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(paths,
 						true));
 				mViewPager.setCurrentItem(index);
-				mCountView.setText((index + 1) + " / " + paths.size());
+				mCountView.setText((index + 1) + "/" + paths.size());
 			} else {
-				mCountView.setText("0 / 0");
+				mCountView.setText("0/0");
 			}
 		} catch (JSONException e) {
 			Log.e(TAG, e.toString());
@@ -90,11 +89,11 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 		@Override
 		public void onPageSelected(int position) {
 			if (mViewPager.getAdapter() != null) {
-				String text = (position + 1) + " / "
+				String text = (position + 1) + "/"
 						+ mViewPager.getAdapter().getCount();
 				mCountView.setText(text);
 			} else {
-				mCountView.setText("0 / 0");
+				mCountView.setText("0/0");
 			}
 		}
 

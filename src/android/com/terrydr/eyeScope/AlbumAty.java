@@ -56,7 +56,10 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	private LinearLayout linearLayou_left,linearLayou_right;
 	private ImageView header_bar_back_iv,header_bar_back_iv1;
 	private boolean returnB = false;
+
 	
+	Set<String> itemSelectedLeft = new HashSet<String>();
+	Set<String> itemSelectedRight = new HashSet<String>();
 
 	/**
 	 * 透明状态栏,透明导航栏
@@ -111,101 +114,101 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		commit_bt.setOnClickListener(this);
 		header_bar_back_iv.setOnClickListener(this);
 		header_bar_back_iv1.setOnClickListener(this);
-
-		mAlbumView.setOnItemClickListener(new OnItemClickListener() { 
-			
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				isLeft = true;
-				if (mAlbumView.getEditable()){
-					view = (ThumbnaiImageView) arg1;
-					boolean isChecked  = view.checkBox.isChecked();
-					if(mAlbumView.getSelectedItems().size()>=2 && !isChecked && returnB){
-//						returnB = false;
-						AlertDialog.Builder builder = new AlertDialog.Builder(AlbumAty.this);
-						builder.setMessage("单侧眼睛最多选择两张图片")
-								.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-//										buttonView.setChecked(false);
-									}
-								});
-						builder.create().show();
-					}else{
-//						boolean isChecked  = view.checkBox.isChecked();
-						if(isChecked){
-							view.checkBox.setChecked(false);
-						}else{
-							view.checkBox.setChecked(true);
-						}
-						left_count_tv.setText(mAlbumView.getSelectedItems().size() + "/2");
-					}
-					return;
-				}
-				Intent intent = new Intent(AlbumAty.this, AlbumItemAty.class);
-				intent.putExtra("path", arg1.getTag().toString());
-				intent.putExtra("root", mSaveRoot_left);
-				startActivityForResult(intent, 0);
-			}
-		});
-
-		mAlbumView_right.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				isLeft = false;
-				if (mAlbumView_right.getEditable()){
-					view = (ThumbnaiImageView) arg1;
-					boolean isChecked  = view.checkBox.isChecked();
-					if(mAlbumView_right.getSelectedItems().size()>=2 && !isChecked && returnB){
-//						returnB = false;
-						AlertDialog.Builder builder = new AlertDialog.Builder(AlbumAty.this);
-						builder.setMessage("单侧眼睛最多选择两张图片")
-								.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-//										buttonView.setChecked(false);
-									}
-								});
-						builder.create().show();
-					}else{
-						view = (ThumbnaiImageView) arg1;
-	//					boolean isChecked  = view.checkBox.isChecked();
-						if(isChecked){
-							view.checkBox.setChecked(false);
-						}else{
-							view.checkBox.setChecked(true);
-						}
-						right_count_tv.setText(mAlbumView_right.getSelectedItems().size() + "/2");
-					}
-					return;
-				}
-				
-				Intent intent = new Intent(AlbumAty.this, AlbumItemAty.class);
-				intent.putExtra("path", arg1.getTag().toString());
-				intent.putExtra("root", mSaveRoot_right);
-				startActivityForResult(intent, 0);
-			}
-		});
-//		 mAlbumView.setOnItemLongClickListener(new OnItemLongClickListener() {
-//		 @Override
-//		 public boolean onItemLongClick(AdapterView<?> parent, View view,
-//		 int position, long id) {
-//		
-//		 if (mAlbumView.getEditable())
-//		 return true;
-//		 // enterEdit();
-//		 return true;
-//		 }
-//		 });
 		
-		
+		mAlbumView.setOnItemClickListener(mAlbumView_left_listener);
+		mAlbumView_right.setOnItemClickListener(mAlbumView_right_listener);
+
 		Set<String> itemSelectedSet = new HashSet<String>();
 		loadAlbumBySelectImage(mSaveRoot_left, ".jpg", mAlbumView, itemSelectedSet);
 		loadAlbumBySelectImage(mSaveRoot_right, ".jpg", mAlbumView_right, itemSelectedSet);
 	}
+	
+	/**
+	 * 点击左眼图片缩略图事件
+	 */
+	private OnItemClickListener mAlbumView_left_listener = new OnItemClickListener() {
+		@Override  
+		public void onItemClick(AdapterView<?> parent, View _view, int position,
+				long id) {
+			isLeft = true;
+			if (mAlbumView.getEditable()){
+				view = (ThumbnaiImageView) _view;
+				boolean isChecked  = view.checkBox.isChecked();
+				if(itemSelectedLeft.size()>=2 && !isChecked){
+					AlertDialog.Builder builder = new AlertDialog.Builder(AlbumAty.this);
+					builder.setMessage("单侧眼睛最多选择两张图片")
+							.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+								}
+							});
+					builder.create().show();
+				}else{
+//					Log.e(TAG, "itemSelectedLeft:"+itemSelectedLeft);
+					if(isChecked){
+						itemSelectedLeft.remove(_view.getTag().toString());
+						view.checkBox.setChecked(false);
+						view.checkBox.setVisibility(View.GONE);
+					}else{
+						itemSelectedLeft.add(_view.getTag().toString());
+						view.checkBox.setChecked(true);
+						view.checkBox.setVisibility(View.VISIBLE);
+					}
+//					Log.e(TAG, "selectPathsLeft:"+itemSelectedLeft);
+					left_count_tv.setText(itemSelectedLeft.size() + "/2");
+				}
+				return;
+			}
+			Intent intent = new Intent(AlbumAty.this, AlbumItemAty.class);
+			intent.putExtra("path", _view.getTag().toString());
+			intent.putExtra("root", mSaveRoot_left);
+			startActivityForResult(intent, 0);
+		}
+	};
+	
+	/**
+	 * 点击右眼图片缩略图事件
+	 */
+	private OnItemClickListener mAlbumView_right_listener = new OnItemClickListener() {
+		@Override  
+		public void onItemClick(AdapterView<?> parent, View _view, int position,
+				long id) {
+			isLeft = false;
+			if (mAlbumView_right.getEditable()){
+				view = (ThumbnaiImageView) _view;
+				boolean isChecked  = view.checkBox.isChecked();
+				if(itemSelectedRight.size()>=2 && !isChecked){
+					AlertDialog.Builder builder = new AlertDialog.Builder(AlbumAty.this);
+					builder.setMessage("单侧眼睛最多选择两张图片")
+							.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+								}
+							});
+					builder.create().show();
+				}else{
+					if(isChecked){
+						itemSelectedRight.remove(_view.getTag().toString());
+						view.checkBox.setChecked(false);
+						view.checkBox.setVisibility(View.GONE);
+					}else{
+						itemSelectedRight.add(_view.getTag().toString());
+						view.checkBox.setChecked(true);
+						view.checkBox.setVisibility(View.VISIBLE);
+					}
+					right_count_tv.setText(itemSelectedRight.size() + "/2");
+				}
+				return;
+			}
+			
+			Intent intent = new Intent(AlbumAty.this, AlbumItemAty.class);
+			intent.putExtra("path", _view.getTag().toString());
+			intent.putExtra("root", mSaveRoot_right);
+			startActivityForResult(intent, 0);
+		}
+	};
 
 	/**
 	 * 加载图片
@@ -263,6 +266,11 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		if (mAlbumView_right.getChildCount() > 0) {
 			mAlbumView_right.setEditable(false,false);
 		}
+		
+//		selectPathsLeft.clear();
+//		selectPathsRight.clear();
+		itemSelectedLeft = new HashSet<String>();
+		itemSelectedRight = new HashSet<String>();
 		left_count_tv.setVisibility(View.GONE);
 		right_count_tv.setVisibility(View.GONE);
 		commit_bt.setVisibility(View.GONE);
@@ -292,7 +300,8 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			String imageNmae = this.getString(R.string.Image);
 			String thumbnail = this.getString(R.string.Thumbnail);
 			JSONObject result_Json = new JSONObject();
-			Set<String> left_mAlbumView = mAlbumView.getSelectedItems();
+//			Set<String> left_mAlbumView = mAlbumView.getSelectedItems(); 
+			Set<String> left_mAlbumView = itemSelectedLeft; 
 			if (left_mAlbumView != null) {
 				if (!left_mAlbumView.isEmpty()) {
 					JSONArray path = new JSONArray();
@@ -308,7 +317,8 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 					}
 				}
 			}
-			Set<String> right_mAlbumView = mAlbumView_right.getSelectedItems();
+//			Set<String> right_mAlbumView = mAlbumView_right.getSelectedItems();
+			Set<String> right_mAlbumView = itemSelectedRight;
 			if (right_mAlbumView != null) {
 				if (!right_mAlbumView.isEmpty()) {
 					JSONArray path = new JSONArray();
@@ -365,7 +375,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 //		Log.e(TAG, "" + isPlugin);
 		if (!isPlugin) {
 			intent = new Intent(AlbumAty.this, CameraActivity.class);
-
 			if (bundle != null) {
 				bundle.putBoolean("deleteFile", false);
 				intent.putExtras(bundle);
@@ -379,7 +388,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			if (bundle != null) {
 				bundle.putBoolean("deleteFile", false);
 				intent.putExtras(bundle);
-
 			}
 			// 设置返回数据
 			this.setResult(6, intent);
@@ -417,10 +425,12 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			for (String path : selectPathsLeft) {
 				String repImagePath = path.replace(imageNmae, thumbnail);
 				sl.add(repImagePath);
+				itemSelectedLeft.add(repImagePath);
 			}
 			for (String path : selectPathsRight) {
 				String repImagePath = path.replace(imageNmae, thumbnail);
 				sr.add(repImagePath);
+				itemSelectedRight.add(repImagePath);
 			}
 			if (s.isEmpty()) {
 				leaveEdit();

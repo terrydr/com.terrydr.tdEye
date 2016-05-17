@@ -220,6 +220,7 @@ public class AlbumGridView extends GridView {
 			if (albumItemView == null)
 				albumItemView = new ThumbnaiImageView(getContext(),
 						mImageLoader, mOptions);
+			assert albumItemView != null;
 			albumItemView.setOnCheckedChangeListener(this);
 			// 设置点击事件，将ItemClick事件转化为AlbumItemView的Click事件
 			albumItemView.setOnClickListener(this);
@@ -227,7 +228,7 @@ public class AlbumGridView extends GridView {
 			String path = getItem(position);
 			albumItemView.setTags(path, position, mEditable,
 					itemSelectedSet1.contains(path));
-			if(isGONE){
+			if(isGONE){  //点击取消选择事件触发
 				if(albumItemView.checkBox.isChecked()){
 					albumItemView.checkBox.setVisibility(View.VISIBLE);
 				}else{
@@ -249,33 +250,33 @@ public class AlbumGridView extends GridView {
 		@Override
 		public void onCheckedChanged(final CompoundButton buttonView,
 				boolean isChecked) {
-			if(itemSelectedSet.size()>=2 && isChecked){
-				AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-				builder.setMessage("单侧眼睛最多选择两张图片")
-						.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								buttonView.setChecked(false);
-							}
-						});
-				builder.create().show();
-			}else{
-				if (buttonView.getTag() == null)
-					return;
-				if (isChecked){
-					itemSelectedSet.add(buttonView.getTag().toString());
-				}else{
-					itemSelectedSet.remove(buttonView.getTag().toString());
-				}
-				if (listener != null)
-					listener.onCheckedChanged(itemSelectedSet);
-			}
-			if(isChecked){
-				buttonView.setVisibility(View.VISIBLE);
-			}else{
-				buttonView.setVisibility(View.GONE);
-			}
+//			if(itemSelectedSet.size()>=2 && isChecked){
+//				AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//				builder.setMessage("单侧眼睛最多选择两张图片")
+//						.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
+//							@Override
+//							public void onClick(DialogInterface dialog,
+//									int which) {
+//								buttonView.setChecked(false);
+//							}
+//						});
+//				builder.create().show();
+//			}else{
+//				if (buttonView.getTag() == null)
+//					return;
+//				if (isChecked){
+//					itemSelectedSet.add(buttonView.getTag().toString());
+//				}else{
+//					itemSelectedSet.remove(buttonView.getTag().toString());
+//				}
+////				if (listener != null)
+////					listener.onCheckedChanged(itemSelectedSet);
+//			}
+//			if(isChecked){
+//				buttonView.setVisibility(View.VISIBLE);
+//			}else{
+//				buttonView.setVisibility(View.GONE);
+//			}
 		}
 	}
 }

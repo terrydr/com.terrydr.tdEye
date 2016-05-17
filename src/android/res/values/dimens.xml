@@ -10,7 +10,7 @@
     <!-- album相册底栏高度 -->
     <dimen name="album_bottom_height">50.0dp</dimen>
     <!-- 拍照界面底栏高度 -->
-    <dimen name="bottom_bar_height">120.0dp</dimen>
+    <dimen name="bottom_bar_height">110.0dp</dimen>
     
     <dimen name="album_header_bar_height">50.0dp</dimen>
     <dimen name="thumbnail_imageview_size">41.0dp</dimen>

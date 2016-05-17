@@ -5,10 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
-import com.terrydr.eyeScope.CameraSize.CameraSizeComparator;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -18,13 +15,9 @@ import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
-import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
-import android.media.ThumbnailUtils;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -66,7 +59,6 @@ public class CameraView extends SurfaceView implements CameraOperation {
 
 		@Override
 		public void surfaceCreated(SurfaceHolder holder) {
-			Log.d(TAG, "11");  
 			try {
 				if (mCamera == null) {
 					openCamera();
@@ -76,7 +68,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 			} catch (Exception e) {
 				Toast.makeText(getContext(), "打开相机失败", Toast.LENGTH_SHORT)
 						.show();
-//				Log.e(TAG, "打开相机失败"+e.getMessage());
+				Log.e(TAG, "打开相机失败"+e.getMessage());
 			}
 			mCamera.startPreview();
 		}
@@ -84,13 +76,11 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
-			Log.d(TAG, "22");  
 			updateCameraOrientation();
 		}
 		
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
-			Log.d(TAG, "33");  
 			if (mCamera != null) {
 				mCamera.stopPreview();
 				mCamera.release();
@@ -128,12 +118,12 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
 	    Size pictureS = CameraSize.getInstance().getPreviewSize(sizeList, 1200);  
 	    parameters.setPreviewSize(pictureS.width, pictureS.height);  
-	    Log.e(TAG, "w:" + pictureS.width +"-h:" + pictureS.height);  
+//	    Log.e(TAG, "w:" + pictureS.width +"-h:" + pictureS.height);  
 		// 设置生成的图片大
 	    sizeList1 = parameters.getSupportedPictureSizes();
 		pictureS1 = CameraSize.getInstance().getPictureSize(sizeList1, 1200);  
 	    parameters.setPictureSize(pictureS1.width, pictureS1.height);  
-	    Log.e(TAG, "w1:" + pictureS1.width +"-h1:" + pictureS1.height);  
+//	    Log.e(TAG, "w1:" + pictureS1.width +"-h1:" + pictureS1.height);  
 		
 		// 设置图片格式
 		parameters.setPictureFormat(ImageFormat.JPEG);
@@ -153,9 +143,9 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		  @Override
 		  public void onAutoFocus(boolean success, Camera arg1) {
 			  if(success){
-				  Log.d(TAG, "对焦成功");  
+//				  Log.d(TAG, "对焦成功");  
 			  }else{
-				  Log.d(TAG, "对焦失败");  
+//				  Log.d(TAG, "对焦失败");  
 			  }
 		  }};
 

@@ -286,16 +286,15 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 			} else {
 				if (mViewPager.getAdapter() != null) {
 					String filePath = mViewPager.getSelectPath();
-					Log.e(TAG, "filePath:" + filePath);
+//					Log.e(TAG, "filePath:" + filePath);
 					int index = 0;
 					for (File file : files) {
-						Log.e(TAG, "file:" + file.getName());
+//						Log.e(TAG, "file:" + file.getName());
 						if (filePath != null
 								&& filePath.contains(file.getName())) {
 							index = files.indexOf(file);
 							if (albumitem_selected_cb.isChecked()) {
 								albumitem_selected_cb_bool[index] = "true";
-
 								selectPaths.add(filePath);
 								if (filePath.contains("left")) {
 									selectPathsLeft.add(filePath);

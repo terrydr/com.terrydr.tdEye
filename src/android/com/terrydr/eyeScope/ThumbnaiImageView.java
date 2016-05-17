@@ -51,13 +51,7 @@ public class ThumbnaiImageView extends FrameLayout  {
 			setTag(path);
 			mPosition=position;
 		}
-		//可编辑状态，显示checkbox
-//		if (editable) {
-//			mViewHolder.checkBox.setVisibility(View.VISIBLE);
-//			mViewHolder.checkBox.setChecked(checked);
-//		}else {
-//			mViewHolder.checkBox.setVisibility(View.GONE);
-//		}
+		
 		if (editable) {
 			checkBox.setChecked(checked);
 //			if(checked){
