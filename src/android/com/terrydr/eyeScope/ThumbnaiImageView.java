@@ -15,7 +15,7 @@ import com.terrydr.eyeScope.R;
  *  
  */
 public class ThumbnaiImageView extends FrameLayout  {
-	public static  final String TAG="AlbumItemView";
+	public static  final String TAG="ThumbnaiImageView";
 	private final ViewHolder mViewHolder;
 	private final ImageLoader mImageLoader;
 	private final DisplayImageOptions mOptions;

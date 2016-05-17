@@ -178,6 +178,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 									i_left = 0;
 								else
 									i_right = 0;
+								deleteFolder();
 							}
 						}).setNegativeButton("取消", new OnClickListener() {
 							@Override
@@ -241,9 +242,18 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		}
 
 	}
-//	long s;
-//	long e;
-	
+
+	private void deleteFolder() {
+		String thumbFolder = this.getExternalFilesDir(null).getAbsolutePath()
+				+ File.separator + this.getString(R.string.Files);
+		if (leftOrRight) {
+			deleteFolder(thumbFolder + File.separator + mSaveRoot_left);
+			camera_camera_tv.setText(Integer.toString(i_left) + "/6");
+		} else {
+			deleteFolder(thumbFolder + File.separator + mSaveRoot_right);
+			camera_camera_tv.setText(Integer.toString(i_right) + "/6");
+		}
+	}
 	/**
 	 * 当拍照大于6张时删除多于图片
 	 * @leftOrRight 左、右眼图片路径
@@ -664,11 +674,11 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 							if (leftOrRight){
 								i_left = 0;
 								mContainer.mNumLeft = 0;
-							}
-							else{
+							}else{
 								i_right = 0;
 								mContainer.mNumright = 0;
 							}
+							deleteFolder();
 						}
 					}).setNegativeButton("取消", new OnClickListener() {
 						@Override

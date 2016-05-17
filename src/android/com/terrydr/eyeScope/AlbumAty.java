@@ -10,6 +10,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -53,6 +55,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	private ThumbnaiImageView view;
 	private LinearLayout linearLayou_left,linearLayou_right;
 	private ImageView header_bar_back_iv,header_bar_back_iv1;
+	private boolean returnB = false;
 	
 
 	/**
@@ -117,12 +120,27 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 				if (mAlbumView.getEditable()){
 					view = (ThumbnaiImageView) arg1;
 					boolean isChecked  = view.checkBox.isChecked();
-					if(isChecked){
-						view.checkBox.setChecked(false);
+					if(mAlbumView.getSelectedItems().size()>=2 && !isChecked && returnB){
+//						returnB = false;
+						AlertDialog.Builder builder = new AlertDialog.Builder(AlbumAty.this);
+						builder.setMessage("单侧眼睛最多选择两张图片")
+								.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+//										buttonView.setChecked(false);
+									}
+								});
+						builder.create().show();
 					}else{
-						view.checkBox.setChecked(true);
+//						boolean isChecked  = view.checkBox.isChecked();
+						if(isChecked){
+							view.checkBox.setChecked(false);
+						}else{
+							view.checkBox.setChecked(true);
+						}
+						left_count_tv.setText(mAlbumView.getSelectedItems().size() + "/2");
 					}
-					left_count_tv.setText(mAlbumView.getSelectedItems().size() + "/2");
 					return;
 				}
 				Intent intent = new Intent(AlbumAty.this, AlbumItemAty.class);
@@ -140,12 +158,28 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 				if (mAlbumView_right.getEditable()){
 					view = (ThumbnaiImageView) arg1;
 					boolean isChecked  = view.checkBox.isChecked();
-					if(isChecked){
-						view.checkBox.setChecked(false);
+					if(mAlbumView_right.getSelectedItems().size()>=2 && !isChecked && returnB){
+//						returnB = false;
+						AlertDialog.Builder builder = new AlertDialog.Builder(AlbumAty.this);
+						builder.setMessage("单侧眼睛最多选择两张图片")
+								.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+//										buttonView.setChecked(false);
+									}
+								});
+						builder.create().show();
 					}else{
-						view.checkBox.setChecked(true);
+						view = (ThumbnaiImageView) arg1;
+	//					boolean isChecked  = view.checkBox.isChecked();
+						if(isChecked){
+							view.checkBox.setChecked(false);
+						}else{
+							view.checkBox.setChecked(true);
+						}
+						right_count_tv.setText(mAlbumView_right.getSelectedItems().size() + "/2");
 					}
-					right_count_tv.setText(mAlbumView_right.getSelectedItems().size() + "/2");
 					return;
 				}
 				
@@ -169,8 +203,8 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		
 		
 		Set<String> itemSelectedSet = new HashSet<String>();
-		loadAlbum1(mSaveRoot_left, ".jpg", mAlbumView, itemSelectedSet);
-		loadAlbum1(mSaveRoot_right, ".jpg", mAlbumView_right, itemSelectedSet);
+		loadAlbumBySelectImage(mSaveRoot_left, ".jpg", mAlbumView, itemSelectedSet);
+		loadAlbumBySelectImage(mSaveRoot_right, ".jpg", mAlbumView_right, itemSelectedSet);
 	}
 
 	/**
@@ -207,10 +241,10 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	 */
 	private void enterEdit() {
 		if (mAlbumView.getChildCount() > 0) {
-			mAlbumView.setEditable(true, this);
+			mAlbumView.setEditable(true, this,true);
 		}
 		if (mAlbumView_right.getChildCount() > 0) {
-			mAlbumView_right.setEditable(true, this);
+			mAlbumView_right.setEditable(true, this,true);
 		}
 		left_count_tv.setVisibility(View.VISIBLE);
 		right_count_tv.setVisibility(View.VISIBLE);
@@ -224,10 +258,10 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	 */
 	private void leaveEdit() {
 		if (mAlbumView.getChildCount() > 0) {
-			mAlbumView.setEditable(false);
+			mAlbumView.setEditable(false,false);
 		}
 		if (mAlbumView_right.getChildCount() > 0) {
-			mAlbumView_right.setEditable(false);
+			mAlbumView_right.setEditable(false,false);
 		}
 		left_count_tv.setVisibility(View.GONE);
 		right_count_tv.setVisibility(View.GONE);
@@ -393,11 +427,9 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			} else {
 				enterEdit();
 			}
-			
-			loadAlbum1(mSaveRoot_left, ".jpg", mAlbumView, sl);
-			loadAlbum1(mSaveRoot_right, ".jpg", mAlbumView_right, sr);
-//			loadAlbum1(mSaveRoot_left, ".jpg", mAlbumView, s);
-//			loadAlbum1(mSaveRoot_right, ".jpg", mAlbumView_right, s);
+			returnB = true;
+			loadAlbumBySelectImage(mSaveRoot_left, ".jpg", mAlbumView, sl);
+			loadAlbumBySelectImage(mSaveRoot_right, ".jpg", mAlbumView_right, sr);
 			left_count_tv.setText(selectPathsLeftSize + "/2");
 			right_count_tv.setText(selectPathsRightSize + "/2");
 			break;
@@ -424,7 +456,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	 * @param format
 	 *            要加载的文件格式
 	 */
-	public void loadAlbum1(String rootPath, String format, AlbumGridView alvumGridView, Set<String> _itemSelectedSet) {
+	public void loadAlbumBySelectImage(String rootPath, String format, AlbumGridView alvumGridView, Set<String> _itemSelectedSet) {
 		// 获取根目录下缩略图文件夹
 		String thumbFolder = FileOperateUtil.getFolderPath(this, FileOperateUtil.TYPE_THUMBNAIL, rootPath);
 		List<File> files = FileOperateUtil.listFiles(thumbFolder, format);

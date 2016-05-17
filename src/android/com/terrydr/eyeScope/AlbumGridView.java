@@ -27,6 +27,7 @@ public class AlbumGridView extends GridView {
 	/** 加载图片配置参数 */
 	private DisplayImageOptions mOptions;
 	private boolean mEditable;
+	private boolean isGONE = true;
 
 	public AlbumGridView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -66,7 +67,8 @@ public class AlbumGridView extends GridView {
 	 * 
 	 * @param editable
 	 */
-	public void setEditable(boolean editable) {
+	public void setEditable(boolean editable,boolean _isGONE) {
+		isGONE = _isGONE;
 		mEditable = editable;
 		((AlbumViewAdapter) getAdapter()).notifyDataSetChanged(null);
 	}
@@ -77,7 +79,8 @@ public class AlbumGridView extends GridView {
 	 *            选择图片后执行的回调函数
 	 */
 	public void setEditable(boolean editable,
-			AlbumGridView.OnCheckedChangeListener listener) {
+			AlbumGridView.OnCheckedChangeListener listener,boolean _isGONE) {
+		isGONE = _isGONE;
 		mEditable = editable;
 		((AlbumViewAdapter) getAdapter()).notifyDataSetChanged(listener);
 	}
@@ -220,9 +223,17 @@ public class AlbumGridView extends GridView {
 			albumItemView.setOnCheckedChangeListener(this);
 			// 设置点击事件，将ItemClick事件转化为AlbumItemView的Click事件
 			albumItemView.setOnClickListener(this);
+			albumItemView.checkBox.setClickable(false);
 			String path = getItem(position);
 			albumItemView.setTags(path, position, mEditable,
 					itemSelectedSet1.contains(path));
+			if(isGONE){
+				if(albumItemView.checkBox.isChecked()){
+					albumItemView.checkBox.setVisibility(View.VISIBLE);
+				}else{
+					albumItemView.checkBox.setVisibility(View.GONE);
+				}
+			}
 			return albumItemView;
 		}
 
@@ -257,10 +268,14 @@ public class AlbumGridView extends GridView {
 				}else{
 					itemSelectedSet.remove(buttonView.getTag().toString());
 				}
-//				if (listener != null)
-//					listener.onCheckedChanged(itemSelectedSet);
+				if (listener != null)
+					listener.onCheckedChanged(itemSelectedSet);
 			}
-			
+			if(isChecked){
+				buttonView.setVisibility(View.VISIBLE);
+			}else{
+				buttonView.setVisibility(View.GONE);
+			}
 		}
 	}
 }
