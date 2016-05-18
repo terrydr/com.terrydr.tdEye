@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import org.apache.cordova.LOG;
+
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
 import android.content.Context;
 import android.graphics.ImageFormat;
@@ -299,14 +302,48 @@ public class CameraView extends SurfaceView implements CameraOperation {
     }
 	
 	@Override
-	public void setCameraISO(int iso) {
+	public void setCameraISO(int iso,boolean lightOn) {
 		if (mCamera == null) {
 			mCamera = Camera.open();
 		}
 		
 		Camera.Parameters parameters = mCamera.getParameters();
-		parameters.setExposureCompensation(iso);
+//		int i = parameters.getExposureCompensation();
+//		int i1 = parameters.getMinExposureCompensation();
+//		int i2 = parameters.getMaxExposureCompensation();
+//		float i3 = parameters.getExposureCompensationStep();
+//		LOG.e(TAG, "i:" + i);
+//		LOG.e(TAG, "i1:" + i1);
+//		LOG.e(TAG, "i2:" + i2);
+//		LOG.e(TAG, "i3:" + i3);
+		setBestExposure(parameters,lightOn);
+//		parameters.setExposureCompensation(3);
 		mCamera.setParameters(parameters);
+	}
+	
+	private final float MAX_EXPOSURE_COMPENSATION = 1.0f;
+	private final float MIN_EXPOSURE_COMPENSATION = 0.0f;
+	public void setBestExposure(Camera.Parameters parameters, boolean lightOn) {
+		int minExposure = parameters.getMinExposureCompensation();
+		int maxExposure = parameters.getMaxExposureCompensation();
+		float step = parameters.getExposureCompensationStep();
+		if ((minExposure != 0 || maxExposure != 0) && step > 0.0f) {
+			// Set low when light is on
+			float targetCompensation = lightOn ? MIN_EXPOSURE_COMPENSATION
+					: MAX_EXPOSURE_COMPENSATION;
+			int compensationSteps = Math.round(targetCompensation / step);
+			float actualCompensation = step * compensationSteps;
+			// Clamp value:
+			compensationSteps = Math.max(Math.min(compensationSteps, maxExposure), minExposure);
+			if (parameters.getExposureCompensation() == compensationSteps) {
+				Log.i(TAG, "Exposure compensation already set to "+ compensationSteps + " / " + actualCompensation);
+			} else {
+				Log.i(TAG, "Setting exposure compensation to "+ compensationSteps + " / " + actualCompensation);
+				parameters.setExposureCompensation(compensationSteps);
+			}
+		} else {
+			Log.i(TAG, "Camera does not support exposure compensation");
+		}
 	}
 	
 	public class CameraSizeComparator implements Comparator<Camera.Size> {

@@ -7,11 +7,10 @@
 
     <com.terrydr.eyeScope.FilterImageView
         android:id="@+id/imgThumbnail"
-        android:layout_width="fill_parent"
-        android:layout_height="73dip"
-        android:adjustViewBounds="true"
+        android:layout_width="match_parent"
+        android:layout_height="73dp"
         android:background="@null"
-        android:scaleType="centerCrop" />
+        android:scaleType="center" />
 
     <CheckBox
         android:id="@+id/checkbox"

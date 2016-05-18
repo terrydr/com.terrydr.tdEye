@@ -17,5 +17,5 @@ public interface CameraOperation {
 	 *  设置爆光
 	 *  @return  
 	 */
-	public void setCameraISO(int iso);
+	public void setCameraISO(int iso,boolean lightOn);
 }

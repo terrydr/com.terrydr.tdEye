@@ -38,6 +38,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private String mSaveRoot_left, mSaveRoot_right;
 	private ImageView iso_iv, whitebalance_iv;
 	private int mExposureNum = 0;
+	private boolean lightOn = true;
 	private RelativeLayout whitebalance_rl;
 	private TextView eyeleft_tv, eyeleft_tv1,return_index_bt,camera_camera_tv;
 	private LinearLayout linearlayou_left, linearlayou_right;
@@ -92,7 +93,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		setPath(leftOrRight);
 
 //		int i = dip2px(30);
-//		int m = px2dip(120);
+//		int m = px2dip(213);
 //		Log.e(TAG, "i:" + i);
 //		Log.e(TAG, "m:" + m);
 		// mHeaderBar.getBackground().setAlpha(204);//透明0~255透明度 ，越小越透明
@@ -194,13 +195,15 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			break;
 		case R.id.iso_iv:
 			if (mExposureNum == 0) {
+				lightOn = false;
 				mExposureNum = 5;
 				iso_iv.setImageResource(R.drawable.icon_iso_iv_dark);
 			} else {
+				lightOn = true;
 				mExposureNum = 0;
 				iso_iv.setImageResource(R.drawable.icon_iso_iv_bright);
 			}
-			mContainer.setCameraISO_int(mExposureNum);
+			mContainer.setCameraISO_int(mExposureNum,lightOn);
 			break;
 		case R.id.whitebalance_iv:
 			if (whitebalance_rl.getVisibility() == View.GONE) {
@@ -439,7 +442,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 				mExposureNum = b.getInt("mexposureNum");
 				deleteFile = b.getBoolean("deleteFile");
 			}
-			mContainer.setCameraISO_int(mExposureNum);
+			mContainer.setCameraISO_int(mExposureNum,lightOn);
 			photos_iv.setEnabled(true);
 			break;
 		case 5:

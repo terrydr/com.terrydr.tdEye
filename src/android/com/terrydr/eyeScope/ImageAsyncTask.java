@@ -68,7 +68,8 @@ public class ImageAsyncTask extends AsyncTask<Bitmap, Void, Bitmap> {
 
         savedata(out.toByteArray(),fileNamePath);
         
-        Bitmap thumbnail = ThumbnailUtils.extractThumbnail(retBmp, 213, 213);
+//        Bitmap thumbnail = ThumbnailUtils.extractThumbnail(retBmp, 213, 213);
+        Bitmap thumbnail = ThumbnailUtils.extractThumbnail(retBmp, 320, 219);
      // 存图片小
 		BufferedOutputStream bufferos = null;
 		try {

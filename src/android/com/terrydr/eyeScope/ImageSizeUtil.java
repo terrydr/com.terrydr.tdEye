@@ -61,7 +61,7 @@ public class ImageSizeUtil {
 			width = displayMetrics.widthPixels;
 		}
 
-		int height = imageView.getHeight();// 获取imageview的实际高�?
+		int height = imageView.getHeight();// 获取imageview的实际高
 		if (height <= 0) {
 			height = lp.height;// 获取imageview在layout中声明的宽度
 		}

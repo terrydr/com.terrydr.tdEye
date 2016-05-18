@@ -307,8 +307,8 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 				// 解析生成相机返回的图
 				Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
 				// 生成缩略
-				Bitmap thumbnail = ThumbnailUtils
-						.extractThumbnail(bm, 213, 213);
+//				Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 213, 213);
+				Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 320, 219);
 				// 产生新的文件
 				String imgName = FileOperateUtil.createFileNmae(".jpg");
 				String imagePath = mImageFolder + File.separator + imgName;
@@ -386,8 +386,8 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	}
 
 	@Override
-	public void setCameraISO(int iso) {		
-		mCameraView.setCameraISO(iso);
+	public void setCameraISO(int iso,boolean lightOn) {		
+		mCameraView.setCameraISO(iso,lightOn);
 	}
 	
 	/**
@@ -395,8 +395,8 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	 * @return void
 	 * @throws
 	 */
-	public void setCameraISO_int(int iso) {
-		setCameraISO(iso);
+	public void setCameraISO_int(int iso,boolean lightOn) {
+		setCameraISO(iso,lightOn);
 	}
 	
 	public void setOnFocus(Point point) {		
