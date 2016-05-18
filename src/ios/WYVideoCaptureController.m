@@ -81,12 +81,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    [_captureSession startRunning];
     [self configureNavgationBar];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [_captureSession startRunning];
 }
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
