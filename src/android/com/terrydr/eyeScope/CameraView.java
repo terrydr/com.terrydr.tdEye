@@ -43,8 +43,11 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	private List<Camera.Size> sizeList1;
 	private List<Size> mSupportList = null;
 
+	private CameraActivity cActivity;
+	
 	public CameraView(Context context) {
 		super(context);
+		cActivity = (CameraActivity) context;
 		// 初始化容
 		getHolder().addCallback(callback);
 		openCamera();
@@ -52,6 +55,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 
 	public CameraView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		cActivity = (CameraActivity) context;
 		// 初始化容
 		getHolder().addCallback(callback);
 		openCamera();
@@ -69,9 +73,12 @@ public class CameraView extends SurfaceView implements CameraOperation {
 				setCameraParameters();
 				mCamera.setPreviewDisplay(getHolder());
 			} catch (Exception e) {
-				Toast.makeText(getContext(), "打开相机失败", Toast.LENGTH_SHORT)
+				Toast.makeText(getContext(), "未获得相机权限，请到设置中授权后再尝试。", Toast.LENGTH_SHORT)
 						.show();
-				Log.e(TAG, "打开相机失败"+e.getMessage());
+				
+				Log.e(TAG, "未获得相机权限，请到设置中授权后再尝试。"+e.getMessage());
+				cActivity.finish();
+				return;
 			}
 			mCamera.startPreview();
 		}
@@ -301,6 +308,18 @@ public class CameraView extends SurfaceView implements CameraOperation {
         }
     }
 	
+	public void setWB(String wbValue){
+		if (mCamera == null) {
+			return;
+		}
+		Camera.Parameters parameters = mCamera.getParameters();
+		if(wbValue==null){
+			return;
+		}
+		parameters.setWhiteBalance(wbValue);
+		mCamera.setParameters(parameters);
+	}
+	
 	@Override
 	public void setCameraISO(int iso,boolean lightOn) {
 		if (mCamera == null) {
@@ -336,9 +355,9 @@ public class CameraView extends SurfaceView implements CameraOperation {
 			// Clamp value:
 			compensationSteps = Math.max(Math.min(compensationSteps, maxExposure), minExposure);
 			if (parameters.getExposureCompensation() == compensationSteps) {
-				Log.i(TAG, "Exposure compensation already set to "+ compensationSteps + " / " + actualCompensation);
+				Log.d(TAG, "Exposure compensation already set to "+ compensationSteps + " / " + actualCompensation);
 			} else {
-				Log.i(TAG, "Setting exposure compensation to "+ compensationSteps + " / " + actualCompensation);
+				Log.d(TAG, "Setting exposure compensation to "+ compensationSteps + " / " + actualCompensation);
 				parameters.setExposureCompensation(compensationSteps);
 			}
 		} else {

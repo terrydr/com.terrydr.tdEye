@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     
-    <RelativeLayout
+    <!-- <RelativeLayout
         android:id="@+id/whitebalance_rl"
         android:layout_width="fill_parent"
         android:layout_height="30dip"
@@ -18,8 +18,7 @@
         android:layout_marginBottom="180dip"
         android:layout_marginLeft="20dip"
         android:layout_marginRight="20dip"
-        android:background="@color/whitebalance_background"
-        android:visibility="gone" >
+        android:background="@color/whitebalance_background" >
 
         <ImageView
             android:id="@+id/left_iv"
@@ -52,6 +51,8 @@
             android:layout_centerVertical="true"
             android:paddingRight="10dip"
             android:src="@drawable/whitebalance_right" />
-    </RelativeLayout>
+    </RelativeLayout> -->
+
+	
 
 </RelativeLayout>

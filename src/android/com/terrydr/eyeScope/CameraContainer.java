@@ -390,6 +390,10 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		mCameraView.setCameraISO(iso,lightOn);
 	}
 	
+	public void setWB(String wbValue){
+		mCameraView.setWB(wbValue);
+	}
+	
 	/**
 	 * @Description: 设置爆光
 	 * @return void

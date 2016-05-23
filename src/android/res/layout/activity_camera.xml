@@ -10,10 +10,10 @@
 
     <com.terrydr.eyeScope.CameraContainer
         android:id="@+id/container"
-        android:layout_below="@+id/camera_header_bar"
-        android:layout_above="@+id/camera_bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@+id/camera_bottom_bar"
+        android:layout_below="@+id/camera_header_bar" />
 
     <include
         android:id="@+id/camera_header_bar"
@@ -41,7 +41,109 @@
         android:layout_below="@+id/iso_iv"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:visibility="gone"
         android:src="@drawable/icon_whitebalance_iv_bright" />
+
+    <RelativeLayout
+        android:id="@+id/whitebalance_rl"
+        android:layout_width="fill_parent"
+        android:layout_height="150dp"
+        android:visibility="gone"
+        android:layout_alignBottom="@+id/container"
+        android:background="@drawable/wb_background" >
+
+        <!--
+            <LinearLayout
+            android:id="@+id/seekBar_llayout"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_alignParentBottom="true" />
+        -->
+
+        <LinearLayout
+            android:id="@+id/seekBar_llayout"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_alignParentBottom="true" >
+
+            <com.terrydr.eyeScope.ArcSeekBarParent
+                android:id="@+id/seek_bar"
+                android:layout_width="match_parent"
+                android:layout_height="80dp" >
+
+                <com.terrydr.eyeScope.SeekBarArcView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <com.terrydr.eyeScope.SeekBarBallView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </com.terrydr.eyeScope.ArcSeekBarParent>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/wb_iv"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/wb_auto" />
+
+        <ImageView
+            android:id="@+id/wb_auto_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="70dp"
+            android:src="@drawable/wb_auto" />
+
+        <ImageView
+            android:id="@+id/wb_incandescent_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="45dp"
+            android:layout_marginTop="50dp"
+            android:layout_toRightOf="@+id/wb_auto_iv"
+            android:src="@drawable/wb_incandescent" />
+
+        <ImageView
+            android:id="@+id/wb_warm_fluorescent_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_above="@+id/seekBar_llayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="5dp"
+            android:src="@drawable/wb_warm_fluorescent" />
+
+        <ImageView
+            android:id="@+id/wb_daylight_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="55dp"
+            android:layout_marginTop="50dp"
+            android:layout_toRightOf="@+id/wb_warm_fluorescent_iv"
+            android:src="@drawable/wb_daylight" />
+
+        <ImageView
+            android:id="@+id/wb_cloudy_daylight_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="70dp"
+            android:src="@drawable/wb_cloudy_daylight" />
+
+        <TextView
+            android:id="@+id/wb_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/seekBar_llayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:text="自动"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size" />
+    </RelativeLayout>
 
 </RelativeLayout>
