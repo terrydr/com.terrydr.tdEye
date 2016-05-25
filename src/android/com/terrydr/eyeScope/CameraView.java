@@ -115,14 +115,6 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 */
 	private void setCameraParameters() {
 		Camera.Parameters parameters = mCamera.getParameters();
-//		parameters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_CLOUDY_DAYLIGHT);
-//		boolean m = parameters.isAutoWhiteBalanceLockSupported();
-//		String i = parameters.getWhiteBalance();
-//		Log.e( "是否支持自动白平衡：", String.valueOf(m));
-//		Log.e( "当前白平衡：", String.valueOf(i));
-//		parameters.setAutoWhiteBalanceLock(false);
-//		String n = parameters.getWhiteBalance();
-//		int m = parameters.getMaxExposureCompensation();
 		
 		// 选择合的预览尺寸
 		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
@@ -153,9 +145,9 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		  @Override
 		  public void onAutoFocus(boolean success, Camera arg1) {
 			  if(success){
-//				  Log.d(TAG, "对焦成功");  
+				  Log.d(TAG, "对焦成功");  
 			  }else{
-//				  Log.d(TAG, "对焦失败");  
+				  Log.d(TAG, "对焦失败");  
 			  }
 		  }};
 
@@ -253,34 +245,46 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 * 手动聚焦 
 	 *  @param point 触屏坐标
 	 */
-	protected void onFocus(Point point,AutoFocusCallback callback){
+	public void onFocus(Point point){
 		mCamera.cancelAutoFocus();
-
 		Camera.Parameters parameters=mCamera.getParameters();
 		//不支持设置自定义聚焦，则使用自动聚焦，返回
 		if (parameters.getMaxNumFocusAreas()<=0) {
 			mCamera.autoFocus(autoFocusCallback);
 			return;
 		}
-		List<Area> areas=new ArrayList<Camera.Area>();
-		int left=point.x-300;
-		int top=point.y-300;
-		int right=point.x+300;
-		int bottom=point.y+300;
-		left=left<-1000?-1000:left;
-		top=top<-1000?-1000:top;
-		right=right>1000?1000:right;
-		bottom=bottom>1000?1000:bottom;
-		areas.add(new Area(new Rect(left,top,right,bottom), 100));
-		parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
-
-		parameters.setFocusAreas(areas);
-		try {
-			mCamera.setParameters(parameters);
-		} catch (Exception e) {
-			Log.e(TAG,"手动聚焦失败", e);
-		}
 		mCamera.autoFocus(autoFocusCallback);
+	}
+	
+	/**  
+	 * 手动聚焦 
+	 *  @param point 触屏坐标
+	 */
+	public void onFocus(Point point,AutoFocusCallback callback){
+		Camera.Parameters parameters=mCamera.getParameters();
+		//不支持设置自定义聚焦，则使用自动聚焦，返回
+		if (parameters.getMaxNumFocusAreas()<=0) {
+			mCamera.autoFocus(callback);
+			return;
+		}
+//		List<Area> areas=new ArrayList<Camera.Area>();
+//		int left=point.x-300;
+//		int top=point.y-300;
+//		int right=point.x+300;
+//		int bottom=point.y+300;
+//		left=left<-1000?-1000:left;
+//		top=top<-1000?-1000:top;
+//		right=right>1000?1000:right;
+//		bottom=bottom>1000?1000:bottom;
+//		areas.add(new Area(new Rect(left,top,right,bottom), 100));
+//		parameters.setFocusAreas(areas);
+//		try {
+//			mCamera.setParameters(parameters);
+//		} catch (Exception e) {
+//			Log.e(TAG,"手动聚焦失败", e);
+//		}
+//		parameters.setFocusMode(Parameters.FOCUS_MODE_MACRO);
+		mCamera.autoFocus(callback);
 	}
 	
 	@Override
@@ -308,6 +312,10 @@ public class CameraView extends SurfaceView implements CameraOperation {
         }
     }
 	
+	/**
+	 * 设置白平衡
+	 * @param wbValue
+	 */
 	public void setWB(String wbValue){
 		if (mCamera == null) {
 			return;

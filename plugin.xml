@@ -195,6 +195,8 @@
                      target-dir="src/com/terrydr/eyeScope"/>						 
 		<source-file src="src/android/com/terrydr/eyeScope/FilterImageView.java"
                      target-dir="src/com/terrydr/eyeScope"/>
+		<source-file src="src/android/com/terrydr/eyeScope/FocusImageView.java"
+                     target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/ImageAsyncTask.java"
                      target-dir="src/com/terrydr/eyeScope"/>					 
 		<source-file src="src/android/com/terrydr/eyeScope/ImageLoader.java"
@@ -217,7 +219,7 @@
                      target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/ThumbnaiImageView.java"
                      target-dir="src/com/terrydr/eyeScope"/>
-			 	 
+		<source-file src="src/android/res/anim/focusview_show.xml" target-dir="res/anim"/>
 		<source-file src="src/android/res/drawable/item_album_grid_checkbox.xml" target-dir="res/drawable"/>
 		<source-file src="src/android/res/drawable/item_page_grid_checkbox.xml" target-dir="res/drawable"/>
 		<source-file src="src/android/res/drawable/shape.xml" target-dir="res/drawable"/>
@@ -229,6 +231,9 @@
 		<source-file src="src/android/res/drawable-xhdpi/commit_bt_bg.png" target-dir="res/drawable-xhdpi" />
 		<source-file src="src/android/res/drawable-xhdpi/eyeleft_iv.png" target-dir="res/drawable-xhdpi" />
 		<source-file src="src/android/res/drawable-xhdpi/eyeright_iv.png" target-dir="res/drawable-xhdpi" />
+		<source-file src="src/android/res/drawable-xhdpi/focus_focus_failed.9.png" target-dir="res/drawable-xhdpi" />
+		<source-file src="src/android/res/drawable-xhdpi/focus_focused.9.png" target-dir="res/drawable-xhdpi" />
+		<source-file src="src/android/res/drawable-xhdpi/focus_focusing.9.png" target-dir="res/drawable-xhdpi" />
 		<source-file src="src/android/res/drawable-xhdpi/ic_launcher.png" target-dir="res/drawable-xhdpi" />	
 		<source-file src="src/android/res/drawable-xhdpi/icon_iso_iv_bright.png" target-dir="res/drawable-xhdpi" />	
 		<source-file src="src/android/res/drawable-xhdpi/icon_iso_iv_dark.png" target-dir="res/drawable-xhdpi" />		

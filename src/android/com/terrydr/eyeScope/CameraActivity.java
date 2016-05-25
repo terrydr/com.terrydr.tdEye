@@ -153,7 +153,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
     private void checkWriteExternalPermission() { 
         int hasWriteContactsPermission = ContextCompat.checkSelfPermission(CameraActivity.this, 
                 Manifest.permission.CAMERA); 
-        LOG.e(TAG, "hasWriteContactsPermission:" + hasWriteContactsPermission + "----PackageManager.PERMISSION_GRANTED:" + PackageManager.PERMISSION_GRANTED);
+//        LOG.e(TAG, "hasWriteContactsPermission:" + hasWriteContactsPermission + "----PackageManager.PERMISSION_GRANTED:" + PackageManager.PERMISSION_GRANTED);
         if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) { 
         	Toast.makeText(CameraActivity.this, "未获得相机权限，请到设置中授权后再尝试。", Toast.LENGTH_SHORT) .show(); 
         	finish();
@@ -664,6 +664,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
+		Point point=new Point((int)e.getX(), (int)e.getY());
+//		mContainer.setOnFocus(point); 
+		mContainer.setOnFocus(point,null);
 		return false;
 	}
 
@@ -754,16 +757,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	@Override
 	  public boolean onTouch(View view, MotionEvent event) {
 		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			switch (view.getId()) {
-			case R.id.container:
-//				Log.d(TAG,"开始触摸对焦...");
-				mContainer.setOnFocus(new Point((int)event.getX(), (int)event.getY())); 
-				break;
-			}
-			break;
 		case MotionEvent.ACTION_UP:
-//			Log.d(TAG,"结束连继拍照..");
 			if(isLong){
 				photos_iv.setEnabled(false);
 				isLong = false;
