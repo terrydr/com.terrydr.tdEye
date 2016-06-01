@@ -109,6 +109,7 @@
         <resource-file src="src/ios/selectedicon@3x.png" />
         <resource-file src="src/ios/Submit-icon@2x.png" />
         <resource-file src="src/ios/Submit-icon@3x.png" />
+        <resource-file src="src/ios/silent.m4a" />
     </platform>
     
 	<platform name="android">
