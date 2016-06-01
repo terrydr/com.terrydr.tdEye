@@ -525,9 +525,59 @@ static NSString *_cellIdentifier = @"collectionViewCell";
                                                                  isLeftEye:_isCurrentLeftEye];
         NSString *eyeType;
         if (_isCurrentLeftEye) {
+            
+            int index = (int)self.currentPage +1;
+            int totalCount = (int)_leftCount;
+            if (index != totalCount) {
+                for (int i=index; i<totalCount; i++) {
+                    JRPictureModel *tempPictureModel = self.photos[i];
+                    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:tempPictureModel.pictureName isLeftEye:YES];
+                    NSData *imgData = [NSData dataWithContentsOfFile:imgPath];
+                    
+                    JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
+                    NSString *filePath = [fileManage getJRMediaPathWithType:YES];
+                    NSString *imageName = [NSString stringWithFormat:@"0%d.jpg",i];
+                    NSString *destinationImgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
+                    NSFileManager *fileManager = [NSFileManager defaultManager];
+                    BOOL result = [fileManager createFileAtPath:destinationImgPath
+                                                       contents:imgData
+                                                     attributes:nil];
+                    NSLog(@"result:%d",result);
+                    
+                    [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:tempPictureModel.pictureName
+                                                                             isLeftEye:YES];
+                    tempPictureModel.pictureName = imageName;
+                }
+            }
+            
             eyeType = @"left";
             _leftCount--;
         }else{
+            
+            int index = (int)self.currentPage +1;
+            int totalCount = (int)_rightCount;
+            if (index != totalCount) {
+                for (int i=index; i<totalCount; i++) {
+                    JRPictureModel *tempPictureModel = self.photos[i];
+                    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:tempPictureModel.pictureName isLeftEye:NO];
+                    NSData *imgData = [NSData dataWithContentsOfFile:imgPath];
+                    
+                    JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
+                    NSString *filePath = [fileManage getJRMediaPathWithType:NO];
+                    NSString *imageName = [NSString stringWithFormat:@"0%d.jpg",i];
+                    NSString *destinationImgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
+                    NSFileManager *fileManager = [NSFileManager defaultManager];
+                    BOOL result = [fileManager createFileAtPath:destinationImgPath
+                                                       contents:imgData
+                                                     attributes:nil];
+                    NSLog(@"result:%d",result);
+                    
+                    [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:tempPictureModel.pictureName
+                                                                             isLeftEye:NO];
+                    tempPictureModel.pictureName = imageName;
+                }
+            }
+            
             eyeType = @"right";
             _rightCount--;
         }
