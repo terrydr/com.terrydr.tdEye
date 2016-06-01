@@ -518,15 +518,18 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 
 - (void)trashAsset{
     NSMutableArray *trashAssets = [NSMutableArray arrayWithArray:self.photos];
-    if ([trashAssets containsObject:[self.photos objectAtIndex:self.currentPage]]) {
-        [trashAssets removeObject:[self.photos objectAtIndex:self.currentPage]];
+    JRPictureModel *pictureModel = self.photos[self.currentPage];
+    if ([trashAssets containsObject:pictureModel]) {
+        [trashAssets removeObject:pictureModel];
+        [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:pictureModel.pictureName
+                                                                 isLeftEye:_isCurrentLeftEye];
         if (_isCurrentLeftEye) {
             _leftCount--;
         }else{
             _rightCount--;
         }
-        if ([_selectedModelArr isValid] && [_selectedModelArr containsObject:[self.photos objectAtIndex:self.currentPage]]) {
-            [_selectedModelArr removeObject:[self.photos objectAtIndex:self.currentPage]];
+        if ([_selectedModelArr isValid] && [_selectedModelArr containsObject:pictureModel]) {
+            [_selectedModelArr removeObject:pictureModel];
             if (_isCurrentLeftEye) {
                 _leftSelectedCount--;
             }else{
