@@ -14,7 +14,9 @@
 #import "ProgressView.h"
 #import "UIView+AutoLayoutViews.h"
 #import "JRMediaFileManage.h"
-#import "PictureScanViewController.h"
+#import "JRPictureModel.h"
+#import "ZQBaseClassesExtended.h"
+#import "MLSelectPhotoBrowserViewController.h"
 
 typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 #define kAnimationDuration 0.2
@@ -45,8 +47,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UIButton *rightBtn;
 @property (nonatomic, strong) UIButton *cameraBtn;
 @property (nonatomic, strong) UIView *toolView;
+@property (nonatomic, strong) UIView *pictureScanView;
+@property (nonatomic, strong) UIImageView *pictureScanImgView;
 @property (nonatomic, strong) UIButton *ISOBtn;
 @property (nonatomic, strong) UIButton *whiteBalanceBtn;
+@property (nonatomic, strong) UIButton *pictureScanBtn;
 @property (nonatomic, strong) UIView *whiteBalanceView;
 
 /// 负责输入和输出设备之间数据传递
@@ -233,17 +238,18 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:_centerBtn];
     [self.view addSubview:_rightBtn];
     [self.view addSubview:_cameraBtn];
+    [self.view addSubview:self.pictureScanView];
     
     CGFloat viewContainerHeight = APP_HEIGHT-64-CGRectGetHeight(self.toolView.bounds);
     _viewContainer.frame = CGRectMake(0, 64, APP_WIDTH, viewContainerHeight);
     _progressView.frame = CGRectMake(0, CGRectGetMaxY(_viewContainer.frame), APP_WIDTH, 5);
     CGFloat btnW = 40;
-    CGFloat leftBtnX = (APP_WIDTH - 3 * btnW - 2 * 32) *0.5;
+    CGFloat leftBtnX = (APP_WIDTH - 3 * btnW - 2 * 20) *0.5;
     CGFloat leftBtnY = APP_HEIGHT-62-btnW;
     
     _leftBtnFrame = CGRectMake(leftBtnX, leftBtnY, btnW, btnW);
-    _centerBtnFrame = CGRectOffset(_leftBtnFrame, 32 + btnW, 0);
-    _rightBtnFrame = CGRectOffset(_centerBtnFrame, 32 + btnW, 0);
+    _centerBtnFrame = CGRectOffset(_leftBtnFrame, 20 + btnW, 0);
+    _rightBtnFrame = CGRectOffset(_centerBtnFrame, 20 + btnW, 0);
     [self restoreBtn];
     _cameraBtn.frame = CGRectMake((APP_WIDTH - 67) * 0.5, APP_HEIGHT-62, 62, 62);
 }
@@ -313,6 +319,49 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     return _whiteBalanceBtn;
 }
 
+- (UIView *)pictureScanView{
+    if (!_pictureScanView) {
+        CGFloat scanViewWidth = 110.0f/2.0f;
+        CGFloat scanViewHeight = 110.0f/2.0f;
+        CGFloat scanViewOriginX = 10.0f;
+        CGFloat scanViewOriginY = APP_HEIGHT-scanViewHeight-5.0f;
+        _pictureScanView = [[UIView alloc] initWithFrame:CGRectMake(scanViewOriginX, scanViewOriginY, scanViewWidth, scanViewHeight)];
+        _pictureScanView.hidden = YES;
+        [_pictureScanView addSubview:self.pictureScanImgView];
+        [_pictureScanView addSubview:self.pictureScanBtn];
+    }
+    return _pictureScanView;
+}
+
+- (UIImageView *)pictureScanImgView{
+    if (!_pictureScanImgView) {
+        CGFloat scanImgViewWidth = 110.0f/2.0f;
+        CGFloat scanImgViewHeight = 110.0f/2.0f;
+        CGFloat scanImgViewOriginX = 0.0f;
+        CGFloat scanImgViewOriginY = 0.0f;
+        _pictureScanImgView = [[UIImageView alloc] initWithFrame:CGRectMake(scanImgViewOriginX, scanImgViewOriginY, scanImgViewWidth, scanImgViewHeight)];
+    }
+    return _pictureScanImgView;
+}
+
+- (UIButton *)pictureScanBtn{
+    if (!_pictureScanBtn) {
+        CGFloat psWidth = 110.0f/2.0f;
+        CGFloat psHeight = 110.0f/2.0f;
+        CGFloat psOriginX = 0.0f;
+        CGFloat psOriginY = 0.0f;
+        _pictureScanBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _pictureScanBtn.frame = CGRectMake(psOriginX, psOriginY, psWidth, psHeight);
+        [_pictureScanBtn addTarget:self
+                            action:@selector(pictureScanBtnClick:)
+                  forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _pictureScanBtn;
+}
+- (void)pictureScanBtnClick:(id)sender{
+    [self pushToPictureScan:YES];
+}
+
 - (UIView *)toolView{
     if (!_toolView) {
         CGFloat toolWidth = APP_WIDTH;
@@ -330,7 +379,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat width = 553.0f/2.0f;
         CGFloat height = 70.0f/2.0f;
         CGFloat originX = (APP_WIDTH-width)/2.0f;
-        CGFloat originY = APP_HEIGHT - (324.0f+62.0f+44.0f)/2.0f;
+        CGFloat originY = APP_HEIGHT - (200.0f+62.0f+44.0f)/2.0f;
         _whiteBalanceView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
         _whiteBalanceView.hidden = YES;
         _whiteBalanceView.backgroundColor = RGB(0x000000);
@@ -364,8 +413,73 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 #pragma mark - ButtonClick
 - (void)pushToPictureScan:(BOOL)animated{
-    PictureScanViewController *scanVc = [[PictureScanViewController alloc] init];
-    [self.navigationController pushViewController:scanVc animated:animated];
+    MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
+    [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
+    browserVc.isModelData = YES;
+    browserVc.currentPage = 0;
+    
+    NSMutableArray *leftEyeDataArr = [[NSMutableArray alloc] initWithCapacity:0];
+    NSMutableArray *rightEyeDataArr = [[NSMutableArray alloc] initWithCapacity:0];
+    NSMutableArray *tempMutableArr = [[NSMutableArray alloc] initWithCapacity:0];
+    
+    NSString *leftFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:YES];
+    NSError *le = nil;
+    NSArray *leftFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:leftFilePath error:&le];
+    NSLog(@"leftFileArr:%@",leftFileArr);
+    NSString *rightFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:NO];
+    NSError *re = nil;
+    NSArray *rightFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:rightFilePath error:&re];
+    NSLog(@"rightFileArr:%@",rightFileArr);
+    
+    if ([leftFileArr isValid]) {
+        for (NSString *fileName in leftFileArr) {
+            JRPictureModel *picture = [[JRPictureModel alloc] init];
+            picture.pictureName = fileName;
+            picture.isSelected = NO;
+            [leftEyeDataArr addObject:picture];
+        }
+        
+        [tempMutableArr addObjectsFromArray:leftEyeDataArr];
+        browserVc.leftCount = leftFileArr.count;
+        
+        if ([rightFileArr isValid]) {
+            for (NSString *fileName in rightFileArr) {
+                JRPictureModel *picture = [[JRPictureModel alloc] init];
+                picture.pictureName = fileName;
+                picture.isSelected = NO;
+                [rightEyeDataArr addObject:picture];
+            }
+            
+            [tempMutableArr addObjectsFromArray:rightEyeDataArr];
+            browserVc.rightCount = rightFileArr.count;
+        }else{
+            browserVc.rightCount = 0;
+        }
+    }else{
+        browserVc.leftCount = 0;
+        
+        if ([rightFileArr isValid]) {
+            for (NSString *fileName in rightFileArr) {
+                JRPictureModel *picture = [[JRPictureModel alloc] init];
+                picture.pictureName = fileName;
+                picture.isSelected = NO;
+                [rightEyeDataArr addObject:picture];
+            }
+            
+            [tempMutableArr addObjectsFromArray:rightEyeDataArr];
+            browserVc.rightCount = rightFileArr.count;
+        }else{
+            browserVc.rightCount = 0;
+        }
+    }
+    
+    browserVc.photos = [NSArray arrayWithArray:tempMutableArr];
+    browserVc.selectedModelArr = [NSMutableArray arrayWithCapacity:0];
+    browserVc.mlLeftselectedArr = [NSMutableArray arrayWithCapacity:0];
+    browserVc.mlRightselectedArr = [NSMutableArray arrayWithCapacity:0];
+    browserVc.deleteCallBack = ^(NSArray *assets){
+    };
+    [self.navigationController pushViewController:browserVc animated:animated];
 }
 - (void)wbSliderMethod:(id)sender{
     UISlider *slider = (UISlider *)sender;
@@ -528,7 +642,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)showBeyondLimitTakenCount{
-    __weak WYVideoCaptureController *wself = self;
+    //__weak WYVideoCaptureController *wself = self;
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"单侧眼睛最多拍摄六张图片,是否重拍?" message:nil preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"重拍" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         if (_isLeftEye) {
@@ -543,7 +657,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
         dispatch_async(dispatch_get_main_queue(), ^{
             // 更新界面
-            [wself pushToPictureScan:YES];
+            //[wself pushToPictureScan:YES];
         });
     }];
     // Add the actions.
@@ -558,9 +672,13 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }else{
         self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
     }
+    if (_pictureScanView.hidden) {
+        _pictureScanView.hidden = NO;
+    }
     
     UIImage *image = [UIImage imageWithData:imgData];
     UIImage *saveImg = [self cropImage:image withCropSize:self.viewContainer.size];
+    _pictureScanImgView.image = saveImg;
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
     
     JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
@@ -581,23 +699,19 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         if (_isLeftTouchDown) {
             if (_leftTakenPictureCount==6) {
                 _isLeftTouchDown = NO;
-                [self pushToPictureScan:YES];
             }else{
                 [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
             }
         }else{
-            [self pushToPictureScan:YES];
         }
     }else{
         if (_isRightTouchDown) {
             if (_rightTakenPictureCount==6) {
                 _isRightTouchDown = NO;
-                [self pushToPictureScan:YES];
             }else{
                 [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
             }
         }else{
-            [self pushToPictureScan:YES];
         }
     }
 }

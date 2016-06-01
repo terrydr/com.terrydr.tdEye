@@ -390,10 +390,19 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     self.extendedLayoutIncludesOpaqueBars = YES;
     _leftSelectedCount = 0;
     _rightSelectedCount = 0;
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
     [self configureNavgationBar];
 }
 
 - (void)configureNavgationBar{
+    self.navigationController.navigationBar.translucent = NO;
+    self.navigationController.navigationBar.barTintColor = RGB(0x3691e6);
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+    [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, [UIFont boldSystemFontOfSize:18.f], NSFontAttributeName, nil]];
+    
     _leftItem = [[UIBarButtonItem alloc] initWithTitle:@"取消"
                                                  style:UIBarButtonItemStylePlain
                                                 target:self
