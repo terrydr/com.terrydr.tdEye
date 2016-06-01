@@ -95,10 +95,10 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         
         UISwipeGestureRecognizer *recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(upHandleSwipe:)];
         [recognizer setDirection:(UISwipeGestureRecognizerDirectionUp)];
-        [collectionView addGestureRecognizer:recognizer];
         
         [self.view addSubview:collectionView];
         if (_isModelData) {
+            [collectionView addGestureRecognizer:recognizer];
             [self.view addSubview:self.infoView];
             [self.view addSubview:self.pageControl];
             [self.infoView addSubview:self.selectedBtn];
@@ -541,13 +541,14 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         if (self.currentPage < 0) {
             self.currentPage = 0;
         }
-        self.photos = [NSArray arrayWithArray:trashAssets];
         
         if (self.deleteCallBack) {
             self.deleteCallBack(trashAssets);
         }
         if (trashAssets.count == 0) {
             [self.navigationController popViewControllerAnimated:YES];
+        }else{
+            self.photos = [NSArray arrayWithArray:trashAssets];
         }
     }
 }
