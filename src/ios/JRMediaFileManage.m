@@ -51,6 +51,22 @@
     return mediaPath;
 }
 
+//根据路径保存文件
+- (BOOL)saveFileWithPath:(NSString *)filePath fileData:(NSData *)data{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    BOOL isDir = NO;
+    if([fileManager fileExistsAtPath:filePath isDirectory:&isDir]) {
+        NSError *e = nil;
+        [fileManager removeItemAtPath:filePath error:&e];
+    }
+    
+    BOOL result = [fileManager createFileAtPath:filePath
+                                       contents:data
+                                     attributes:nil];
+    return result;
+}
+
 //根据路径删除单个文件
 - (void)deleteSingleFileWithPictureName:(NSString *)pictureName isLeftEye:(BOOL)eyeType{
     NSString *filePath = [self getImagePathWithPictureName:pictureName isLeftEye:eyeType];

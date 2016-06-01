@@ -845,10 +845,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         imageName = [NSString stringWithFormat:@"%02d.jpg",_rightTakenPictureCount];
     }
     NSString *imgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    BOOL result = [fileManager createFileAtPath:imgPath
-                                       contents:saveImgData
-                                     attributes:nil];
+    BOOL result = [fileManage saveFileWithPath:imgPath fileData:saveImgData];
     NSLog(@"result:%d",result);
     
     _cameraBtn.userInteractionEnabled = YES;

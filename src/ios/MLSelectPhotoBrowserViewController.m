@@ -529,6 +529,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             int index = (int)self.currentPage +1;
             int totalCount = (int)_leftCount;
             if (index != totalCount) {
+                //重新排序
                 for (int i=index; i<totalCount; i++) {
                     JRPictureModel *tempPictureModel = self.photos[i];
                     NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:tempPictureModel.pictureName isLeftEye:YES];
@@ -538,10 +539,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
                     NSString *filePath = [fileManage getJRMediaPathWithType:YES];
                     NSString *imageName = [NSString stringWithFormat:@"0%d.jpg",i];
                     NSString *destinationImgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
-                    NSFileManager *fileManager = [NSFileManager defaultManager];
-                    BOOL result = [fileManager createFileAtPath:destinationImgPath
-                                                       contents:imgData
-                                                     attributes:nil];
+                    BOOL result = [fileManage saveFileWithPath:destinationImgPath fileData:imgData];
                     NSLog(@"result:%d",result);
                     
                     [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:tempPictureModel.pictureName
@@ -557,6 +555,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             int index = (int)self.currentPage +1;
             int totalCount = (int)_rightCount;
             if (index != totalCount) {
+                //重新排序
                 for (int i=index; i<totalCount; i++) {
                     JRPictureModel *tempPictureModel = self.photos[i];
                     NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:tempPictureModel.pictureName isLeftEye:NO];
@@ -566,10 +565,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
                     NSString *filePath = [fileManage getJRMediaPathWithType:NO];
                     NSString *imageName = [NSString stringWithFormat:@"0%d.jpg",i];
                     NSString *destinationImgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
-                    NSFileManager *fileManager = [NSFileManager defaultManager];
-                    BOOL result = [fileManager createFileAtPath:destinationImgPath
-                                                       contents:imgData
-                                                     attributes:nil];
+                    BOOL result = [fileManage saveFileWithPath:destinationImgPath fileData:imgData];
                     NSLog(@"result:%d",result);
                     
                     [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:tempPictureModel.pictureName
