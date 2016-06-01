@@ -47,11 +47,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UIButton *rightBtn;
 @property (nonatomic, strong) UIButton *cameraBtn;
 @property (nonatomic, strong) UIView *toolView;
+@property (strong, nonatomic) UIView *screenFlashView;
 @property (nonatomic, strong) UIView *pictureScanView;
 @property (nonatomic, strong) UIImageView *pictureScanImgView;
+@property (nonatomic, strong) UIButton *pictureScanBtn;
 @property (nonatomic, strong) UIButton *ISOBtn;
 @property (nonatomic, strong) UIButton *whiteBalanceBtn;
-@property (nonatomic, strong) UIButton *pictureScanBtn;
 @property (nonatomic, strong) UIView *whiteBalanceView;
 
 /// 负责输入和输出设备之间数据传递
@@ -239,6 +240,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:_rightBtn];
     [self.view addSubview:_cameraBtn];
     [self.view addSubview:self.pictureScanView];
+    [self.view addSubview:self.screenFlashView];
     
     CGFloat viewContainerHeight = APP_HEIGHT-64-CGRectGetHeight(self.toolView.bounds);
     _viewContainer.frame = CGRectMake(0, 64, APP_WIDTH, viewContainerHeight);
@@ -317,6 +319,22 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [_whiteBalanceBtn addTarget:self action:@selector(whiteBalanceBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _whiteBalanceBtn;
+}
+
+- (UIView *)screenFlashView{
+    if (!_screenFlashView) {
+        _screenFlashView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, APP_WIDTH, APP_HEIGHT-100.0f)];
+        _screenFlashView.backgroundColor = [UIColor blackColor];
+        [_screenFlashView setAlpha:0];
+    }
+    return _screenFlashView;
+}
+
+- (void)begainScreenFlashAnimation{
+    [self.screenFlashView setAlpha:1];
+    [UIView animateWithDuration:0.3f animations:^{
+        [self.screenFlashView setAlpha:0.0f];
+    }];
 }
 
 - (UIView *)pictureScanView{
@@ -625,11 +643,18 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)takePictureMethodCore{
+    if (!_cameraBtn.userInteractionEnabled) {
+        return;
+    }
     if (_isLeftEye) {
         _leftTakenPictureCount++;
     }else{
         _rightTakenPictureCount++;
     }
+    
+    _cameraBtn.userInteractionEnabled = NO;
+    _pictureScanBtn.userInteractionEnabled = NO;
+    [self begainScreenFlashAnimation];
     
     __weak WYVideoCaptureController *wself = self;
     // 1.根据设备输出获得链接
@@ -695,6 +720,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                                        contents:saveImgData
                                      attributes:nil];
     NSLog(@"result:%d",result);
+    
+    _cameraBtn.userInteractionEnabled = YES;
+    _pictureScanBtn.userInteractionEnabled = YES;
+    
     if (_isLeftEye) {
         if (_isLeftTouchDown) {
             if (_leftTakenPictureCount==6) {
