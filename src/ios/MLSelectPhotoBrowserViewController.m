@@ -28,6 +28,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     int _leftSelectedCount;
     int _rightSelectedCount;
     UIView *_currentPageView;
+    BOOL _isCurrentLeftEye;
 }
 
 // 控件
@@ -519,9 +520,18 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     NSMutableArray *trashAssets = [NSMutableArray arrayWithArray:self.photos];
     if ([trashAssets containsObject:[self.photos objectAtIndex:self.currentPage]]) {
         [trashAssets removeObject:[self.photos objectAtIndex:self.currentPage]];
-        
+        if (_isCurrentLeftEye) {
+            _leftCount--;
+        }else{
+            _rightCount--;
+        }
         if ([_selectedModelArr isValid] && [_selectedModelArr containsObject:[self.photos objectAtIndex:self.currentPage]]) {
             [_selectedModelArr removeObject:[self.photos objectAtIndex:self.currentPage]];
+            if (_isCurrentLeftEye) {
+                _leftSelectedCount--;
+            }else{
+                _rightSelectedCount--;
+            }
             if (![_selectedModelArr isValid]) {
                 self.navigationItem.rightBarButtonItem.enabled = NO;
             }
@@ -724,11 +734,14 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     if (_isModelData) {
         if (_leftCount>0) {
             if (page+1<=_leftCount) {
+                _isCurrentLeftEye = YES;
                 self.title = @"左眼";
             }else{
+                _isCurrentLeftEye = NO;
                 self.title = @"右眼";
             }
         }else{
+            _isCurrentLeftEye = NO;
             self.title = @"右眼";
         }
         
