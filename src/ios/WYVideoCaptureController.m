@@ -7,6 +7,7 @@
 //
 
 #import "WYVideoCaptureController.h"
+#import <MediaPlayer/MediaPlayer.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIView+Extension.h"
@@ -39,6 +40,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     int _leftTakenPictureCount;
     int _rightTakenPictureCount;
 }
+/** 音量View*/
+@property (nonatomic, strong) MPVolumeView *volumeView;
+/** 设置音量滚动View*/
+@property (nonatomic, strong) UISlider *volumeViewSlider;
+/** 音频播放器 */
+@property (nonatomic, strong) AVPlayer *player;
 @property (nonatomic, strong) UISlider *wbSlider;
 @property (nonatomic, strong) UIView *viewContainer;
 @property (nonatomic, strong) ProgressView *progressView;
@@ -72,11 +79,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.view.backgroundColor = RGB(0x16161b);
     [self setupUI];
     [self initTakenParameters];
     [self ChangeToLeft:YES];
     [self setupCaptureView];
-    self.view.backgroundColor = RGB(0x16161b);
+    [self configureVolumeTool];
     
     if (_isScan) {
         [self pushToPictureScan:NO];
@@ -221,6 +229,115 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)areaChanged:(NSNotification *)n {
     
+}
+
+#pragma mark - configureVolumeTool
+- (void)configureVolumeTool{
+    //1.获取音量监听视图
+    [self p_getVolumeView];
+    
+    //2.隐藏音量Icon
+    [self p_hiddIcon];
+    
+    //3.监听点击音量键事件
+    [self p_addObserver];
+    
+    //4.监听打开控制中心
+    [self p_addObserverControlCenter];
+    
+    //5.获取当前系统音量
+    [self p_getSystemVolume];
+    
+    //6.耳机中间键远程遥控需要播放一段音频激活，否则无法使用
+    [self.player play];
+    
+    //7.开始接收远程遥控事件,耳机中间键
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+}
+
+/**
+ *  获取音量监听视图
+ */
+- (void)p_getVolumeView {
+    self.volumeView = [[MPVolumeView alloc] init];
+    for (UIView *view in [self.volumeView subviews]){
+        if ([view.class.description isEqualToString:@"MPVolumeSlider"]){
+            self.volumeViewSlider = (UISlider*)view;
+            break;
+        }
+    }
+}
+
+/**
+ *  隐藏音量Icon
+ */
+- (void)p_hiddIcon {
+    self.volumeView.frame = CGRectMake(-1000, -100, 100, 100);
+    self.volumeView.hidden = NO;
+    [self.view  addSubview:self.volumeView];
+}
+
+/**
+ *  监听点击音量键事件
+ */
+- (void)p_addObserver {
+    NSError *error;
+    [[AVAudioSession sharedInstance] setActive:YES error:&error];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cameraBtnTouchUpInside:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+}
+
+/**
+ *  应用程序失效或者再次进入前台，会走以下两个通知
+ */
+- (void)p_addObserverControlCenter {
+    //应用程序将要进入后台之前
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willResignActive) name:UIApplicationWillResignActiveNotification object:nil];
+    //应用程序切回到前台
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
+/**
+ *  APP挂起时，取消对音量键的监听
+ */
+- (void)willResignActive {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+    
+    //结束远程遥控
+    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
+}
+
+/**
+ *  重新进去前台
+ */
+- (void)didBecomeActive {
+    //重新监听音量改变事件
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cameraBtnTouchUpInside:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+    
+    //进入前台后，重新设置player状态为播放
+    [self.player play];
+    
+    //开始远程遥控
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+}
+
+/**
+ *  获取系统音量
+ */
+- (void)p_getSystemVolume {
+}
+
+#pragma mark - Lazy
+/**
+ *  加载音频播放文件
+ */
+- (AVPlayer *)player {
+    if (_player == nil) {
+        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"silent.m4a" ofType:nil];
+        NSURL *url = [NSURL fileURLWithPath:filePath];
+        _player = [[AVPlayer alloc] initWithURL:url];
+        [_player setVolume:0.0];
+    }
+    return _player;
 }
 
 #pragma mark - UI设计
