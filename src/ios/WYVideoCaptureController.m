@@ -771,7 +771,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     _cameraBtn.userInteractionEnabled = NO;
     _pictureScanBtn.userInteractionEnabled = NO;
-    [self begainScreenFlashAnimation];
     
     __weak WYVideoCaptureController *wself = self;
     // 1.根据设备输出获得链接
@@ -809,6 +808,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)saveTakenPictureData:(NSData *)imgData{
+    [self begainScreenFlashAnimation];
     if (_isLeftEye) {
         self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
     }else{
