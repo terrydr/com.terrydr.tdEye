@@ -612,7 +612,20 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     browserVc.selectedModelArr = [NSMutableArray arrayWithCapacity:0];
     browserVc.mlLeftselectedArr = [NSMutableArray arrayWithCapacity:0];
     browserVc.mlRightselectedArr = [NSMutableArray arrayWithCapacity:0];
-    browserVc.deleteCallBack = ^(NSArray *assets){
+    browserVc.deleteCallBack = ^(NSArray *assets,NSString *eyeType){
+        if ([eyeType isEqualToString:@"left"]) {
+            _leftTakenPictureCount--;
+        }else{
+            _rightTakenPictureCount--;
+        }
+        if (_isLeftEye) {
+            self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
+        }else{
+            self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
+        }
+        if (_leftTakenPictureCount==0 && _rightTakenPictureCount==0) {
+            _pictureScanView.hidden = YES;
+        }
     };
     [self.navigationController pushViewController:browserVc animated:animated];
 }

@@ -523,9 +523,12 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         [trashAssets removeObject:pictureModel];
         [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:pictureModel.pictureName
                                                                  isLeftEye:_isCurrentLeftEye];
+        NSString *eyeType;
         if (_isCurrentLeftEye) {
+            eyeType = @"left";
             _leftCount--;
         }else{
+            eyeType = @"right";
             _rightCount--;
         }
         if ([_selectedModelArr isValid] && [_selectedModelArr containsObject:pictureModel]) {
@@ -546,7 +549,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         }
         
         if (self.deleteCallBack) {
-            self.deleteCallBack(trashAssets);
+            self.deleteCallBack(trashAssets,eyeType);
         }
         if (trashAssets.count == 0) {
             [self.navigationController popViewControllerAnimated:YES];
