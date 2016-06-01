@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 import org.apache.cordova.LOG;
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -13,7 +14,9 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.hardware.Camera;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -26,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.terrydr.eyeScope.R;
 
@@ -41,27 +45,27 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private boolean lightOn = true;
 	private RelativeLayout whitebalance_rl;
 	private TextView eyeleft_tv, eyeleft_tv1,return_index_bt,camera_camera_tv;
-	private LinearLayout linearlayou_left, linearlayou_right;
+	private LinearLayout linearlayou_left, linearlayou_right,seekBar_llayout;
 	private GestureDetector detector;
 	public boolean leftOrRight = true; // 默认为左 true:左眼，false:右眼
 	public int i_left = 0; // 记录单侧拍摄图像个数
 	public int i_right = 0; // 记录单侧拍摄图像个数
 	private boolean deleteFile = true;
 	private boolean isLong = false;
-
+	private ImageView wb_iv, wb_auto_iv,wb_incandescent_iv,wb_warm_fluorescent_iv,wb_daylight_iv,wb_cloudy_daylight_iv;
+	private TextView wb_tv;
+	private ArcSeekBarParent arcSeekBar;
+	private int wb_level;
+	
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_camera);
-//	    PackageManager pm = getPackageManager();  
-//        boolean permission = (PackageManager.PERMISSION_GRANTED ==   
-//                pm.checkPermission("android.permission.CAMERA", "com.terrydr.eyeScope"));  
-//        if (!permission) {  
-//        	Toast.makeText(getApplicationContext(), "未获得相机权限，请到设置中授权后再尝试。",Toast.LENGTH_SHORT).show();
-//            finish(); 
-//        }
+		
+		checkWriteExternalPermission();  //判断如果用户阻止了权限给提示窗，目前紧对android6.0以上版本有效
+		
 		mContainer = (CameraContainer) findViewById(R.id.container);
 		eyeleft_tv = (TextView) findViewById(R.id.eyeleft_tv);
 		eyeleft_tv1 = (TextView) findViewById(R.id.eyeleft_tv1);
@@ -72,10 +76,30 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		whitebalance_rl = (RelativeLayout) findViewById(R.id.whitebalance_rl);
 		linearlayou_left = (LinearLayout) findViewById(R.id.linearlayou_left);
 		linearlayou_right = (LinearLayout) findViewById(R.id.linearlayou_right);
+		seekBar_llayout  = (LinearLayout) findViewById(R.id.seekBar_llayout);
 		camera_camera_tv = (TextView) findViewById(R.id.camera_camera_tv);
 		TextPaint tp = camera_camera_tv.getPaint();  //安体加粗
 	    tp.setFakeBoldText(true);
+	    
+	    wb_iv = (ImageView) findViewById(R.id.wb_iv);
+	    
+	    wb_incandescent_iv = (ImageView) findViewById(R.id.wb_incandescent_iv);
+	    wb_warm_fluorescent_iv = (ImageView) findViewById(R.id.wb_warm_fluorescent_iv);
+	    wb_daylight_iv = (ImageView) findViewById(R.id.wb_daylight_iv);
+	    wb_cloudy_daylight_iv = (ImageView) findViewById(R.id.wb_cloudy_daylight_iv);
+	    wb_tv = (TextView) findViewById(R.id.wb_tv);
+	    wb_auto_iv = (ImageView) findViewById(R.id.wb_auto_iv);
 
+//	    wb_auto_iv.setOnClickListener(this);
+//	    wb_incandescent_iv.setOnClickListener(this);
+//	    wb_warm_fluorescent_iv.setOnClickListener(this);
+//	    wb_daylight_iv.setOnClickListener(this);
+//	    wb_cloudy_daylight_iv.setOnClickListener(this);
+	    
+	    arcSeekBar = (ArcSeekBarParent) findViewById(R.id.seek_bar);
+	    arcSeekBar.setListener(onChang);
+	    
+		
 		photos_iv.setOnClickListener(this);
 		iso_iv.setOnClickListener(this);
 		whitebalance_iv.setOnClickListener(this);
@@ -92,13 +116,96 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		mSaveRoot_right = "right";
 		setPath(leftOrRight);
 
-//		int i = dip2px(30);
-//		int m = px2dip(213);
-//		Log.e(TAG, "i:" + i);
-//		Log.e(TAG, "m:" + m);
+		int i = dip2px(30);
+		int m = px2dip(38);
+		Log.e(TAG, "i:" + i);
+		Log.e(TAG, "m:" + m);
 		// mHeaderBar.getBackground().setAlpha(204);//透明0~255透明度 ，越小越透明
 	}
+	
+	/**
+	 * 弧形滑动改变事件
+	 */
+	ArcSeekBarParent.OnProgressChangedListener onChang = new ArcSeekBarParent.OnProgressChangedListener() {
 
+		@Override
+		public void OnProgressChanged(int level) {
+			if ( level>= 1 && level <2 ){
+				setWB(0);
+				wb_level = 0;
+			}else if( level>= 2 && level <3 ){
+				setWB(1);
+				wb_level = 1;
+			}else if( level>= 3 && level <4 ){
+				setWB(2);
+				wb_level = 2;
+			}else if( level>= 4 && level <5 ){
+				setWB(3);
+				wb_level = 3;
+			}else if( level>= 5 && level <6 ){
+				setWB(4);
+				wb_level = 4;
+			}
+		}
+	};
+
+	final private int REQUEST_CODE_ASK_PERMISSIONS = 123; 
+    private void checkWriteExternalPermission() { 
+        int hasWriteContactsPermission = ContextCompat.checkSelfPermission(CameraActivity.this, 
+                Manifest.permission.CAMERA); 
+//        LOG.e(TAG, "hasWriteContactsPermission:" + hasWriteContactsPermission + "----PackageManager.PERMISSION_GRANTED:" + PackageManager.PERMISSION_GRANTED);
+        if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) { 
+        	Toast.makeText(CameraActivity.this, "未获得相机权限，请到设置中授权后再尝试。", Toast.LENGTH_SHORT) .show(); 
+        	finish();
+//            if (!ActivityCompat.shouldShowRequestPermissionRationale(CameraActivity.this, 
+//                    Manifest.permission.CAMERA)) { 
+//                showMessageOKCancel("你需要允许获取相机权限", 
+//                        new DialogInterface.OnClickListener() { 
+//                            @Override 
+//                            public void onClick(DialogInterface dialog, int which) { 
+//                                ActivityCompat.requestPermissions(CameraActivity.this, 
+//                                        new String[] {Manifest.permission.CAMERA}, 
+//                                        REQUEST_CODE_ASK_PERMISSIONS); 
+//                            } 
+//                        }); 
+//                return; 
+//            } 
+//            ActivityCompat.requestPermissions(CameraActivity.this, 
+//                    new String[] {Manifest.permission.CAMERA}, 
+//                    REQUEST_CODE_ASK_PERMISSIONS); 
+//            return; 
+        } 
+    } 
+    
+    /**
+     * android 6.0以上版本阻止权限提示是否开启权限
+     */
+    @Override 
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) { 
+        switch (requestCode) { 
+            case REQUEST_CODE_ASK_PERMISSIONS: 
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { 
+                    // Permission Granted 
+                } else { 
+                    // Permission Denied 
+                    Toast.makeText(CameraActivity.this, "WRITE_CONTACTS Denied", Toast.LENGTH_SHORT) 
+                            .show(); 
+                } 
+                break; 
+            default: 
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults); 
+        } 
+    } 
+    
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) { 
+        new AlertDialog.Builder(CameraActivity.this) 
+                .setMessage(message) 
+                .setPositiveButton("OK", okListener) 
+                .setNegativeButton("Cancel", null) 
+                .create() 
+                .show(); 
+    } 
+    
 	/**
 	 * 保存图片路径
 	 * 
@@ -155,6 +262,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 	@Override
 	public void onClick(View view) {
+		int currentX = (int) view.getX();
 		switch (view.getId()) {
 		case R.id.photos_iv:
 //			LOG.d(TAG, "点击拍照按钮");
@@ -229,10 +337,73 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		case R.id.return_index_bt:
 			finish();
 			break;
+		case R.id.wb_auto_iv:
+			setWB(0);
+			arcSeekBar.onSmoothScroll(currentX);
+			break;
+		case R.id.wb_incandescent_iv:
+			setWB(1);
+			arcSeekBar.onSmoothScroll(currentX);
+			break;
+		case R.id.wb_warm_fluorescent_iv:
+			setWB(2);
+			arcSeekBar.onSmoothScroll(currentX);
+			break;
+		case R.id.wb_daylight_iv:
+			setWB(3);
+			arcSeekBar.onSmoothScroll(currentX);
+			break;
+		case R.id.wb_cloudy_daylight_iv:
+			setWB(4);
+			arcSeekBar.onSmoothScroll(currentX);
+			break;
 		default:
 			break;
 		}
 
+	}
+	
+	/**
+	    WHITE_BALANCE_AUTO              Constant Value: "auto" 				自动
+		WHITE_BALANCE_INCANDESCENT      Constant Value: "incandescent"    	白炽光
+		WHITE_BALANCE_FLUORESCENT		Constant Value: "fluorescent"  		日光
+		WHITE_BALANCE_WARM_FLUORESCENT	Constant Value: "warm-fluorescent"  荧光
+		WHITE_BALANCE_DAYLIGHT			Constant Value: "daylight" 			白天
+		WHITE_BALANCE_CLOUDY_DAYLIGHT	Constant Value: "cloudy-daylight" 	多云、阴天
+		WHITE_BALANCE_TWILIGHT			Constant Value: "twilight" 			黄昏
+		WHITE_BALANCE_SHADE				Constant Value: "shade" 			暧荧光灯
+	 */
+    
+	private void setWB(int value){
+		switch (value) {
+		case 0:
+			mContainer.setWB(Camera.Parameters.WHITE_BALANCE_AUTO);
+			wb_iv.setImageResource(R.drawable.wb_auto);
+			wb_tv.setText("自动");
+			break;
+		case 1:
+			mContainer.setWB(Camera.Parameters.WHITE_BALANCE_INCANDESCENT);
+			wb_iv.setImageResource(R.drawable.wb_incandescent);
+			wb_tv.setText("白炽灯");
+			break;
+		case 2:
+			mContainer.setWB(Camera.Parameters.WHITE_BALANCE_WARM_FLUORESCENT);
+			wb_iv.setImageResource(R.drawable.wb_warm_fluorescent);
+			wb_tv.setText("荧光灯");
+			break;
+		case 3:
+			mContainer.setWB(Camera.Parameters.WHITE_BALANCE_DAYLIGHT);
+			wb_iv.setImageResource(R.drawable.wb_daylight);
+			wb_tv.setText("白天");
+			break;
+		case 4:
+			mContainer.setWB(Camera.Parameters.WHITE_BALANCE_CLOUDY_DAYLIGHT);
+			wb_iv.setImageResource(R.drawable.wb_cloudy_daylight);
+			wb_tv.setText("阴天");
+			break;
+		default:
+			break;
+		}
 	}
 
 	/**
@@ -416,7 +587,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		Intent intent = new Intent(this, AlbumAty.class);
 		Bundle bundle = new Bundle();
 		int mexposureNum = mExposureNum; // 曝光
-		bundle.putInt("mexposureNum", mexposureNum);
+		bundle.putInt("mexposureNum", mexposureNum);  
+		bundle.putInt("wb_level", wb_level);  
 		intent.putExtras(bundle);
 		startActivityForResult(intent, 0);
 	}
@@ -441,8 +613,10 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			if(b!=null){
 				mExposureNum = b.getInt("mexposureNum");
 				deleteFile = b.getBoolean("deleteFile");
+				wb_level = b.getInt("wb_level");
 			}
 			mContainer.setCameraISO_int(mExposureNum,lightOn);
+			setWB(wb_level);
 			photos_iv.setEnabled(true);
 			break;
 		case 5:
@@ -490,6 +664,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
+		Point point=new Point((int)e.getX(), (int)e.getY());
+//		mContainer.setOnFocus(point); 
+		mContainer.setOnFocus(point,null);
 		return false;
 	}
 
@@ -511,6 +688,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
+		if(e1==null || e2 == null || whitebalance_rl.getVisibility()==View.VISIBLE)
+			return false;
 		if (e1.getX() - e2.getX() > 120) {
 			linearlayou_left.setVisibility(View.GONE);
 			linearlayou_right.setVisibility(View.VISIBLE);
@@ -534,7 +713,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-
 		return this.detector.onTouchEvent(event);
 	}
 
@@ -579,16 +757,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	@Override
 	  public boolean onTouch(View view, MotionEvent event) {
 		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			switch (view.getId()) {
-			case R.id.container:
-//				Log.d(TAG,"开始触摸对焦...");
-				mContainer.setOnFocus(new Point((int)event.getX(), (int)event.getY())); 
-				break;
-			}
-			break;
 		case MotionEvent.ACTION_UP:
-//			Log.d(TAG,"结束连继拍照..");
 			if(isLong){
 				photos_iv.setEnabled(false);
 				isLong = false;

@@ -43,8 +43,11 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	private List<Camera.Size> sizeList1;
 	private List<Size> mSupportList = null;
 
+	private CameraActivity cActivity;
+	
 	public CameraView(Context context) {
 		super(context);
+		cActivity = (CameraActivity) context;
 		// 初始化容
 		getHolder().addCallback(callback);
 		openCamera();
@@ -52,6 +55,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 
 	public CameraView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		cActivity = (CameraActivity) context;
 		// 初始化容
 		getHolder().addCallback(callback);
 		openCamera();
@@ -69,9 +73,12 @@ public class CameraView extends SurfaceView implements CameraOperation {
 				setCameraParameters();
 				mCamera.setPreviewDisplay(getHolder());
 			} catch (Exception e) {
-				Toast.makeText(getContext(), "打开相机失败", Toast.LENGTH_SHORT)
+				Toast.makeText(getContext(), "未获得相机权限，请到设置中授权后再尝试。", Toast.LENGTH_SHORT)
 						.show();
-				Log.e(TAG, "打开相机失败"+e.getMessage());
+				
+				Log.e(TAG, "未获得相机权限，请到设置中授权后再尝试。"+e.getMessage());
+				cActivity.finish();
+				return;
 			}
 			mCamera.startPreview();
 		}
@@ -108,14 +115,6 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 */
 	private void setCameraParameters() {
 		Camera.Parameters parameters = mCamera.getParameters();
-//		parameters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_CLOUDY_DAYLIGHT);
-//		boolean m = parameters.isAutoWhiteBalanceLockSupported();
-//		String i = parameters.getWhiteBalance();
-//		Log.e( "是否支持自动白平衡：", String.valueOf(m));
-//		Log.e( "当前白平衡：", String.valueOf(i));
-//		parameters.setAutoWhiteBalanceLock(false);
-//		String n = parameters.getWhiteBalance();
-//		int m = parameters.getMaxExposureCompensation();
 		
 		// 选择合的预览尺寸
 		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
@@ -146,9 +145,9 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		  @Override
 		  public void onAutoFocus(boolean success, Camera arg1) {
 			  if(success){
-//				  Log.d(TAG, "对焦成功");  
+				  Log.d(TAG, "对焦成功");  
 			  }else{
-//				  Log.d(TAG, "对焦失败");  
+				  Log.d(TAG, "对焦失败");  
 			  }
 		  }};
 
@@ -246,34 +245,46 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 * 手动聚焦 
 	 *  @param point 触屏坐标
 	 */
-	protected void onFocus(Point point,AutoFocusCallback callback){
+	public void onFocus(Point point){
 		mCamera.cancelAutoFocus();
-
 		Camera.Parameters parameters=mCamera.getParameters();
 		//不支持设置自定义聚焦，则使用自动聚焦，返回
 		if (parameters.getMaxNumFocusAreas()<=0) {
 			mCamera.autoFocus(autoFocusCallback);
 			return;
 		}
-		List<Area> areas=new ArrayList<Camera.Area>();
-		int left=point.x-300;
-		int top=point.y-300;
-		int right=point.x+300;
-		int bottom=point.y+300;
-		left=left<-1000?-1000:left;
-		top=top<-1000?-1000:top;
-		right=right>1000?1000:right;
-		bottom=bottom>1000?1000:bottom;
-		areas.add(new Area(new Rect(left,top,right,bottom), 100));
-		parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
-
-		parameters.setFocusAreas(areas);
-		try {
-			mCamera.setParameters(parameters);
-		} catch (Exception e) {
-			Log.e(TAG,"手动聚焦失败", e);
-		}
 		mCamera.autoFocus(autoFocusCallback);
+	}
+	
+	/**  
+	 * 手动聚焦 
+	 *  @param point 触屏坐标
+	 */
+	public void onFocus(Point point,AutoFocusCallback callback){
+		Camera.Parameters parameters=mCamera.getParameters();
+		//不支持设置自定义聚焦，则使用自动聚焦，返回
+		if (parameters.getMaxNumFocusAreas()<=0) {
+			mCamera.autoFocus(callback);
+			return;
+		}
+//		List<Area> areas=new ArrayList<Camera.Area>();
+//		int left=point.x-300;
+//		int top=point.y-300;
+//		int right=point.x+300;
+//		int bottom=point.y+300;
+//		left=left<-1000?-1000:left;
+//		top=top<-1000?-1000:top;
+//		right=right>1000?1000:right;
+//		bottom=bottom>1000?1000:bottom;
+//		areas.add(new Area(new Rect(left,top,right,bottom), 100));
+//		parameters.setFocusAreas(areas);
+//		try {
+//			mCamera.setParameters(parameters);
+//		} catch (Exception e) {
+//			Log.e(TAG,"手动聚焦失败", e);
+//		}
+//		parameters.setFocusMode(Parameters.FOCUS_MODE_MACRO);
+		mCamera.autoFocus(callback);
 	}
 	
 	@Override
@@ -300,6 +311,22 @@ public class CameraView extends SurfaceView implements CameraOperation {
             Collections.sort(mSupportList, sizeComparator);
         }
     }
+	
+	/**
+	 * 设置白平衡
+	 * @param wbValue
+	 */
+	public void setWB(String wbValue){
+		if (mCamera == null) {
+			return;
+		}
+		Camera.Parameters parameters = mCamera.getParameters();
+		if(wbValue==null){
+			return;
+		}
+		parameters.setWhiteBalance(wbValue);
+		mCamera.setParameters(parameters);
+	}
 	
 	@Override
 	public void setCameraISO(int iso,boolean lightOn) {
@@ -336,9 +363,9 @@ public class CameraView extends SurfaceView implements CameraOperation {
 			// Clamp value:
 			compensationSteps = Math.max(Math.min(compensationSteps, maxExposure), minExposure);
 			if (parameters.getExposureCompensation() == compensationSteps) {
-				Log.i(TAG, "Exposure compensation already set to "+ compensationSteps + " / " + actualCompensation);
+				Log.d(TAG, "Exposure compensation already set to "+ compensationSteps + " / " + actualCompensation);
 			} else {
-				Log.i(TAG, "Setting exposure compensation to "+ compensationSteps + " / " + actualCompensation);
+				Log.d(TAG, "Setting exposure compensation to "+ compensationSteps + " / " + actualCompensation);
 				parameters.setExposureCompensation(compensationSteps);
 			}
 		} else {

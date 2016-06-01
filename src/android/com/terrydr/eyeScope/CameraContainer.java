@@ -4,11 +4,15 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+
+import org.apache.cordova.LOG;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
 import android.media.ThumbnailUtils;
@@ -23,6 +27,8 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 
 	/** 相机绑定的SurfaceView */
 	private CameraView mCameraView;
+	
+	private FocusImageView mFocusImageView;
 
 	/** 拍照监听接口，用以在拍照始和结束后执行相应操*/
 	private TakePictureListener mListener;
@@ -60,6 +66,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	private void initView(final Context context) {
 		inflate(context, R.layout.cameracontainer, this);
 		mCameraView = (CameraView) findViewById(R.id.cameraView);
+		mFocusImageView=(FocusImageView) findViewById(R.id.focusImageView);
 	}
 
 	@Override
@@ -162,6 +169,21 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 			camera.startPreview();
 			if (mListener != null)
 				mListener.onTakePictureEnd(bm);
+		}
+	};
+	
+	private final AutoFocusCallback aFocusCallback=new AutoFocusCallback() {
+
+		@Override
+		public void onAutoFocus(boolean success, Camera camera) {
+			LOG.e(TAG, "手动对焦.....");
+			if (success) {
+				LOG.e(TAG, "手动对焦成功");
+				mFocusImageView.onFocusSuccess();
+			}else {
+				LOG.e(TAG, "手动对焦失败");
+				mFocusImageView.onFocusFailed();
+			}
 		}
 	};
 	
@@ -390,6 +412,10 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		mCameraView.setCameraISO(iso,lightOn);
 	}
 	
+	public void setWB(String wbValue){
+		mCameraView.setWB(wbValue);
+	}
+	
 	/**
 	 * @Description: 设置爆光
 	 * @return void
@@ -401,6 +427,11 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	
 	public void setOnFocus(Point point) {		
 		mCameraView.onFocus(point, null);
+	}
+	
+	public void setOnFocus(Point point,AutoFocusCallback callback) {		
+		mCameraView.onFocus(point, aFocusCallback);
+		mFocusImageView.startFocus(point);
 	}
 
 }

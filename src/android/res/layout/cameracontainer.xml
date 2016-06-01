@@ -8,7 +8,16 @@
         android:id="@+id/cameraView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    
+
+    <com.terrydr.eyeScope.FocusImageView
+        android:id="@+id/focusImageView"
+        android:layout_width="75dip"
+        android:layout_height="75dip"
+        camera:focus_fail_id="@drawable/focus_focus_failed"
+        camera:focus_focusing_id="@drawable/focus_focusing"
+        camera:focus_success_id="@drawable/focus_focused" />
+
+    <!--
     <RelativeLayout
         android:id="@+id/whitebalance_rl"
         android:layout_width="fill_parent"
@@ -18,8 +27,7 @@
         android:layout_marginBottom="180dip"
         android:layout_marginLeft="20dip"
         android:layout_marginRight="20dip"
-        android:background="@color/whitebalance_background"
-        android:visibility="gone" >
+        android:background="@color/whitebalance_background" >
 
         <ImageView
             android:id="@+id/left_iv"
@@ -53,5 +61,6 @@
             android:paddingRight="10dip"
             android:src="@drawable/whitebalance_right" />
     </RelativeLayout>
+    -->
 
 </RelativeLayout>

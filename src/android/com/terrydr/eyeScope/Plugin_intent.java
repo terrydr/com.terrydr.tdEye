@@ -23,24 +23,15 @@ public class Plugin_intent extends CordovaPlugin {
 			CallbackContext callbackContext) throws org.json.JSONException {
 		this.callbackContext = callbackContext;
 		if (action.equals("jrEyeTakePhotos")) {
-			Log.e(TAG, "jrEyeTakePhotos:" + callbackContext);
-			
-//		    PackageManager pm = cordova.getActivity().getPackageManager(); 
-//	        boolean permission = (PackageManager.PERMISSION_GRANTED ==   
-//	                pm.checkPermission("android.permission.CAMERA", "com.terrydr.eyeScope"));  
-//	        Log.e(TAG, "permission:" + permission);
-//	        if (!permission) {  
-//	        	Toast.makeText(cordova.getActivity(), "未获得相机权限，请到设置中授权后再尝试。",Toast.LENGTH_SHORT).show();
-//	        	return true;
-//	        }
+//			Log.e(TAG, "jrEyeTakePhotos:" + callbackContext);
 			this.startCameraActivity();
 			return true;
 		} else if (action.equals("jrEyeSelectPhotos")) { // 相册缩略图界面
-			Log.e(TAG, "jrEyeSelectPhotos:" + callbackContext);
+//			Log.e(TAG, "jrEyeSelectPhotos:" + callbackContext);
 			startAlbumAty();
 			return true;
 		} else if (action.equals("jrEyeScanPhotos")) { // 大图片预览界面参数{data:[图片路径，图片路径]}
-			Log.e(TAG, "jrEyeScanPhotos:" + callbackContext);
+//			Log.e(TAG, "jrEyeScanPhotos:" + callbackContext);
 			infos = args.getString(0);
 			this.startAlbumItemAty(infos);
 			return true;
@@ -61,7 +52,7 @@ public class Plugin_intent extends CordovaPlugin {
 	 * 跳转到相册缩略图界面
 	 */
 	private void startAlbumAty() {
-		Log.i(TAG, "startAlbumAty");
+//		Log.i(TAG, "startAlbumAty");
 		Intent intent = new Intent(cordova.getActivity(), AlbumAty.class);
 		Bundle bundle = new Bundle();
 		bundle.putBoolean("isPlugin", true);
@@ -89,7 +80,7 @@ public class Plugin_intent extends CordovaPlugin {
 		case 0:
 			break;
 		case 5:
-			Log.e(TAG, "5");
+//			Log.e(TAG, "5");
 			Bundle b = intent.getExtras();
 			String result_Json = b.getString("result_Json");
 			org.json.JSONObject result = null;
