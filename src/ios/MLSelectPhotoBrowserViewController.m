@@ -92,6 +92,10 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         collectionView.delegate = self;
         [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:_cellIdentifier];
         
+        UISwipeGestureRecognizer *recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(upHandleSwipe:)];
+        [recognizer setDirection:(UISwipeGestureRecognizerDirectionUp)];
+        [collectionView addGestureRecognizer:recognizer];
+        
         [self.view addSubview:collectionView];
         if (_isModelData) {
             [self.view addSubview:self.infoView];
@@ -113,29 +117,60 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     return _collectionView;
 }
 
+- (void)upHandleSwipe:(UISwipeGestureRecognizer *)sender{
+    if (sender.direction == UISwipeGestureRecognizerDirectionUp){
+        [self showDeletePictureAlert];
+    }
+}
+
+- (void)showDeletePictureAlert{
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"是否确定删除此张图片?" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    
+    // Create the actions.
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+    }];
+    UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [self trashAsset];
+    }];
+    // Add the actions.
+    [alertController addAction:cancelAction];
+    [alertController addAction:sureAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
 - (UIView *)pageControl{
     if (!_pageControl) {
         CGFloat mainWidth = CGRectGetWidth(self.view.bounds);
         _pageControl = [[UIView alloc] initWithFrame:CGRectMake(0, 100, mainWidth, 7)];
-        CGFloat padding = (mainWidth-((7+10)*_photos.count-10))/2;
-        for (int i=0; i<_photos.count; i++) {
-            CGFloat dotOriginX = padding+(7+10)*i;
-            CGFloat dotOriginY = 0.0f;
-            CGFloat dotWidth = 7.0f;
-            CGFloat dotHeight = 7.0f;
-            
-            UIView *dotView = [[UIView alloc] initWithFrame:CGRectMake(dotOriginX, dotOriginY, dotWidth, dotHeight)];
-            dotView.layer.cornerRadius = 3.5f;
-            if (i==_currentPage) {
-                _currentPageView = dotView;
-                dotView.backgroundColor = RGB(0x3691e6);
-            }else{
-                dotView.backgroundColor = [UIColor whiteColor];
-            }
-            [_pageControl addSubview:dotView];
-        }
+        [self reloadPageControl];
     }
     return _pageControl;
+}
+
+- (void)reloadPageControl{
+    for (id view in _pageControl.subviews) {
+        [view removeFromSuperview];
+    }
+    
+    CGFloat mainWidth = CGRectGetWidth(self.view.bounds);
+    CGFloat padding = (mainWidth-((7+10)*_photos.count-10))/2;
+    for (int i=0; i<_photos.count; i++) {
+        CGFloat dotOriginX = padding+(7+10)*i;
+        CGFloat dotOriginY = 0.0f;
+        CGFloat dotWidth = 7.0f;
+        CGFloat dotHeight = 7.0f;
+        
+        UIView *dotView = [[UIView alloc] initWithFrame:CGRectMake(dotOriginX, dotOriginY, dotWidth, dotHeight)];
+        dotView.layer.cornerRadius = 3.5f;
+        if (i==_currentPage) {
+            _currentPageView = dotView;
+            dotView.backgroundColor = RGB(0x3691e6);
+        }else{
+            dotView.backgroundColor = [UIColor whiteColor];
+        }
+        [_pageControl addSubview:dotView];
+    }
 }
 
 - (UIView *)infoView{
@@ -484,26 +519,33 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     NSMutableArray *trashAssets = [NSMutableArray arrayWithArray:self.photos];
     if ([trashAssets containsObject:[self.photos objectAtIndex:self.currentPage]]) {
         [trashAssets removeObject:[self.photos objectAtIndex:self.currentPage]];
+        
+        if ([_selectedModelArr isValid] && [_selectedModelArr containsObject:[self.photos objectAtIndex:self.currentPage]]) {
+            [_selectedModelArr removeObject:[self.photos objectAtIndex:self.currentPage]];
+            if (![_selectedModelArr isValid]) {
+                self.navigationItem.rightBarButtonItem.enabled = NO;
+            }
+        }
+        
+        self.currentPage --;
+        if (self.currentPage < 0) {
+            self.currentPage = 0;
+        }
         self.photos = [NSArray arrayWithArray:trashAssets];
-    }
-    self.currentPage --;
-    if (self.currentPage < 0) {
-        self.currentPage = 0;
-    }
-    if (self.deleteCallBack) {
-        self.deleteCallBack(trashAssets);
-    }
-    if (trashAssets.count == 0) {
-        [self.navigationController popViewControllerAnimated:YES];
-    }else{
-        [self setPageLabelPage:self.currentPage];
-        [self.collectionView reloadData];
+        
+        if (self.deleteCallBack) {
+            self.deleteCallBack(trashAssets);
+        }
+        if (trashAssets.count == 0) {
+            [self.navigationController popViewControllerAnimated:YES];
+        }
     }
 }
 
 #pragma mark - reloadData
 - (void) reloadData{
     
+    [self reloadPageControl];
     [self.collectionView reloadData];
     
     if (self.currentPage >= 0) {
