@@ -51,6 +51,16 @@
     return mediaPath;
 }
 
+//根据路径删除单个文件
+- (void)deleteSingleFileWithPictureName:(NSString *)pictureName isLeftEye:(BOOL)eyeType{
+    NSString *filePath = [self getImagePathWithPictureName:pictureName isLeftEye:eyeType];
+    BOOL isDir = NO;
+    if([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDir]) {
+        NSError *e = nil;
+        [[NSFileManager defaultManager] removeItemAtPath:filePath error:&e];
+    }
+}
+
 //根据路径删除文件
 - (BOOL)deleteFileWithEyeType:(BOOL)isLeftEye{
     BOOL isDir = NO;
