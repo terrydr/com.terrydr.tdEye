@@ -742,6 +742,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [CATransaction begin];
         [CATransaction setAnimationDuration:.025];
         [self.captureVideoPreviewLayer setAffineTransform:CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale)];
+        self.captureDevice.focusMode = AVCaptureFocusModeAutoFocus;
         [CATransaction commit];
     }
 }
@@ -920,6 +921,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             _rightTakenPictureCount=0;
         }
         self.title = @"0/6";
+        if (_leftTakenPictureCount==0 && _rightTakenPictureCount==0) {
+            _pictureScanView.hidden = YES;
+        }
         [[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
         //[wself takePictureMethod];
     }];
