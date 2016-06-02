@@ -758,6 +758,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [self.captureVideoPreviewLayer setAffineTransform:CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale)];
         [CATransaction commit];
     }
+    
+    if (recognizer.state == UIGestureRecognizerStateEnded) {
+        
+    }
 }
 
 #pragma mark gestureRecognizer delegate
