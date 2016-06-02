@@ -716,11 +716,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             self.effectiveScale = 1.0;
         }
         
-        NSLog(@"%f-------------->%f------------recognizerScale%f",self.effectiveScale,self.beginGestureScale,recognizer.scale);
+        CGFloat sysMaxScaleAndCropFactor = [[self.captureStillImageOutput connectionWithMediaType:AVMediaTypeVideo] videoMaxScaleAndCropFactor];
         
-        CGFloat maxScaleAndCropFactor = [[self.captureStillImageOutput connectionWithMediaType:AVMediaTypeVideo] videoMaxScaleAndCropFactor];
+        CGFloat maxScaleAndCropFactor = 5.0f<sysMaxScaleAndCropFactor?5.0f:sysMaxScaleAndCropFactor;
         
-        NSLog(@"%f",maxScaleAndCropFactor);
         if (self.effectiveScale > maxScaleAndCropFactor)
             self.effectiveScale = maxScaleAndCropFactor;
         
