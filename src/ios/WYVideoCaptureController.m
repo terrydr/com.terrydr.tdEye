@@ -150,7 +150,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }
     // 2.获得输入设备
     self.captureDevice = [self getCameraDeviceWithPosition:AVCaptureDevicePositionBack];
-    [self wbSliderMethod:_wbSlider];
+    [self wbSliderValueChanged:_wbSlider];
     if (_captureDevice == nil) {
         NSLog(@"获取输入设备失败");
         return;
@@ -586,7 +586,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         _wbSlider.value = 6000.0f;
         _wbSlider.minimumValueImage = leftImg;
         _wbSlider.maximumValueImage = rightImg;
-        [_wbSlider addTarget:self action:@selector(wbSliderMethod:) forControlEvents:UIControlEventValueChanged];
+        [_wbSlider addTarget:self
+                      action:@selector(wbSliderValueChanged:)
+            forControlEvents:UIControlEventValueChanged];
+        [_wbSlider addTarget:self
+                      action:@selector(wbSliderTouchUpInside:)
+            forControlEvents:UIControlEventTouchUpInside];
     }
     return _wbSlider;
 }
@@ -608,8 +613,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         _scaleSlider.minimumValueImage = leftImg;
         _scaleSlider.maximumValueImage = rightImg;
         [_scaleSlider addTarget:self
-                         action:@selector(scaleSliderMethod:)
+                         action:@selector(scaleSliderValueChanged:)
                forControlEvents:UIControlEventValueChanged];
+        [_scaleSlider addTarget:self
+                         action:@selector(scaleSliderTouchUpInside:)
+               forControlEvents:UIControlEventTouchUpInside];
     }
     return _scaleSlider;
 }
@@ -697,7 +705,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     };
     [self.navigationController pushViewController:browserVc animated:animated];
 }
-- (void)wbSliderMethod:(id)sender{
+- (void)wbSliderValueChanged:(id)sender{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(hideWhiteBalanceView:)
+                                               object:_whiteBalanceBtn];
     UISlider *slider = (UISlider *)sender;
     AVCaptureWhiteBalanceTemperatureAndTintValues temperatureAndTint = {
         .temperature = slider.value,
@@ -709,7 +720,16 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [_captureDevice unlockForConfiguration];
 }
 
-- (void)scaleSliderMethod:(id)sender{
+- (void)wbSliderTouchUpInside:(id)sender{
+    [self performSelector:@selector(hideWhiteBalanceView:)
+               withObject:_whiteBalanceBtn
+               afterDelay:5.0f];
+}
+
+- (void)scaleSliderValueChanged:(id)sender{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(hideScaleView)
+                                               object:nil];
     UISlider *slider = (UISlider *)sender;
     self.effectiveScale = slider.value;
     
@@ -717,6 +737,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [CATransaction setAnimationDuration:.025];
     [self.captureVideoPreviewLayer setAffineTransform:CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale)];
     [CATransaction commit];
+}
+
+- (void)scaleSliderTouchUpInside:(id)sender{
+    [self performSelector:@selector(hideScaleView) withObject:nil afterDelay:5.0f];
 }
 
 - (void)ISOBtnClick:(id)sender{
@@ -748,7 +772,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [_whiteBalanceBtn setBackgroundImage:whiteBalanceSelectedImg
                                     forState:UIControlStateNormal];
         [self performSelector:@selector(hideWhiteBalanceView:)
-                   withObject:btn afterDelay:5.0f];
+                   withObject:btn
+                   afterDelay:5.0f];
+        
         if (!_scaleView.hidden) {
             _scaleView.hidden = YES;
             _scaleSlider.hidden = YES;
