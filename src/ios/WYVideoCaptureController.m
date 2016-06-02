@@ -1002,6 +1002,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _isRightToucUpInside = NO;
     _leftTakenPictureCount = 0;
     _rightTakenPictureCount = 0;
+    self.effectiveScale = 1.0f;
+    self.beginGestureScale = 1.0f;
 }
 /// 切换拍照和视频录制
 ///
