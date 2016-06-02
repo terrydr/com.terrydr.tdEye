@@ -351,7 +351,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self prepareUI];
     
     [self.view addSubview:_viewContainer];
-    //[self.view addSubview:_progressView];
+    [_viewContainer addSubview:self.focusCursorImgView];
     [self.view addSubview:self.whiteBalanceView];
     [self.view addSubview:self.wbSlider];
     [self.view addSubview:self.toolView];
@@ -362,7 +362,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:_centerBtn];
     [self.view addSubview:_rightBtn];
     [self.view addSubview:_cameraBtn];
-    [self.view addSubview:self.focusCursorImgView];
     [self.view addSubview:self.pictureScanView];
     [self.view addSubview:self.screenFlashView];
     
