@@ -742,7 +742,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [CATransaction begin];
         [CATransaction setAnimationDuration:.025];
         [self.captureVideoPreviewLayer setAffineTransform:CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale)];
-        self.captureDevice.focusMode = AVCaptureFocusModeAutoFocus;
         [CATransaction commit];
     }
 }
@@ -973,7 +972,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     if (_isLeftEye) {
         if (_isLeftTouchDown) {
             if (_leftTakenPictureCount==6) {
-                _isLeftTouchDown = NO;
+                //_isLeftTouchDown = NO;
+                [self showBeyondLimitTakenCount];
             }else{
                 [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
             }
@@ -982,7 +982,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }else{
         if (_isRightTouchDown) {
             if (_rightTakenPictureCount==6) {
-                _isRightTouchDown = NO;
+                //_isRightTouchDown = NO;
+                [self showBeyondLimitTakenCount];
             }else{
                 [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
             }
