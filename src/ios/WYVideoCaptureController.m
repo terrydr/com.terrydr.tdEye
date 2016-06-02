@@ -25,7 +25,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 #define kVideoTotalTime 30
 #define kVideoLimit 10
 
-@interface WYVideoCaptureController (){
+@interface WYVideoCaptureController ()<UIGestureRecognizerDelegate>{
     UIBarButtonItem *_leftItem;
     CGRect _leftBtnFrame;
     CGRect _centerBtnFrame;
@@ -71,6 +71,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) AVCaptureStillImageOutput *captureStillImageOutput;
 /// 相机拍摄预览层
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *captureVideoPreviewLayer;
+/// 记录开始的缩放比例
+@property(nonatomic,assign)CGFloat beginGestureScale;
+/// 最后的缩放比例
+@property(nonatomic,assign)CGFloat effectiveScale;
 
 @end
 
@@ -383,6 +387,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     rightSwipGestureRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
     [_viewContainer addGestureRecognizer:rightSwipGestureRecognizer];
     
+    //添加缩放手势
+    UIPinchGestureRecognizer *pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
+    pinch.delegate = self;
+    [_viewContainer addGestureRecognizer:pinch];
+    
     _progressView = [[ProgressView alloc] initWithFrame:CGRectMake(0, APP_WIDTH + 44, APP_WIDTH, 5)];
     _progressView.totalTime = kVideoTotalTime;
     
@@ -687,6 +696,49 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }
 }
 
+//缩放手势 用于调整焦距
+- (void)handlePinchGesture:(UIPinchGestureRecognizer *)recognizer{
+    BOOL allTouchesAreOnThePreviewLayer = YES;
+    NSUInteger numTouches = [recognizer numberOfTouches], i;
+    for ( i = 0; i < numTouches; ++i ) {
+        CGPoint location = [recognizer locationOfTouch:i inView:self.viewContainer];
+        CGPoint convertedLocation = [self.captureVideoPreviewLayer convertPoint:location
+                                                                      fromLayer:self.captureVideoPreviewLayer.superlayer];
+        if (![self.captureVideoPreviewLayer containsPoint:convertedLocation] ) {
+            allTouchesAreOnThePreviewLayer = NO;
+            break;
+        }
+    }
+    
+    if ( allTouchesAreOnThePreviewLayer ) {
+        self.effectiveScale = self.beginGestureScale * recognizer.scale;
+        if (self.effectiveScale < 1.0){
+            self.effectiveScale = 1.0;
+        }
+        
+        NSLog(@"%f-------------->%f------------recognizerScale%f",self.effectiveScale,self.beginGestureScale,recognizer.scale);
+        
+        CGFloat maxScaleAndCropFactor = [[self.captureStillImageOutput connectionWithMediaType:AVMediaTypeVideo] videoMaxScaleAndCropFactor];
+        
+        NSLog(@"%f",maxScaleAndCropFactor);
+        if (self.effectiveScale > maxScaleAndCropFactor)
+            self.effectiveScale = maxScaleAndCropFactor;
+        
+        [CATransaction begin];
+        [CATransaction setAnimationDuration:.025];
+        [self.captureVideoPreviewLayer setAffineTransform:CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale)];
+        [CATransaction commit];
+    }
+}
+
+#pragma mark gestureRecognizer delegate
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer{
+    if ([gestureRecognizer isKindOfClass:[UIPinchGestureRecognizer class]]) {
+        self.beginGestureScale = self.effectiveScale;
+    }
+    return YES;
+}
+
 - (void)leftBtnClick:(UIButton *)btn {
     [UIView animateWithDuration:kAnimationDuration animations:^{
         _leftBtn.frame = _centerBtnFrame;
@@ -788,6 +840,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     __weak WYVideoCaptureController *wself = self;
     // 1.根据设备输出获得链接
     AVCaptureConnection *captureConnection = [_captureStillImageOutput connectionWithMediaType:AVMediaTypeVideo];
+    [captureConnection setVideoScaleAndCropFactor:self.effectiveScale];
     // 2.根据链接取得设备输出的数据
     [_captureStillImageOutput captureStillImageAsynchronouslyFromConnection:captureConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
         NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
