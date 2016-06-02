@@ -71,6 +71,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) AVCaptureStillImageOutput *captureStillImageOutput;
 /// 相机拍摄预览层
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *captureVideoPreviewLayer;
+/// 聚焦光标
+@property (nonatomic, strong) UIImageView *focusCursorImgView;
 /// 记录开始的缩放比例
 @property(nonatomic,assign)CGFloat beginGestureScale;
 /// 最后的缩放比例
@@ -360,6 +362,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:_centerBtn];
     [self.view addSubview:_rightBtn];
     [self.view addSubview:_cameraBtn];
+    [self.view addSubview:self.focusCursorImgView];
     [self.view addSubview:self.pictureScanView];
     [self.view addSubview:self.screenFlashView];
     
@@ -391,6 +394,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     UIPinchGestureRecognizer *pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
     pinch.delegate = self;
     [_viewContainer addGestureRecognizer:pinch];
+    
+    //添加点按手势，点按时聚焦
+    UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapScreenGesture:)];
+    [_viewContainer addGestureRecognizer:tapGesture];
     
     _progressView = [[ProgressView alloc] initWithFrame:CGRectMake(0, APP_WIDTH + 44, APP_WIDTH, 5)];
     _progressView.totalTime = kVideoTotalTime;
@@ -504,6 +511,16 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 - (void)pictureScanBtnClick:(id)sender{
     [self pushToPictureScan:YES];
+}
+
+- (UIImageView *)focusCursorImgView{
+    if (!_focusCursorImgView) {
+        UIImage *focusImg = [UIImage imageNamed:@"iconfont-fingerprintwithcrosshairfocus"];
+        _focusCursorImgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, focusImg.size.width, focusImg.size.height)];
+        _focusCursorImgView.alpha = 0.0f;
+        _focusCursorImgView.image = focusImg;
+    }
+    return _focusCursorImgView;
 }
 
 - (UIView *)toolView{
@@ -736,6 +753,53 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         self.beginGestureScale = self.effectiveScale;
     }
     return YES;
+}
+
+-(void)tapScreenGesture:(UITapGestureRecognizer *)tapGesture{
+    CGPoint point= [tapGesture locationInView:self.viewContainer];
+    //将UI坐标转化为摄像头坐标
+    CGPoint cameraPoint= [self.captureVideoPreviewLayer captureDevicePointOfInterestForPoint:point];
+    [self setFocusCursorWithPoint:point];
+    [self focusWithMode:AVCaptureFocusModeAutoFocus exposureMode:AVCaptureExposureModeAutoExpose atPoint:cameraPoint];
+}
+
+/**
+ *  设置聚焦光标位置
+ *
+ *  @param point 光标位置
+ */
+-(void)setFocusCursorWithPoint:(CGPoint)point{
+    self.focusCursorImgView.center=point;
+    self.focusCursorImgView.transform=CGAffineTransformMakeScale(1.2, 1.2);
+    self.focusCursorImgView.alpha=1.0;
+    [UIView animateWithDuration:1.0 animations:^{
+        self.focusCursorImgView.transform=CGAffineTransformIdentity;
+    } completion:^(BOOL finished) {
+        self.focusCursorImgView.alpha=0;
+        
+    }];
+}
+
+/**
+ *  设置聚焦点
+ *
+ *  @param point 聚焦点
+ */
+-(void)focusWithMode:(AVCaptureFocusMode)focusMode exposureMode:(AVCaptureExposureMode)exposureMode atPoint:(CGPoint)point{
+    [self changeDeviceProperty:^(AVCaptureDevice *captureDevice) {
+        if ([captureDevice isFocusModeSupported:focusMode]) {
+            [captureDevice setFocusMode:AVCaptureFocusModeAutoFocus];
+        }
+        if ([captureDevice isFocusPointOfInterestSupported]) {
+            [captureDevice setFocusPointOfInterest:point];
+        }
+        if ([captureDevice isExposureModeSupported:exposureMode]) {
+            [captureDevice setExposureMode:AVCaptureExposureModeAutoExpose];
+        }
+        if ([captureDevice isExposurePointOfInterestSupported]) {
+            [captureDevice setExposurePointOfInterest:point];
+        }
+    }];
 }
 
 - (void)leftBtnClick:(UIButton *)btn {
