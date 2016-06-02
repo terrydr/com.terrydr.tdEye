@@ -47,6 +47,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 /** 音频播放器 */
 @property (nonatomic, strong) AVPlayer *player;
 @property (nonatomic, strong) UISlider *wbSlider;
+@property (nonatomic, strong) UISlider *scaleSlider;
 @property (nonatomic, strong) UIView *viewContainer;
 @property (nonatomic, strong) ProgressView *progressView;
 @property (nonatomic, strong) UIButton *leftBtn;
@@ -569,6 +570,29 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [_wbSlider addTarget:self action:@selector(wbSliderMethod:) forControlEvents:UIControlEventValueChanged];
     }
     return _wbSlider;
+}
+
+- (UISlider *)scaleSlider{
+    if (!_scaleSlider) {
+        UIImage *leftImg = [UIImage imageNamed:@"whiteBalanceLefticon"];
+        UIImage *rightImg = [UIImage imageNamed:@"whiteBalanceRighticon"];
+        
+        CGFloat sliderWidth = CGRectGetWidth(_whiteBalanceView.bounds) - (22.0f+22.0f)/2.0f;
+        CGFloat sliderHeight = 31.0f;
+        CGFloat sliderOriginX = CGRectGetMinX(_whiteBalanceView.frame) + 22.0f/2.0f;
+        CGFloat sliderOriginY = CGRectGetMinY(_whiteBalanceView.frame) +((CGRectGetHeight(_whiteBalanceView.bounds)-sliderHeight)/2.0f);
+        _scaleSlider = [[UISlider alloc] initWithFrame:CGRectMake(sliderOriginX, sliderOriginY, sliderWidth, sliderHeight)];
+        _scaleSlider.hidden = YES;
+        _scaleSlider.minimumValue = 3000.0f;
+        _scaleSlider.maximumValue = 12000.0f;
+        _scaleSlider.value = 6000.0f;
+        _scaleSlider.minimumValueImage = leftImg;
+        _scaleSlider.maximumValueImage = rightImg;
+        [_scaleSlider addTarget:self
+                         action:@selector(wbSliderMethod:)
+               forControlEvents:UIControlEventValueChanged];
+    }
+    return _scaleSlider;
 }
 
 #pragma mark - ButtonClick
