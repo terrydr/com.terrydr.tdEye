@@ -62,6 +62,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UIButton *ISOBtn;
 @property (nonatomic, strong) UIButton *whiteBalanceBtn;
 @property (nonatomic, strong) UIView *whiteBalanceView;
+@property (nonatomic, strong) UIView *scaleView;
 
 /// 负责输入和输出设备之间数据传递
 @property (nonatomic, strong) AVCaptureSession *captureSession;
@@ -354,7 +355,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:_viewContainer];
     [_viewContainer addSubview:self.focusCursorImgView];
     [self.view addSubview:self.whiteBalanceView];
+    [self.view addSubview:self.scaleView];
     [self.view addSubview:self.wbSlider];
+    [self.view addSubview:self.scaleSlider];
     [self.view addSubview:self.toolView];
     [self.view addSubview:self.ISOBtn];
     [self.view addSubview:self.whiteBalanceBtn];
@@ -551,6 +554,22 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     return _whiteBalanceView;
 }
 
+- (UIView *)scaleView{
+    if (!_scaleView) {
+        CGFloat width = 553.0f/2.0f;
+        CGFloat height = 70.0f/2.0f;
+        CGFloat originX = (APP_WIDTH-width)/2.0f;
+        CGFloat originY = APP_HEIGHT - (200.0f+62.0f+44.0f)/2.0f;
+        _scaleView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
+        _scaleView.hidden = YES;
+        _scaleView.backgroundColor = RGB(0x000000);
+        _scaleView.alpha = 0.8f;
+        _scaleView.layer.cornerRadius = 5.0f;
+        _scaleView.layer.masksToBounds = YES;
+    }
+    return _scaleView;
+}
+
 - (UISlider *)wbSlider{
     if (!_wbSlider) {
         UIImage *leftImg = [UIImage imageNamed:@"whiteBalanceLefticon"];
@@ -574,8 +593,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (UISlider *)scaleSlider{
     if (!_scaleSlider) {
-        UIImage *leftImg = [UIImage imageNamed:@"whiteBalanceLefticon"];
-        UIImage *rightImg = [UIImage imageNamed:@"whiteBalanceRighticon"];
+        UIImage *leftImg = [UIImage imageNamed:@"educe"];
+        UIImage *rightImg = [UIImage imageNamed:@"plus"];
         
         CGFloat sliderWidth = CGRectGetWidth(_whiteBalanceView.bounds) - (22.0f+22.0f)/2.0f;
         CGFloat sliderHeight = 31.0f;
@@ -583,13 +602,13 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat sliderOriginY = CGRectGetMinY(_whiteBalanceView.frame) +((CGRectGetHeight(_whiteBalanceView.bounds)-sliderHeight)/2.0f);
         _scaleSlider = [[UISlider alloc] initWithFrame:CGRectMake(sliderOriginX, sliderOriginY, sliderWidth, sliderHeight)];
         _scaleSlider.hidden = YES;
-        _scaleSlider.minimumValue = 3000.0f;
-        _scaleSlider.maximumValue = 12000.0f;
-        _scaleSlider.value = 6000.0f;
+        _scaleSlider.minimumValue = 1.0f;
+        _scaleSlider.maximumValue = 5.0f;
+        _scaleSlider.value = 1.0f;
         _scaleSlider.minimumValueImage = leftImg;
         _scaleSlider.maximumValueImage = rightImg;
         [_scaleSlider addTarget:self
-                         action:@selector(wbSliderMethod:)
+                         action:@selector(scaleSliderMethod:)
                forControlEvents:UIControlEventValueChanged];
     }
     return _scaleSlider;
@@ -690,6 +709,16 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [_captureDevice unlockForConfiguration];
 }
 
+- (void)scaleSliderMethod:(id)sender{
+    UISlider *slider = (UISlider *)sender;
+    self.effectiveScale = slider.value;
+    
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:.025];
+    [self.captureVideoPreviewLayer setAffineTransform:CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale)];
+    [CATransaction commit];
+}
+
 - (void)ISOBtnClick:(id)sender{
     UIButton *btn = (UIButton *)sender;
     btn.selected = !btn.selected;
@@ -720,6 +749,13 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                                     forState:UIControlStateNormal];
         [self performSelector:@selector(hideWhiteBalanceView:)
                    withObject:btn afterDelay:5.0f];
+        if (!_scaleView.hidden) {
+            _scaleView.hidden = YES;
+            _scaleSlider.hidden = YES;
+            [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                                     selector:@selector(hideScaleView)
+                                                       object:nil];
+        }
     }else{
         [_whiteBalanceBtn setBackgroundImage:whiteBalanceImg
                                     forState:UIControlStateNormal];
@@ -783,9 +819,25 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [CATransaction commit];
     }
     
-    if (recognizer.state == UIGestureRecognizerStateEnded) {
-        
+    if (!_whiteBalanceView.hidden) {
+        [self whiteBalanceBtnClick:_whiteBalanceBtn];
     }
+    
+    if (_scaleView.hidden) {
+        _scaleView.hidden = NO;
+        _scaleSlider.hidden = NO;
+    }
+    
+    _scaleSlider.value = self.effectiveScale;
+    
+    if (recognizer.state == UIGestureRecognizerStateEnded) {
+        [self performSelector:@selector(hideScaleView) withObject:nil afterDelay:5.0f];
+    }
+}
+
+- (void)hideScaleView{
+    _scaleView.hidden = YES;
+    _scaleSlider.hidden = YES;
 }
 
 #pragma mark gestureRecognizer delegate
