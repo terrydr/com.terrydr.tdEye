@@ -694,10 +694,24 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     if (btn.isSelected) {
         [_whiteBalanceBtn setBackgroundImage:whiteBalanceSelectedImg
                                     forState:UIControlStateNormal];
+        [self performSelector:@selector(hideWhiteBalanceView:)
+                   withObject:btn afterDelay:5.0f];
     }else{
         [_whiteBalanceBtn setBackgroundImage:whiteBalanceImg
                                     forState:UIControlStateNormal];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                                 selector:@selector(hideWhiteBalanceView:)
+                                                   object:btn];
     }
+}
+
+- (void)hideWhiteBalanceView:(UIButton *)btn{
+    btn.selected = !btn.isSelected;
+    _whiteBalanceView.hidden = !_whiteBalanceView.hidden;
+    _wbSlider.hidden = !_wbSlider.hidden;
+    UIImage *whiteBalanceImg = [UIImage imageNamed:@"white-balance-icon"];
+    [_whiteBalanceBtn setBackgroundImage:whiteBalanceImg
+                                forState:UIControlStateNormal];
 }
 
 - (void)handleSwipes:(UISwipeGestureRecognizer *)sender{
