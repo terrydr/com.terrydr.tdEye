@@ -109,6 +109,16 @@
         <resource-file src="src/ios/selectedicon@3x.png" />
         <resource-file src="src/ios/Submit-icon@2x.png" />
         <resource-file src="src/ios/Submit-icon@3x.png" />
+        <resource-file src="src/ios/iconfont-fingerprintwithcrosshairfocus.png" />
+        <resource-file src="src/ios/iconfont-fingerprintwithcrosshairfocus@2x.png" />
+        <resource-file src="src/ios/iconfont-fingerprintwithcrosshairfocus@3x.png" />
+        <resource-file src="src/ios/educe.png" />
+        <resource-file src="src/ios/educe@2x.png" />
+        <resource-file src="src/ios/educe@3x.png" />
+        <resource-file src="src/ios/plus.png" />
+        <resource-file src="src/ios/plus@2x.png" />
+        <resource-file src="src/ios/plus@3x.png" />
+        <resource-file src="src/ios/silent.m4a" />
     </platform>
     
 	<platform name="android">

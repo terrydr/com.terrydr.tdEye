@@ -7,6 +7,7 @@
 //
 
 #import "WYVideoCaptureController.h"
+#import <MediaPlayer/MediaPlayer.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIView+Extension.h"
@@ -14,7 +15,9 @@
 #import "ProgressView.h"
 #import "UIView+AutoLayoutViews.h"
 #import "JRMediaFileManage.h"
-#import "PictureScanViewController.h"
+#import "JRPictureModel.h"
+#import "ZQBaseClassesExtended.h"
+#import "MLSelectPhotoBrowserViewController.h"
 
 typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 #define kAnimationDuration 0.2
@@ -22,7 +25,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 #define kVideoTotalTime 30
 #define kVideoLimit 10
 
-@interface WYVideoCaptureController (){
+@interface WYVideoCaptureController ()<UIGestureRecognizerDelegate>{
     UIBarButtonItem *_leftItem;
     CGRect _leftBtnFrame;
     CGRect _centerBtnFrame;
@@ -37,7 +40,14 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     int _leftTakenPictureCount;
     int _rightTakenPictureCount;
 }
+/** 音量View*/
+@property (nonatomic, strong) MPVolumeView *volumeView;
+/** 设置音量滚动View*/
+@property (nonatomic, strong) UISlider *volumeViewSlider;
+/** 音频播放器 */
+@property (nonatomic, strong) AVPlayer *player;
 @property (nonatomic, strong) UISlider *wbSlider;
+@property (nonatomic, strong) UISlider *scaleSlider;
 @property (nonatomic, strong) UIView *viewContainer;
 @property (nonatomic, strong) ProgressView *progressView;
 @property (nonatomic, strong) UIButton *leftBtn;
@@ -45,9 +55,14 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UIButton *rightBtn;
 @property (nonatomic, strong) UIButton *cameraBtn;
 @property (nonatomic, strong) UIView *toolView;
+@property (strong, nonatomic) UIView *screenFlashView;
+@property (nonatomic, strong) UIView *pictureScanView;
+@property (nonatomic, strong) UIImageView *pictureScanImgView;
+@property (nonatomic, strong) UIButton *pictureScanBtn;
 @property (nonatomic, strong) UIButton *ISOBtn;
 @property (nonatomic, strong) UIButton *whiteBalanceBtn;
 @property (nonatomic, strong) UIView *whiteBalanceView;
+@property (nonatomic, strong) UIView *scaleView;
 
 /// 负责输入和输出设备之间数据传递
 @property (nonatomic, strong) AVCaptureSession *captureSession;
@@ -58,6 +73,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) AVCaptureStillImageOutput *captureStillImageOutput;
 /// 相机拍摄预览层
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *captureVideoPreviewLayer;
+/// 聚焦光标
+@property (nonatomic, strong) UIImageView *focusCursorImgView;
+/// 记录开始的缩放比例
+@property(nonatomic,assign)CGFloat beginGestureScale;
+/// 最后的缩放比例
+@property(nonatomic,assign)CGFloat effectiveScale;
 
 @end
 
@@ -66,11 +87,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.view.backgroundColor = RGB(0x16161b);
     [self setupUI];
     [self initTakenParameters];
     [self ChangeToLeft:YES];
     [self setupCaptureView];
-    self.view.backgroundColor = RGB(0x16161b);
+    [self configureVolumeTool];
     
     if (_isScan) {
         [self pushToPictureScan:NO];
@@ -113,7 +135,28 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)leftBarButtonItemAction{
-    [self dismissViewControllerAnimated:YES completion:nil];
+    if (_leftTakenPictureCount==0 && _rightTakenPictureCount==0) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            
+        }];
+        
+        return;
+    }
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"是否放弃当前拍摄图片" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    
+    // Create the actions.
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+    }];
+    UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            
+        }];
+    }];
+    // Add the actions.
+    [alertController addAction:cancelAction];
+    [alertController addAction:sureAction];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)cleanOlderData{
@@ -128,7 +171,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }
     // 2.获得输入设备
     self.captureDevice = [self getCameraDeviceWithPosition:AVCaptureDevicePositionBack];
-    [self wbSliderMethod:_wbSlider];
+    [self wbSliderValueChanged:_wbSlider];
     if (_captureDevice == nil) {
         NSLog(@"获取输入设备失败");
         return;
@@ -217,14 +260,125 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
 }
 
+#pragma mark - configureVolumeTool
+- (void)configureVolumeTool{
+    //1.获取音量监听视图
+    [self p_getVolumeView];
+    
+    //2.隐藏音量Icon
+    [self p_hiddIcon];
+    
+    //3.监听点击音量键事件
+    [self p_addObserver];
+    
+    //4.监听打开控制中心
+    [self p_addObserverControlCenter];
+    
+    //5.获取当前系统音量
+    [self p_getSystemVolume];
+    
+    //6.耳机中间键远程遥控需要播放一段音频激活，否则无法使用
+    [self.player play];
+    
+    //7.开始接收远程遥控事件,耳机中间键
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+}
+
+/**
+ *  获取音量监听视图
+ */
+- (void)p_getVolumeView {
+    self.volumeView = [[MPVolumeView alloc] init];
+    for (UIView *view in [self.volumeView subviews]){
+        if ([view.class.description isEqualToString:@"MPVolumeSlider"]){
+            self.volumeViewSlider = (UISlider*)view;
+            break;
+        }
+    }
+}
+
+/**
+ *  隐藏音量Icon
+ */
+- (void)p_hiddIcon {
+    self.volumeView.frame = CGRectMake(-1000, -100, 100, 100);
+    self.volumeView.hidden = NO;
+    [self.view  addSubview:self.volumeView];
+}
+
+/**
+ *  监听点击音量键事件
+ */
+- (void)p_addObserver {
+    NSError *error;
+    [[AVAudioSession sharedInstance] setActive:YES error:&error];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cameraBtnTouchUpInside:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+}
+
+/**
+ *  应用程序失效或者再次进入前台，会走以下两个通知
+ */
+- (void)p_addObserverControlCenter {
+    //应用程序将要进入后台之前
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willResignActive) name:UIApplicationWillResignActiveNotification object:nil];
+    //应用程序切回到前台
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
+/**
+ *  APP挂起时，取消对音量键的监听
+ */
+- (void)willResignActive {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+    
+    //结束远程遥控
+    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
+}
+
+/**
+ *  重新进去前台
+ */
+- (void)didBecomeActive {
+    //重新监听音量改变事件
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cameraBtnTouchUpInside:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+    
+    //进入前台后，重新设置player状态为播放
+    [self.player play];
+    
+    //开始远程遥控
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+}
+
+/**
+ *  获取系统音量
+ */
+- (void)p_getSystemVolume {
+}
+
+#pragma mark - Lazy
+/**
+ *  加载音频播放文件
+ */
+- (AVPlayer *)player {
+    if (_player == nil) {
+        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"silent.m4a" ofType:nil];
+        NSURL *url = [NSURL fileURLWithPath:filePath];
+        _player = [[AVPlayer alloc] initWithURL:url];
+        [_player setVolume:0.0];
+    }
+    return _player;
+}
+
 #pragma mark - UI设计
 - (void)setupUI {
     [self prepareUI];
     
     [self.view addSubview:_viewContainer];
-    //[self.view addSubview:_progressView];
+    [_viewContainer addSubview:self.focusCursorImgView];
     [self.view addSubview:self.whiteBalanceView];
+    [self.view addSubview:self.scaleView];
     [self.view addSubview:self.wbSlider];
+    [self.view addSubview:self.scaleSlider];
     [self.view addSubview:self.toolView];
     [self.view addSubview:self.ISOBtn];
     [self.view addSubview:self.whiteBalanceBtn];
@@ -233,17 +387,19 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self.view addSubview:_centerBtn];
     [self.view addSubview:_rightBtn];
     [self.view addSubview:_cameraBtn];
+    [self.view addSubview:self.pictureScanView];
+    [self.view addSubview:self.screenFlashView];
     
     CGFloat viewContainerHeight = APP_HEIGHT-64-CGRectGetHeight(self.toolView.bounds);
     _viewContainer.frame = CGRectMake(0, 64, APP_WIDTH, viewContainerHeight);
     _progressView.frame = CGRectMake(0, CGRectGetMaxY(_viewContainer.frame), APP_WIDTH, 5);
     CGFloat btnW = 40;
-    CGFloat leftBtnX = (APP_WIDTH - 3 * btnW - 2 * 32) *0.5;
+    CGFloat leftBtnX = (APP_WIDTH - 3 * btnW - 2 * 20) *0.5;
     CGFloat leftBtnY = APP_HEIGHT-62-btnW;
     
     _leftBtnFrame = CGRectMake(leftBtnX, leftBtnY, btnW, btnW);
-    _centerBtnFrame = CGRectOffset(_leftBtnFrame, 32 + btnW, 0);
-    _rightBtnFrame = CGRectOffset(_centerBtnFrame, 32 + btnW, 0);
+    _centerBtnFrame = CGRectOffset(_leftBtnFrame, 20 + btnW, 0);
+    _rightBtnFrame = CGRectOffset(_centerBtnFrame, 20 + btnW, 0);
     [self restoreBtn];
     _cameraBtn.frame = CGRectMake((APP_WIDTH - 67) * 0.5, APP_HEIGHT-62, 62, 62);
 }
@@ -257,6 +413,15 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     UISwipeGestureRecognizer *rightSwipGestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipes:)];
     rightSwipGestureRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
     [_viewContainer addGestureRecognizer:rightSwipGestureRecognizer];
+    
+    //添加缩放手势
+    UIPinchGestureRecognizer *pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
+    pinch.delegate = self;
+    [_viewContainer addGestureRecognizer:pinch];
+    
+    //添加点按手势，点按时聚焦
+    UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapScreenGesture:)];
+    [_viewContainer addGestureRecognizer:tapGesture];
     
     _progressView = [[ProgressView alloc] initWithFrame:CGRectMake(0, APP_WIDTH + 44, APP_WIDTH, 5)];
     _progressView.totalTime = kVideoTotalTime;
@@ -313,6 +478,75 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     return _whiteBalanceBtn;
 }
 
+- (UIView *)screenFlashView{
+    if (!_screenFlashView) {
+        _screenFlashView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, APP_WIDTH, APP_HEIGHT-100.0f)];
+        _screenFlashView.backgroundColor = [UIColor blackColor];
+        [_screenFlashView setAlpha:0];
+    }
+    return _screenFlashView;
+}
+
+- (void)begainScreenFlashAnimation{
+    [self.screenFlashView setAlpha:1];
+    [UIView animateWithDuration:0.3f animations:^{
+        [self.screenFlashView setAlpha:0.0f];
+    }];
+}
+
+- (UIView *)pictureScanView{
+    if (!_pictureScanView) {
+        CGFloat scanViewWidth = 110.0f/2.0f;
+        CGFloat scanViewHeight = 110.0f/2.0f;
+        CGFloat scanViewOriginX = 10.0f;
+        CGFloat scanViewOriginY = APP_HEIGHT-scanViewHeight-5.0f;
+        _pictureScanView = [[UIView alloc] initWithFrame:CGRectMake(scanViewOriginX, scanViewOriginY, scanViewWidth, scanViewHeight)];
+        _pictureScanView.hidden = YES;
+        [_pictureScanView addSubview:self.pictureScanImgView];
+        [_pictureScanView addSubview:self.pictureScanBtn];
+    }
+    return _pictureScanView;
+}
+
+- (UIImageView *)pictureScanImgView{
+    if (!_pictureScanImgView) {
+        CGFloat scanImgViewWidth = 110.0f/2.0f;
+        CGFloat scanImgViewHeight = 110.0f/2.0f;
+        CGFloat scanImgViewOriginX = 0.0f;
+        CGFloat scanImgViewOriginY = 0.0f;
+        _pictureScanImgView = [[UIImageView alloc] initWithFrame:CGRectMake(scanImgViewOriginX, scanImgViewOriginY, scanImgViewWidth, scanImgViewHeight)];
+    }
+    return _pictureScanImgView;
+}
+
+- (UIButton *)pictureScanBtn{
+    if (!_pictureScanBtn) {
+        CGFloat psWidth = 110.0f/2.0f;
+        CGFloat psHeight = 110.0f/2.0f;
+        CGFloat psOriginX = 0.0f;
+        CGFloat psOriginY = 0.0f;
+        _pictureScanBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _pictureScanBtn.frame = CGRectMake(psOriginX, psOriginY, psWidth, psHeight);
+        [_pictureScanBtn addTarget:self
+                            action:@selector(pictureScanBtnClick:)
+                  forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _pictureScanBtn;
+}
+- (void)pictureScanBtnClick:(id)sender{
+    [self pushToPictureScan:YES];
+}
+
+- (UIImageView *)focusCursorImgView{
+    if (!_focusCursorImgView) {
+        UIImage *focusImg = [UIImage imageNamed:@"iconfont-fingerprintwithcrosshairfocus"];
+        _focusCursorImgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, focusImg.size.width, focusImg.size.height)];
+        _focusCursorImgView.alpha = 0.0f;
+        _focusCursorImgView.image = focusImg;
+    }
+    return _focusCursorImgView;
+}
+
 - (UIView *)toolView{
     if (!_toolView) {
         CGFloat toolWidth = APP_WIDTH;
@@ -330,7 +564,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat width = 553.0f/2.0f;
         CGFloat height = 70.0f/2.0f;
         CGFloat originX = (APP_WIDTH-width)/2.0f;
-        CGFloat originY = APP_HEIGHT - (324.0f+62.0f+44.0f)/2.0f;
+        CGFloat originY = APP_HEIGHT - (200.0f+62.0f+44.0f)/2.0f;
         _whiteBalanceView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
         _whiteBalanceView.hidden = YES;
         _whiteBalanceView.backgroundColor = RGB(0x000000);
@@ -339,6 +573,22 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         _whiteBalanceView.layer.masksToBounds = YES;
     }
     return _whiteBalanceView;
+}
+
+- (UIView *)scaleView{
+    if (!_scaleView) {
+        CGFloat width = 553.0f/2.0f;
+        CGFloat height = 70.0f/2.0f;
+        CGFloat originX = (APP_WIDTH-width)/2.0f;
+        CGFloat originY = APP_HEIGHT - (200.0f+62.0f+44.0f)/2.0f;
+        _scaleView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
+        _scaleView.hidden = YES;
+        _scaleView.backgroundColor = RGB(0x000000);
+        _scaleView.alpha = 0.8f;
+        _scaleView.layer.cornerRadius = 5.0f;
+        _scaleView.layer.masksToBounds = YES;
+    }
+    return _scaleView;
 }
 
 - (UISlider *)wbSlider{
@@ -357,17 +607,129 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         _wbSlider.value = 6000.0f;
         _wbSlider.minimumValueImage = leftImg;
         _wbSlider.maximumValueImage = rightImg;
-        [_wbSlider addTarget:self action:@selector(wbSliderMethod:) forControlEvents:UIControlEventValueChanged];
+        [_wbSlider addTarget:self
+                      action:@selector(wbSliderValueChanged:)
+            forControlEvents:UIControlEventValueChanged];
+        [_wbSlider addTarget:self
+                      action:@selector(wbSliderTouchUpInside:)
+            forControlEvents:UIControlEventTouchUpInside];
     }
     return _wbSlider;
 }
 
+- (UISlider *)scaleSlider{
+    if (!_scaleSlider) {
+        UIImage *leftImg = [UIImage imageNamed:@"educe"];
+        UIImage *rightImg = [UIImage imageNamed:@"plus"];
+        
+        CGFloat sliderWidth = CGRectGetWidth(_whiteBalanceView.bounds) - (22.0f+22.0f)/2.0f;
+        CGFloat sliderHeight = 31.0f;
+        CGFloat sliderOriginX = CGRectGetMinX(_whiteBalanceView.frame) + 22.0f/2.0f;
+        CGFloat sliderOriginY = CGRectGetMinY(_whiteBalanceView.frame) +((CGRectGetHeight(_whiteBalanceView.bounds)-sliderHeight)/2.0f);
+        _scaleSlider = [[UISlider alloc] initWithFrame:CGRectMake(sliderOriginX, sliderOriginY, sliderWidth, sliderHeight)];
+        _scaleSlider.hidden = YES;
+        _scaleSlider.minimumValue = 1.0f;
+        _scaleSlider.maximumValue = 5.0f;
+        _scaleSlider.value = 1.0f;
+        _scaleSlider.minimumValueImage = leftImg;
+        _scaleSlider.maximumValueImage = rightImg;
+        [_scaleSlider addTarget:self
+                         action:@selector(scaleSliderValueChanged:)
+               forControlEvents:UIControlEventValueChanged];
+        [_scaleSlider addTarget:self
+                         action:@selector(scaleSliderTouchUpInside:)
+               forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _scaleSlider;
+}
+
 #pragma mark - ButtonClick
 - (void)pushToPictureScan:(BOOL)animated{
-    PictureScanViewController *scanVc = [[PictureScanViewController alloc] init];
-    [self.navigationController pushViewController:scanVc animated:animated];
+    MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
+    [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
+    browserVc.isModelData = YES;
+    browserVc.currentPage = 0;
+    
+    NSMutableArray *leftEyeDataArr = [[NSMutableArray alloc] initWithCapacity:0];
+    NSMutableArray *rightEyeDataArr = [[NSMutableArray alloc] initWithCapacity:0];
+    NSMutableArray *tempMutableArr = [[NSMutableArray alloc] initWithCapacity:0];
+    
+    NSString *leftFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:YES];
+    NSError *le = nil;
+    NSArray *leftFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:leftFilePath error:&le];
+    NSLog(@"leftFileArr:%@",leftFileArr);
+    NSString *rightFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:NO];
+    NSError *re = nil;
+    NSArray *rightFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:rightFilePath error:&re];
+    NSLog(@"rightFileArr:%@",rightFileArr);
+    
+    if ([leftFileArr isValid]) {
+        for (NSString *fileName in leftFileArr) {
+            JRPictureModel *picture = [[JRPictureModel alloc] init];
+            picture.pictureName = fileName;
+            picture.isSelected = NO;
+            [leftEyeDataArr addObject:picture];
+        }
+        
+        [tempMutableArr addObjectsFromArray:leftEyeDataArr];
+        browserVc.leftCount = leftFileArr.count;
+        
+        if ([rightFileArr isValid]) {
+            for (NSString *fileName in rightFileArr) {
+                JRPictureModel *picture = [[JRPictureModel alloc] init];
+                picture.pictureName = fileName;
+                picture.isSelected = NO;
+                [rightEyeDataArr addObject:picture];
+            }
+            
+            [tempMutableArr addObjectsFromArray:rightEyeDataArr];
+            browserVc.rightCount = rightFileArr.count;
+        }else{
+            browserVc.rightCount = 0;
+        }
+    }else{
+        browserVc.leftCount = 0;
+        
+        if ([rightFileArr isValid]) {
+            for (NSString *fileName in rightFileArr) {
+                JRPictureModel *picture = [[JRPictureModel alloc] init];
+                picture.pictureName = fileName;
+                picture.isSelected = NO;
+                [rightEyeDataArr addObject:picture];
+            }
+            
+            [tempMutableArr addObjectsFromArray:rightEyeDataArr];
+            browserVc.rightCount = rightFileArr.count;
+        }else{
+            browserVc.rightCount = 0;
+        }
+    }
+    
+    browserVc.photos = [NSArray arrayWithArray:tempMutableArr];
+    browserVc.selectedModelArr = [NSMutableArray arrayWithCapacity:0];
+    browserVc.mlLeftselectedArr = [NSMutableArray arrayWithCapacity:0];
+    browserVc.mlRightselectedArr = [NSMutableArray arrayWithCapacity:0];
+    browserVc.deleteCallBack = ^(NSArray *assets,NSString *eyeType){
+        if ([eyeType isEqualToString:@"left"]) {
+            _leftTakenPictureCount--;
+        }else{
+            _rightTakenPictureCount--;
+        }
+        if (_isLeftEye) {
+            self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
+        }else{
+            self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
+        }
+        if (_leftTakenPictureCount==0 && _rightTakenPictureCount==0) {
+            _pictureScanView.hidden = YES;
+        }
+    };
+    [self.navigationController pushViewController:browserVc animated:animated];
 }
-- (void)wbSliderMethod:(id)sender{
+- (void)wbSliderValueChanged:(id)sender{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(hideWhiteBalanceView:)
+                                               object:_whiteBalanceBtn];
     UISlider *slider = (UISlider *)sender;
     AVCaptureWhiteBalanceTemperatureAndTintValues temperatureAndTint = {
         .temperature = slider.value,
@@ -377,6 +739,29 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [_captureDevice lockForConfiguration:nil];
     [_captureDevice setWhiteBalanceModeLockedWithDeviceWhiteBalanceGains:wbGains completionHandler:nil];
     [_captureDevice unlockForConfiguration];
+}
+
+- (void)wbSliderTouchUpInside:(id)sender{
+    [self performSelector:@selector(hideWhiteBalanceView:)
+               withObject:_whiteBalanceBtn
+               afterDelay:5.0f];
+}
+
+- (void)scaleSliderValueChanged:(id)sender{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(hideScaleView)
+                                               object:nil];
+    UISlider *slider = (UISlider *)sender;
+    self.effectiveScale = slider.value;
+    
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:.025];
+    [self.captureVideoPreviewLayer setAffineTransform:CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale)];
+    [CATransaction commit];
+}
+
+- (void)scaleSliderTouchUpInside:(id)sender{
+    [self performSelector:@selector(hideScaleView) withObject:nil afterDelay:5.0f];
 }
 
 - (void)ISOBtnClick:(id)sender{
@@ -407,10 +792,33 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     if (btn.isSelected) {
         [_whiteBalanceBtn setBackgroundImage:whiteBalanceSelectedImg
                                     forState:UIControlStateNormal];
+        [self performSelector:@selector(hideWhiteBalanceView:)
+                   withObject:btn
+                   afterDelay:5.0f];
+        
+        if (!_scaleView.hidden) {
+            _scaleView.hidden = YES;
+            _scaleSlider.hidden = YES;
+            [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                                     selector:@selector(hideScaleView)
+                                                       object:nil];
+        }
     }else{
         [_whiteBalanceBtn setBackgroundImage:whiteBalanceImg
                                     forState:UIControlStateNormal];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                                 selector:@selector(hideWhiteBalanceView:)
+                                                   object:btn];
     }
+}
+
+- (void)hideWhiteBalanceView:(UIButton *)btn{
+    btn.selected = !btn.isSelected;
+    _whiteBalanceView.hidden = !_whiteBalanceView.hidden;
+    _wbSlider.hidden = !_wbSlider.hidden;
+    UIImage *whiteBalanceImg = [UIImage imageNamed:@"white-balance-icon"];
+    [_whiteBalanceBtn setBackgroundImage:whiteBalanceImg
+                                forState:UIControlStateNormal];
 }
 
 - (void)handleSwipes:(UISwipeGestureRecognizer *)sender{
@@ -423,6 +831,115 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             [self leftBtnClick:nil];
         }
     }
+}
+
+//缩放手势 用于调整焦距
+- (void)handlePinchGesture:(UIPinchGestureRecognizer *)recognizer{
+    BOOL allTouchesAreOnThePreviewLayer = YES;
+    NSUInteger numTouches = [recognizer numberOfTouches], i;
+    for ( i = 0; i < numTouches; ++i ) {
+        CGPoint location = [recognizer locationOfTouch:i inView:self.viewContainer];
+        CGPoint convertedLocation = [self.captureVideoPreviewLayer convertPoint:location
+                                                                      fromLayer:self.captureVideoPreviewLayer.superlayer];
+        if (![self.captureVideoPreviewLayer containsPoint:convertedLocation] ) {
+            allTouchesAreOnThePreviewLayer = NO;
+            break;
+        }
+    }
+    
+    if ( allTouchesAreOnThePreviewLayer ) {
+        self.effectiveScale = self.beginGestureScale * recognizer.scale;
+        if (self.effectiveScale < 1.0){
+            self.effectiveScale = 1.0;
+        }
+        
+        CGFloat sysMaxScaleAndCropFactor = [[self.captureStillImageOutput connectionWithMediaType:AVMediaTypeVideo] videoMaxScaleAndCropFactor];
+        
+        CGFloat maxScaleAndCropFactor = 5.0f<sysMaxScaleAndCropFactor?5.0f:sysMaxScaleAndCropFactor;
+        
+        if (self.effectiveScale > maxScaleAndCropFactor)
+            self.effectiveScale = maxScaleAndCropFactor;
+        
+        [CATransaction begin];
+        [CATransaction setAnimationDuration:.025];
+        [self.captureVideoPreviewLayer setAffineTransform:CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale)];
+        [CATransaction commit];
+    }
+    
+    if (!_whiteBalanceView.hidden) {
+        [self whiteBalanceBtnClick:_whiteBalanceBtn];
+    }
+    
+    if (_scaleView.hidden) {
+        _scaleView.hidden = NO;
+        _scaleSlider.hidden = NO;
+    }
+    
+    _scaleSlider.value = self.effectiveScale;
+    
+    if (recognizer.state == UIGestureRecognizerStateEnded) {
+        [self performSelector:@selector(hideScaleView) withObject:nil afterDelay:5.0f];
+    }
+}
+
+- (void)hideScaleView{
+    _scaleView.hidden = YES;
+    _scaleSlider.hidden = YES;
+}
+
+#pragma mark gestureRecognizer delegate
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer{
+    if ([gestureRecognizer isKindOfClass:[UIPinchGestureRecognizer class]]) {
+        self.beginGestureScale = self.effectiveScale;
+    }
+    return YES;
+}
+
+-(void)tapScreenGesture:(UITapGestureRecognizer *)tapGesture{
+    CGPoint point= [tapGesture locationInView:self.viewContainer];
+    //将UI坐标转化为摄像头坐标
+    CGPoint cameraPoint= [self.captureVideoPreviewLayer captureDevicePointOfInterestForPoint:point];
+    [self setFocusCursorWithPoint:point];
+    [self focusWithMode:AVCaptureFocusModeAutoFocus exposureMode:AVCaptureExposureModeAutoExpose atPoint:cameraPoint];
+}
+
+/**
+ *  设置聚焦光标位置
+ *
+ *  @param point 光标位置
+ */
+-(void)setFocusCursorWithPoint:(CGPoint)point{
+    self.focusCursorImgView.center=point;
+    self.focusCursorImgView.transform=CGAffineTransformMakeScale(1.2, 1.2);
+    self.focusCursorImgView.alpha=1.0;
+    [UIView animateWithDuration:1.0 animations:^{
+        self.focusCursorImgView.transform=CGAffineTransformIdentity;
+    } completion:^(BOOL finished) {
+        self.focusCursorImgView.alpha=0;
+        
+    }];
+}
+
+/**
+ *  设置聚焦点
+ *
+ *  @param point 聚焦点
+ */
+-(void)focusWithMode:(AVCaptureFocusMode)focusMode exposureMode:(AVCaptureExposureMode)exposureMode atPoint:(CGPoint)point{
+    [self changeDeviceProperty:^(AVCaptureDevice *captureDevice) {
+        if ([captureDevice isFocusModeSupported:focusMode]) {
+            [captureDevice setFocusMode:AVCaptureFocusModeAutoFocus];
+        }
+        if ([captureDevice isFocusPointOfInterestSupported]) {
+            [captureDevice setFocusPointOfInterest:point];
+        }
+        if ([captureDevice isExposureModeSupported:exposureMode]) {
+            [captureDevice setExposureMode:AVCaptureExposureModeAutoExpose];
+        }
+        if ([captureDevice isExposurePointOfInterestSupported]) {
+            [captureDevice setExposurePointOfInterest:point];
+        }
+    }];
 }
 
 - (void)leftBtnClick:(UIButton *)btn {
@@ -511,15 +1028,22 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)takePictureMethodCore{
+    if (!_cameraBtn.userInteractionEnabled) {
+        return;
+    }
     if (_isLeftEye) {
         _leftTakenPictureCount++;
     }else{
         _rightTakenPictureCount++;
     }
     
+    _cameraBtn.userInteractionEnabled = NO;
+    _pictureScanBtn.userInteractionEnabled = NO;
+    
     __weak WYVideoCaptureController *wself = self;
     // 1.根据设备输出获得链接
     AVCaptureConnection *captureConnection = [_captureStillImageOutput connectionWithMediaType:AVMediaTypeVideo];
+    [captureConnection setVideoScaleAndCropFactor:self.effectiveScale];
     // 2.根据链接取得设备输出的数据
     [_captureStillImageOutput captureStillImageAsynchronouslyFromConnection:captureConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
         NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
@@ -528,7 +1052,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)showBeyondLimitTakenCount{
-    __weak WYVideoCaptureController *wself = self;
+    //__weak WYVideoCaptureController *wself = self;
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"单侧眼睛最多拍摄六张图片,是否重拍?" message:nil preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"重拍" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         if (_isLeftEye) {
@@ -537,13 +1061,16 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             _rightTakenPictureCount=0;
         }
         self.title = @"0/6";
+        if (_leftTakenPictureCount==0 && _rightTakenPictureCount==0) {
+            _pictureScanView.hidden = YES;
+        }
         [[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
         //[wself takePictureMethod];
     }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
         dispatch_async(dispatch_get_main_queue(), ^{
             // 更新界面
-            [wself pushToPictureScan:YES];
+            //[wself pushToPictureScan:YES];
         });
     }];
     // Add the actions.
@@ -553,14 +1080,19 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)saveTakenPictureData:(NSData *)imgData{
+    [self begainScreenFlashAnimation];
     if (_isLeftEye) {
         self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
     }else{
         self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
     }
+    if (_pictureScanView.hidden) {
+        _pictureScanView.hidden = NO;
+    }
     
     UIImage *image = [UIImage imageWithData:imgData];
     UIImage *saveImg = [self cropImage:image withCropSize:self.viewContainer.size];
+    _pictureScanImgView.image = saveImg;
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
     
     JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
@@ -572,32 +1104,31 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         imageName = [NSString stringWithFormat:@"%02d.jpg",_rightTakenPictureCount];
     }
     NSString *imgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    BOOL result = [fileManager createFileAtPath:imgPath
-                                       contents:saveImgData
-                                     attributes:nil];
+    BOOL result = [fileManage saveFileWithPath:imgPath fileData:saveImgData];
     NSLog(@"result:%d",result);
+    
+    _cameraBtn.userInteractionEnabled = YES;
+    _pictureScanBtn.userInteractionEnabled = YES;
+    
     if (_isLeftEye) {
         if (_isLeftTouchDown) {
             if (_leftTakenPictureCount==6) {
-                _isLeftTouchDown = NO;
-                [self pushToPictureScan:YES];
+                //_isLeftTouchDown = NO;
+                [self showBeyondLimitTakenCount];
             }else{
                 [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
             }
         }else{
-            [self pushToPictureScan:YES];
         }
     }else{
         if (_isRightTouchDown) {
             if (_rightTakenPictureCount==6) {
-                _isRightTouchDown = NO;
-                [self pushToPictureScan:YES];
+                //_isRightTouchDown = NO;
+                [self showBeyondLimitTakenCount];
             }else{
                 [self performSelector:@selector(takePictureMethod) withObject:nil afterDelay:0.2f];
             }
         }else{
-            [self pushToPictureScan:YES];
         }
     }
 }
@@ -617,6 +1148,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _isRightToucUpInside = NO;
     _leftTakenPictureCount = 0;
     _rightTakenPictureCount = 0;
+    self.effectiveScale = 1.0f;
+    self.beginGestureScale = 1.0f;
 }
 /// 切换拍照和视频录制
 ///

@@ -17,6 +17,10 @@
 - (NSString *)getPictureSign;
 //图片储路径
 - (NSString *)getJRMediaPathWithType:(BOOL)isLeft;
+//根据路径保存文件
+- (BOOL)saveFileWithPath:(NSString *)filePath fileData:(NSData *)data;
+//根据路径删除单个文件
+- (void)deleteSingleFileWithPictureName:(NSString *)pictureName isLeftEye:(BOOL)eyeType;
 //根据路径删除文件
 - (BOOL)deleteFileWithEyeType:(BOOL)isLeftEye;
 //删除所有文件

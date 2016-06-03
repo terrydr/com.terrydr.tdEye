@@ -28,6 +28,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     int _leftSelectedCount;
     int _rightSelectedCount;
     UIView *_currentPageView;
+    BOOL _isCurrentLeftEye;
 }
 
 // 控件
@@ -92,8 +93,12 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         collectionView.delegate = self;
         [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:_cellIdentifier];
         
+        UISwipeGestureRecognizer *recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(upHandleSwipe:)];
+        [recognizer setDirection:(UISwipeGestureRecognizerDirectionUp)];
+        
         [self.view addSubview:collectionView];
         if (_isModelData) {
+            [collectionView addGestureRecognizer:recognizer];
             [self.view addSubview:self.infoView];
             [self.view addSubview:self.pageControl];
             [self.infoView addSubview:self.selectedBtn];
@@ -113,29 +118,60 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     return _collectionView;
 }
 
+- (void)upHandleSwipe:(UISwipeGestureRecognizer *)sender{
+    if (sender.direction == UISwipeGestureRecognizerDirectionUp){
+        [self showDeletePictureAlert];
+    }
+}
+
+- (void)showDeletePictureAlert{
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"是否确定删除此张图片?" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    
+    // Create the actions.
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+    }];
+    UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [self trashAsset];
+    }];
+    // Add the actions.
+    [alertController addAction:cancelAction];
+    [alertController addAction:sureAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
 - (UIView *)pageControl{
     if (!_pageControl) {
         CGFloat mainWidth = CGRectGetWidth(self.view.bounds);
         _pageControl = [[UIView alloc] initWithFrame:CGRectMake(0, 100, mainWidth, 7)];
-        CGFloat padding = (mainWidth-((7+10)*_photos.count-10))/2;
-        for (int i=0; i<_photos.count; i++) {
-            CGFloat dotOriginX = padding+(7+10)*i;
-            CGFloat dotOriginY = 0.0f;
-            CGFloat dotWidth = 7.0f;
-            CGFloat dotHeight = 7.0f;
-            
-            UIView *dotView = [[UIView alloc] initWithFrame:CGRectMake(dotOriginX, dotOriginY, dotWidth, dotHeight)];
-            dotView.layer.cornerRadius = 3.5f;
-            if (i==_currentPage) {
-                _currentPageView = dotView;
-                dotView.backgroundColor = RGB(0x3691e6);
-            }else{
-                dotView.backgroundColor = [UIColor whiteColor];
-            }
-            [_pageControl addSubview:dotView];
-        }
+        [self reloadPageControl];
     }
     return _pageControl;
+}
+
+- (void)reloadPageControl{
+    for (id view in _pageControl.subviews) {
+        [view removeFromSuperview];
+    }
+    
+    CGFloat mainWidth = CGRectGetWidth(self.view.bounds);
+    CGFloat padding = (mainWidth-((7+10)*_photos.count-10))/2;
+    for (int i=0; i<_photos.count; i++) {
+        CGFloat dotOriginX = padding+(7+10)*i;
+        CGFloat dotOriginY = 0.0f;
+        CGFloat dotWidth = 7.0f;
+        CGFloat dotHeight = 7.0f;
+        
+        UIView *dotView = [[UIView alloc] initWithFrame:CGRectMake(dotOriginX, dotOriginY, dotWidth, dotHeight)];
+        dotView.layer.cornerRadius = 3.5f;
+        if (i==_currentPage) {
+            _currentPageView = dotView;
+            dotView.backgroundColor = RGB(0x3691e6);
+        }else{
+            dotView.backgroundColor = [UIColor whiteColor];
+        }
+        [_pageControl addSubview:dotView];
+    }
 }
 
 - (UIView *)infoView{
@@ -390,10 +426,19 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     self.extendedLayoutIncludesOpaqueBars = YES;
     _leftSelectedCount = 0;
     _rightSelectedCount = 0;
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
     [self configureNavgationBar];
 }
 
 - (void)configureNavgationBar{
+    self.navigationController.navigationBar.translucent = NO;
+    self.navigationController.navigationBar.barTintColor = RGB(0x3691e6);
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+    [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, [UIFont boldSystemFontOfSize:18.f], NSFontAttributeName, nil]];
+    
     _leftItem = [[UIBarButtonItem alloc] initWithTitle:@"取消"
                                                  style:UIBarButtonItemStylePlain
                                                 target:self
@@ -473,28 +518,97 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 
 - (void)trashAsset{
     NSMutableArray *trashAssets = [NSMutableArray arrayWithArray:self.photos];
-    if ([trashAssets containsObject:[self.photos objectAtIndex:self.currentPage]]) {
-        [trashAssets removeObject:[self.photos objectAtIndex:self.currentPage]];
-        self.photos = [NSArray arrayWithArray:trashAssets];
-    }
-    self.currentPage --;
-    if (self.currentPage < 0) {
-        self.currentPage = 0;
-    }
-    if (self.deleteCallBack) {
-        self.deleteCallBack(trashAssets);
-    }
-    if (trashAssets.count == 0) {
-        [self.navigationController popViewControllerAnimated:YES];
-    }else{
-        [self setPageLabelPage:self.currentPage];
-        [self.collectionView reloadData];
+    JRPictureModel *pictureModel = self.photos[self.currentPage];
+    if ([trashAssets containsObject:pictureModel]) {
+        [trashAssets removeObject:pictureModel];
+        [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:pictureModel.pictureName
+                                                                 isLeftEye:_isCurrentLeftEye];
+        NSString *eyeType;
+        if (_isCurrentLeftEye) {
+            
+            int index = (int)self.currentPage +1;
+            int totalCount = (int)_leftCount;
+            if (index != totalCount) {
+                //重新排序
+                for (int i=index; i<totalCount; i++) {
+                    JRPictureModel *tempPictureModel = self.photos[i];
+                    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:tempPictureModel.pictureName isLeftEye:YES];
+                    NSData *imgData = [NSData dataWithContentsOfFile:imgPath];
+                    
+                    JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
+                    NSString *filePath = [fileManage getJRMediaPathWithType:YES];
+                    NSString *imageName = [NSString stringWithFormat:@"0%d.jpg",i];
+                    NSString *destinationImgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
+                    BOOL result = [fileManage saveFileWithPath:destinationImgPath fileData:imgData];
+                    NSLog(@"result:%d",result);
+                    
+                    [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:tempPictureModel.pictureName
+                                                                             isLeftEye:YES];
+                    tempPictureModel.pictureName = imageName;
+                }
+            }
+            
+            eyeType = @"left";
+            _leftCount--;
+        }else{
+            
+            int index = (int)self.currentPage +1;
+            int totalCount = (int)_rightCount;
+            if (index != totalCount) {
+                //重新排序
+                for (int i=index; i<totalCount; i++) {
+                    JRPictureModel *tempPictureModel = self.photos[i];
+                    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:tempPictureModel.pictureName isLeftEye:NO];
+                    NSData *imgData = [NSData dataWithContentsOfFile:imgPath];
+                    
+                    JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
+                    NSString *filePath = [fileManage getJRMediaPathWithType:NO];
+                    NSString *imageName = [NSString stringWithFormat:@"0%d.jpg",i];
+                    NSString *destinationImgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
+                    BOOL result = [fileManage saveFileWithPath:destinationImgPath fileData:imgData];
+                    NSLog(@"result:%d",result);
+                    
+                    [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:tempPictureModel.pictureName
+                                                                             isLeftEye:NO];
+                    tempPictureModel.pictureName = imageName;
+                }
+            }
+            
+            eyeType = @"right";
+            _rightCount--;
+        }
+        if ([_selectedModelArr isValid] && [_selectedModelArr containsObject:pictureModel]) {
+            [_selectedModelArr removeObject:pictureModel];
+            if (_isCurrentLeftEye) {
+                _leftSelectedCount--;
+            }else{
+                _rightSelectedCount--;
+            }
+            if (![_selectedModelArr isValid]) {
+                self.navigationItem.rightBarButtonItem.enabled = NO;
+            }
+        }
+        
+        self.currentPage --;
+        if (self.currentPage < 0) {
+            self.currentPage = 0;
+        }
+        
+        if (self.deleteCallBack) {
+            self.deleteCallBack(trashAssets,eyeType);
+        }
+        if (trashAssets.count == 0) {
+            [self.navigationController popViewControllerAnimated:YES];
+        }else{
+            self.photos = [NSArray arrayWithArray:trashAssets];
+        }
     }
 }
 
 #pragma mark - reloadData
 - (void) reloadData{
     
+    [self reloadPageControl];
     [self.collectionView reloadData];
     
     if (self.currentPage >= 0) {
@@ -673,11 +787,14 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     if (_isModelData) {
         if (_leftCount>0) {
             if (page+1<=_leftCount) {
+                _isCurrentLeftEye = YES;
                 self.title = @"左眼";
             }else{
+                _isCurrentLeftEye = NO;
                 self.title = @"右眼";
             }
         }else{
+            _isCurrentLeftEye = NO;
             self.title = @"右眼";
         }
         
