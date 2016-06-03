@@ -45,7 +45,7 @@
         <source-file src="src/ios/Class/JREyeTypeModel.m" />
         <header-file src="src/ios/Class/JREyeTypeModel.h" />
         <source-file src="src/ios/Class/PictureScanViewController.m" />
-        <header-file src="src/ios/Class/Class/PictureScanViewController.h" />
+        <header-file src="src/ios/Class/PictureScanViewController.h" />
         <source-file src="src/ios/Class/ShootCollectionHeaderView.m" />
         <header-file src="src/ios/Class/ShootCollectionHeaderView.h" />
         <source-file src="src/ios/Class/ShootCollectionButton.m" />
