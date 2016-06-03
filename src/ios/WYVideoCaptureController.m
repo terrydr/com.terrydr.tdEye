@@ -135,7 +135,28 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)leftBarButtonItemAction{
-    [self dismissViewControllerAnimated:YES completion:nil];
+    if (_leftTakenPictureCount==0 && _rightTakenPictureCount==0) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            
+        }];
+        
+        return;
+    }
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"是否放弃当前拍摄图片" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    
+    // Create the actions.
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+    }];
+    UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            
+        }];
+    }];
+    // Add the actions.
+    [alertController addAction:cancelAction];
+    [alertController addAction:sureAction];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)cleanOlderData{
