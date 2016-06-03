@@ -17,17 +17,17 @@
         camera:focus_focusing_id="@drawable/focus_focusing"
         camera:focus_success_id="@drawable/focus_focused" />
 
-    <!--
+    
     <RelativeLayout
-        android:id="@+id/whitebalance_rl"
+        android:id="@+id/zoom_rl"
         android:layout_width="fill_parent"
         android:layout_height="30dip"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="180dip"
-        android:layout_marginLeft="20dip"
-        android:layout_marginRight="20dip"
-        android:background="@color/whitebalance_background" >
+        android:layout_marginBottom="30dip"
+        android:layout_marginLeft="50dip"
+        android:layout_marginRight="50dip"
+        android:visibility="gone"
+        android:background="@color/all_transparent_background" >
 
         <ImageView
             android:id="@+id/left_iv"
@@ -36,21 +36,21 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:paddingLeft="10dip"
-            android:src="@drawable/whitebalance_left" />
+            android:src="@drawable/zoom_lessen" />
 
         <SeekBar
-            android:id="@+id/setting_view_bright_seekbar"
-            android:layout_width="wrap_content"
+            android:id="@+id/setting_zoom_seekbar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/right_iv"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/left_iv"
-            android:maxHeight="2dip"
-            android:minHeight="2dip"
+            android:layout_toLeftOf="@+id/right_iv"
+            android:maxHeight="3dip"
+            android:minHeight="3dip"
             android:paddingLeft="10dip"
-            android:paddingRight="30dip"
-            android:progressDrawable="@drawable/whitebalance_setting_progressbar"
-            android:thumb="@drawable/whitebalance_thumb" />
+            android:paddingRight="10dip"
+            android:progressDrawable="@drawable/zoom_setting_progressbar"
+            android:thumb="@drawable/zoom_thumb" />
 
         <ImageView
             android:id="@+id/right_iv"
@@ -59,8 +59,8 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:paddingRight="10dip"
-            android:src="@drawable/whitebalance_right" />
+            android:src="@drawable/zoom_enlargement" />
     </RelativeLayout>
-    -->
+    
 
 </RelativeLayout>

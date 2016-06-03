@@ -66,7 +66,8 @@ public class FocusImageView extends ImageView {
 				.getSystemService(Context.WINDOW_SERVICE);
 		int height = wm.getDefaultDisplay().getHeight();
 		int y = height*250/1920;
-		params.topMargin= point.y-y-getHeight()/2;
+		params.topMargin= point.y-getHeight()/2;
+//		params.topMargin= point.y-y-getHeight()/2;
 		params.leftMargin=point.x-getWidth()/2;
 		setLayoutParams(params);	
 		setVisibility(View.VISIBLE);

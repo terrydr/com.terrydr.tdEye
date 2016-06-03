@@ -1,5 +1,7 @@
 package com.terrydr.eyeScope;
 
+import org.apache.cordova.LOG;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -12,6 +14,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import com.terrydr.eyeScope.R;
 /**
  * @ClassName: MatrixImageView
@@ -29,9 +33,10 @@ public class MatrixImageView extends ImageView {
 	/** 图片高度 */
 	private float mImageHeight;
 	/** 原始缩放级别 */
-	private float mScale;
+	public float mScale;
 	private OnMovingListener moveListener;
 	private OnSingleTapListener singleTapListener;
+	private OnSlideUpListener onSlideUpListener;
 
 	public MatrixImageView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -63,6 +68,10 @@ public class MatrixImageView extends ImageView {
 
 	public void setOnSingleTapListener(OnSingleTapListener onSingleTapListener) {
 		this.singleTapListener = onSingleTapListener;
+	}
+	
+	public void setOnSlideUpListener(OnSlideUpListener onSlideUpListener) {
+		this.onSlideUpListener = onSlideUpListener;
 	}
 
 	@Override
@@ -203,7 +212,7 @@ public class MatrixImageView extends ImageView {
 		}
 
 		/**
-		 * 设置拖拽状�?�下的Matrix
+		 * 设置拖拽状下的Matrix
 		 * 
 		 * @param event
 		 */
@@ -234,7 +243,7 @@ public class MatrixImageView extends ImageView {
 		 * 
 		 * @return true表示非初始,false表示初始
 		 */
-		private boolean isZoomChanged() {
+		public boolean isZoomChanged() {
 			float[] values = new float[9];
 			getImageMatrix().getValues(values);
 			// 获取当前X轴缩放级
@@ -478,6 +487,26 @@ public class MatrixImageView extends ImageView {
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 				float velocityY) {
+			
+	        float minMove = 120;         //最小滑动距离
+	        float minVelocity = 0;      //最小滑动速度
+	        float beginX = e1.getX();     
+	        float endX = e2.getX();
+	        float beginY = e1.getY();     
+	        float endY = e2.getY();
+	         
+	        if(beginX-endX>minMove&&Math.abs(velocityX)>minVelocity){   //左滑
+//	        	LOG.e(TAG, velocityX+"左滑");
+	        }else if(endX-beginX>minMove&&Math.abs(velocityX)>minVelocity){   //右滑
+//	        	LOG.e(TAG, velocityX+"右滑");
+	        }else if(beginY-endY>minMove&&Math.abs(velocityY)>minVelocity){   //上滑
+//	        	LOG.e(TAG, velocityX+"上滑");
+				if (onSlideUpListener != null)
+					if(!listener.isZoomChanged())  //判断图片是否已经缩放，如果已经缩放过的不触发上滑事件
+						onSlideUpListener.onSlideUpTap();
+	        }else if(endY-beginY>minMove&&Math.abs(velocityY)>minVelocity){   //下滑
+//	        	LOG.e(TAG, velocityX+"下滑");
+	        }
 			return super.onFling(e1, e2, velocityX, velocityY);
 		}
 
@@ -519,5 +548,15 @@ public class MatrixImageView extends ImageView {
 	 */
 	public interface OnSingleTapListener {
 		public void onSingleTap();
+	}
+	
+	/**
+	 * @ClassName: SlideUpListener
+	 * @Description: 上滑删除图片事件
+	 * @date 20160602
+	 * 
+	 */
+	public interface OnSlideUpListener {
+		public void onSlideUpTap();
 	}
 }

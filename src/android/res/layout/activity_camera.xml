@@ -30,7 +30,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/camera_header_bar"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:src="@drawable/icon_iso_iv_bright" />
 
     <ImageView
@@ -59,7 +59,7 @@
             android:layout_alignParentBottom="true" />
         -->
 
-        <LinearLayout
+       <LinearLayout
             android:id="@+id/seekBar_llayout"
             android:layout_width="match_parent"
             android:layout_height="80dp"
@@ -71,10 +71,12 @@
                 android:layout_height="80dp" >
 
                 <com.terrydr.eyeScope.SeekBarArcView
+                    android:id="@+id/seekBarArcView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
                 <com.terrydr.eyeScope.SeekBarBallView
+                    android:id="@+id/seekBarBallView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </com.terrydr.eyeScope.ArcSeekBarParent>
@@ -144,6 +146,8 @@
             android:text="自动"
             android:textColor="@color/white"
             android:textSize="@dimen/text_size" />
+        
+         
     </RelativeLayout>
 
 </RelativeLayout>
