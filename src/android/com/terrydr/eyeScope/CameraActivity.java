@@ -455,6 +455,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			AlphaAnimation alphaAnimation = new AlphaAnimation(0.1f, 1.0f);  
 	        alphaAnimation.setDuration(100);  
 	        mContainer.startAnimation(alphaAnimation);
+	        
 		}
 	}
 
@@ -505,7 +506,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			setRightPhotos();
 			break;
 		case R.id.return_index_bt:
-			finish();
+			backPrevious();
 			break;
 		case R.id.wb_auto_iv:
 			setWB(0);
@@ -770,8 +771,18 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 213, 213);
 			btn_thumbnail.setImageBitmap(thumbnail);
 			this.thumbPath = thumbPath;
+			btn_thumbnail.setVisibility(View.VISIBLE);
 			Log.e(TAG, "thumbPath:" + thumbPath);
 		}
+	}
+	
+	public void setThumbnailBitmap(Bitmap bm,String thumbPath){
+		Log.e(TAG, "---thumbPath:" + thumbPath);
+		photos_iv.setEnabled(true);
+		Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 213, 213);
+		btn_thumbnail.setImageBitmap(thumbnail);
+		this.thumbPath = thumbPath;
+		btn_thumbnail.setVisibility(View.VISIBLE);
 	}
 	
 	/**
@@ -1195,9 +1206,38 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 */
 	@Override
 	public void onBackPressed() {
-		finish();
-		super.onBackPressed();
+		backPrevious();
+//		super.onBackPressed();
 	}
+	
+	private void backPrevious(){
+		// 获取根目录下缩略图文件夹
+		String folder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "left");
+		// 获取图片文件大图
+		List<File> imageList = FileOperateUtil.listFiles(folder, ".jpg");
+
+		String folderRight = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "right");
+		List<File> imageListRight = FileOperateUtil.listFiles(folderRight,".jpg");
+		if(imageList != null || imageListRight != null){
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("是否放弃当前拍摄图片")
+					.setPositiveButton("确认", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					}).setNegativeButton("取消", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					});
+			builder.create().show();
+		}else{
+			finish();
+		}
+	}
+	
 	
 	@Override
 	protected void onResume() {		
@@ -1212,6 +1252,47 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			String rootPath_right = getFolderPath(this, mSaveRoot_right);
 			deleteFolder(rootPath_right);
 		}
+		
+		// 获取根目录下缩略图文件夹
+		String folder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "left");
+		// 获取图片文件大图
+		List<File> imageList = FileOperateUtil.listFiles(folder, ".jpg");
+
+		String folderRight = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "right");
+		List<File> imageListRight = FileOperateUtil.listFiles(folderRight,".jpg");
+//		if(leftOrRight){
+			if(imageList!=null){
+				if(!imageList.isEmpty())
+//					btn_thumbnail.setVisibility(View.GONE);
+				i_left = imageList.size();
+				else{
+					i_left = 0;
+				}
+			}else{
+				i_left = 0;
+//				btn_thumbnail.setVisibility(View.GONE);
+			}
+			
+//		}else{
+			if(imageListRight!=null){
+				if(!imageListRight.isEmpty())
+//					btn_thumbnail.setVisibility(View.GONE);
+				i_right = imageListRight.size();
+				else{
+					i_right = 0;
+				}
+			}else{
+				i_right = 0;
+//				btn_thumbnail.setVisibility(View.GONE);
+			}
+			if(leftOrRight)
+				camera_camera_tv.setText(Integer.toString(i_left) + "/6");
+			else
+				camera_camera_tv.setText(Integer.toString(i_right) + "/6");
+			if(i_left==0&&i_right==0){
+				btn_thumbnail.setVisibility(View.GONE);
+			}
+//		}
 		super.onResume();
 	}
 	
@@ -1225,6 +1306,13 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		} else {
 			camera_camera_tv.setText(i_right + "/6");
 		}
+	}
+	
+	/**
+	 * 连拍结束把拍照按钮设为true
+	 */
+	public void setPhotos_iv_Enabled(){
+		photos_iv.setEnabled(true);
 	}
 	
 	/**

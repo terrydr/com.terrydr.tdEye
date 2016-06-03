@@ -108,7 +108,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 //		mViewPager.setOnSlideUpListener(AlbumItemAty.this);
 	}
 	
-	public void reloadAlbum(List<String> paths, String deletePath,String selectPath) {
+	public void reloadAlbum(List<String> paths, String deletePath,String selectPath,int deleteCurretItem,int getCurrentItem) {
 		if(paths.isEmpty()){
 			backPrevious();
 			return;
@@ -139,7 +139,14 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		tips = new ImageView[files.size()];
 
 //		albumitem_selected_cb_bool = new String[files.size()];
+		List<String> new_albumitem_selected_cb_bool = new ArrayList<String>();
 
+		for (int i = 0; i < albumitem_selected_cb_bool.length; i++) {
+			if (i != deleteCurretItem) {
+				new_albumitem_selected_cb_bool.add(albumitem_selected_cb_bool[i]);
+			}
+		}
+		albumitem_selected_cb_bool = new String[new_albumitem_selected_cb_bool.size()];
 		if (files.size() > 0) {
 			group.removeAllViews();
 			paths = new ArrayList<String>();
@@ -154,7 +161,9 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 				imageView.setLayoutParams(new LayoutParams(
 						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 				tips[i] = imageView;
-//				albumitem_selected_cb_bool[i] = "false";
+//				albumitem_selected_cb_bool[i] = String.valueOf(new_albumitem_selected_cb_bool.toArray()[i]);
+//				if(new_albumitem_selected_cb_bool.toArray()[i].equals("true")){
+				albumitem_selected_cb_bool[i] = String.valueOf(new_albumitem_selected_cb_bool.toArray()[i]);
 				if(albumitem_selected_cb_bool[i].equals("true")){
 					tips[i].setBackgroundResource(R.drawable.albumitem_selected_status);
 				}else
@@ -170,8 +179,20 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 			// mViewPager.setAdapter(mViewPager.new
 			// ViewPagerAdapter(this,paths));
 			// mViewPager.setCurrentItem(currentItem);
-			 tips[currentItem].setBackgroundResource(R.drawable.albumitem_selected_current);
+			Log.e(TAG, "currentItem:"+currentItem);
+			tips[getCurrentItem].setBackgroundResource(R.drawable.albumitem_selected_current);
 			setCountView();
+			
+			setImageBackground(getCurrentItem);
+			setCheckBoxSelected(getCurrentItem);
+//			selectPaths.remove(deletePath);
+			if (deletePath.contains("left")) {
+				selectPathsLeft.remove(deletePath);
+			} else if (deletePath.contains("right")) {
+				selectPathsRight.remove(deletePath);
+			}
+			eye_left_select_count_tv.setText(selectPathsLeft.size()+ "/2");
+			eye_right_select_count_tv.setText(selectPathsRight.size()+ "/2");
 		}
 	}
 	

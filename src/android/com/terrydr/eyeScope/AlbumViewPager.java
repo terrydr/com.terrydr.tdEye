@@ -117,6 +117,7 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener,OnSlid
 							public void onClick(DialogInterface dialog,
 									int which) {
 								Log.e(TAG, "getPaths()1:" + getPaths());
+								int deleteCurretItem = getCurrentItem();
 								Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
 								String deletePath = deleteCurrentPath();
 								Log.e(TAG, "deletePath:" + deletePath);
@@ -128,7 +129,7 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener,OnSlid
 								
 								Log.e(TAG, "selectPath:" + selectPath);
 								Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
-								albumItemAty.reloadAlbum(getPaths(), deletePath, selectPath);
+								albumItemAty.reloadAlbum(getPaths(), deletePath, selectPath,deleteCurretItem,getCurrentItem());
 							}
 						})
 				.setNegativeButton("取消",
