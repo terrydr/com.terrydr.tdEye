@@ -13,7 +13,7 @@
     <dimen name="bottom_bar_height">110.0dp</dimen>
     
     <dimen name="album_header_bar_height">50.0dp</dimen>
-    <dimen name="thumbnail_imageview_size">41.0dp</dimen>
+    <dimen name="thumbnail_imageview_size">60.0dp</dimen>
     <dimen name="shutter_bottom_size">62.0dp</dimen>
     
     <dimen name="title_view_left_back_padding_left">10.0dp</dimen>

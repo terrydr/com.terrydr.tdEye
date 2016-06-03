@@ -51,7 +51,6 @@ public class FilterImageView extends ImageView implements
 		if (drawable != null) {
 			// 设置滤镜
 			drawable.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-			;
 		}
 	}
 

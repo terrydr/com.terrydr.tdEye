@@ -3,10 +3,14 @@ package com.terrydr.eyeScope;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.cordova.LOG;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.terrydr.eyeScope.MatrixImageView.OnSingleTapListener;
+import com.terrydr.eyeScope.MatrixImageView.OnSlideUpListener;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -15,7 +19,10 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextPaint;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -50,6 +57,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	private ArrayList<String> selectPathsLeft = new ArrayList<String>();// 选中的图片  左眼图片
 	private ArrayList<String> selectPathsRight = new ArrayList<String>();// 选中的图片  右眼图片
 	private boolean leftOrRight = true;
+	private Bundle bundle;
 	/** 
      * 装点点的ImageView数组 
      */  
@@ -59,6 +67,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.albumitem);
 
+		bundle = getIntent().getExtras();
 		group = (ViewGroup)findViewById(R.id.imagegroup_ll); 
 		mViewPager=(AlbumViewPager)findViewById(R.id.albumviewpager);
 		mBackView=(TextView)findViewById(R.id.header_bar_photo_back);
@@ -96,8 +105,76 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		}
 		loadAlbum(mSaveRoot,currentFileName);
 		
+//		mViewPager.setOnSlideUpListener(AlbumItemAty.this);
 	}
+	
+	public void reloadAlbum(List<String> paths, String deletePath,String selectPath) {
+		if(paths.isEmpty()){
+			backPrevious();
+			return;
+		}
+		
+		// 获取根目录下缩略图文件夹
+		String folder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "left");
+		// 获取图片文件大图
+		List<File> imageList = FileOperateUtil.listFiles(folder, ".jpg");
 
+		String folderRight = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "right");
+		List<File> imageListRight = FileOperateUtil.listFiles(folderRight,".jpg");
+
+		files = new ArrayList<File>();
+		if (imageList != null && imageList.size() > 0) {
+			files.addAll(imageList);
+		}
+		FileOperateUtil.sortList(files, true);
+
+		List<File> filesRight = new ArrayList<File>();
+		if (imageListRight != null && imageListRight.size() > 0) {
+			filesRight.addAll(imageListRight);
+		}
+		FileOperateUtil.sortList(filesRight, true);
+
+		files.addAll(filesRight); // 把右眼图片添加到左眼
+		// 将点点加入到ViewGroup中
+		tips = new ImageView[files.size()];
+
+//		albumitem_selected_cb_bool = new String[files.size()];
+
+		if (files.size() > 0) {
+			group.removeAllViews();
+			paths = new ArrayList<String>();
+			int currentItem = 0;
+			int i = 0;
+			for (File file : files) {
+				if (selectPath != null && file.getName().contains(selectPath))
+					currentItem = files.indexOf(file);
+				paths.add(file.getAbsolutePath());
+
+				ImageView imageView = new ImageView(this);
+				imageView.setLayoutParams(new LayoutParams(
+						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+				tips[i] = imageView;
+//				albumitem_selected_cb_bool[i] = "false";
+				if(albumitem_selected_cb_bool[i].equals("true")){
+					tips[i].setBackgroundResource(R.drawable.albumitem_selected_status);
+				}else
+					tips[i].setBackgroundResource(R.drawable.albumitem_unselect_status);
+				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+						new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT,
+								LayoutParams.WRAP_CONTENT));
+				layoutParams.leftMargin = 10;
+				layoutParams.rightMargin = 10;
+				group.addView(imageView, layoutParams);
+				i++;
+			}
+			// mViewPager.setAdapter(mViewPager.new
+			// ViewPagerAdapter(this,paths));
+			// mViewPager.setCurrentItem(currentItem);
+			 tips[currentItem].setBackgroundResource(R.drawable.albumitem_selected_current);
+			setCountView();
+		}
+	}
+	
 	/**  
 	 *  加载图片
 	 *  @param rootPath   图片根路
@@ -115,13 +192,13 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		if(imageList!=null&&imageList.size()>0){
 			files.addAll(imageList);
 		}
-		FileOperateUtil.sortList(files, false);
+		FileOperateUtil.sortList(files, true);
 		
 		List<File> filesRight=new ArrayList<File>();
 		if(imageListRight!=null&&imageListRight.size()>0){
 			filesRight.addAll(imageListRight);
 		}
-		FileOperateUtil.sortList(filesRight, false);
+		FileOperateUtil.sortList(filesRight, true);
 		
 		files.addAll(filesRight);  //把右眼图片添加到左眼
         //将点点加入到ViewGroup中  
@@ -252,13 +329,18 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	 */
 	private void backPrevious(){
 		Intent intent = new Intent();
-		Bundle bundle = new Bundle();
-		bundle.putStringArrayList("selectPaths", selectPaths);
-		bundle.putStringArrayList("selectPathsLeft", selectPathsLeft);
-		bundle.putStringArrayList("selectPathsRight", selectPathsRight);
-		bundle.putInt("selectPathsLeftSize", selectPathsLeft.size());
-		bundle.putInt("selectPathsRightSize", selectPathsRight.size());
-		intent.putExtras(bundle);
+//		Bundle bundle = new Bundle();
+//		bundle.putStringArrayList("selectPaths", selectPaths);
+//		bundle.putStringArrayList("selectPathsLeft", selectPathsLeft);
+//		bundle.putStringArrayList("selectPathsRight", selectPathsRight);
+//		bundle.putInt("selectPathsLeftSize", selectPathsLeft.size());
+//		bundle.putInt("selectPathsRightSize", selectPathsRight.size());
+//		intent.putExtras(bundle);
+		
+		if (bundle != null) {
+			bundle.putBoolean("deleteFile", false);
+			intent.putExtras(bundle);
+		}
 		this.setResult(0, intent);
 		this.finish();
 	}
@@ -290,8 +372,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 					int index = 0;
 					for (File file : files) {
 //						Log.e(TAG, "file:" + file.getName());
-						if (filePath != null
-								&& filePath.contains(file.getName())) {
+						if (filePath != null && filePath.contains(file.getName())) {
 							index = files.indexOf(file);
 							if (albumitem_selected_cb.isChecked()) {
 								albumitem_selected_cb_bool[index] = "true";
@@ -381,5 +462,5 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	public void onChangeTesChanged(String _text) {
 		selected_tv.setText(_text);
 	}
-
+	
 }

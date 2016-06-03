@@ -3,14 +3,25 @@ package com.terrydr.eyeScope;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import com.terrydr.eyeScope.MatrixImageView.OnMovingListener;
+import com.terrydr.eyeScope.MatrixImageView.OnSlideUpListener;
+
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+
+import android.content.DialogInterface.OnClickListener;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
 
 import com.terrydr.eyeScope.R;
 
@@ -20,7 +31,7 @@ import com.terrydr.eyeScope.R;
  * @date 20160419
  * 
  */
-public class AlbumViewPager extends ViewPager implements OnMovingListener {
+public class AlbumViewPager extends ViewPager implements OnMovingListener,OnSlideUpListener {
 	public final static String TAG = "AlbumViewPager";
 
 	/** 图片加载 优化了了缓存 */
@@ -30,9 +41,11 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener {
 
 	/** 当前子控件是否处理拖动状 */
 	private boolean mChildIsBeingDragged = false;
+	private AlbumItemAty albumItemAty;
 
 	public AlbumViewPager(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		albumItemAty = (AlbumItemAty) context;
 		mImageLoader = ImageLoader.getInstance(context);
 		// 设置图片加载参数
 		DisplayImageOptions.Builder builder = new DisplayImageOptions.Builder();
@@ -63,7 +76,14 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener {
 
 	public Set<String> getPathsArray() {
 		return ((ViewPagerAdapter) getAdapter()).getPathsArray();
-
+	}
+	
+	/**
+	 * 返回所有图片路径
+	 * @return
+	 */
+	public List<String> getPaths() {
+		return ((ViewPagerAdapter) getAdapter()).getPaths();
 	}
 
 	@Override
@@ -83,6 +103,47 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener {
 		mChildIsBeingDragged = false;
 	}
 
+	
+
+	@Override
+	public void onSlideUpTap() {
+		Log.e(TAG, "删除事件处理.......");
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(albumItemAty);
+		builder.setMessage("确认删除该图片?")
+				.setPositiveButton("确认",
+						new android.content.DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								Log.e(TAG, "getPaths()1:" + getPaths());
+								Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
+								String deletePath = deleteCurrentPath();
+								Log.e(TAG, "deletePath:" + deletePath);
+								Log.e(TAG, "getPaths()2:" + getPaths());
+								String selectPath = null;
+								if(!getPaths().isEmpty()){
+									selectPath = getPaths().get(getCurrentItem());
+								}
+								
+								Log.e(TAG, "selectPath:" + selectPath);
+								Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
+								albumItemAty.reloadAlbum(getPaths(), deletePath, selectPath);
+							}
+						})
+				.setNegativeButton("取消",
+						new android.content.DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+
+							}
+
+						});
+		builder.create().show();
+	}
+	
+	
 	public class ViewPagerAdapter extends PagerAdapter {
 		private List<String> paths;// 大图地址
 		private Set<String> selectPaths = new HashSet<String>();// 选中的图片
@@ -114,6 +175,8 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener {
 			assert imageLayout != null;
 			MatrixImageView imageView = (MatrixImageView) imageLayout.findViewById(R.id.image);
 			imageView.setOnMovingListener(AlbumViewPager.this);
+			
+			imageView.setOnSlideUpListener(AlbumViewPager.this);  //上滑删除事件
 			String path = paths.get(position);
 			imageLayout.setTag(path);
 			mImageLoader.loadImage(path, imageView, mOptions);
@@ -143,11 +206,12 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener {
 				FileOperateUtil.deleteSourceFile(path, getContext());
 				paths.remove(path);
 				notifyDataSetChanged();
-				if (paths.size() > 0)
-					return (getCurrentItem() + 1) + "/" + paths.size();
-				else {
-					return "0/0";
-				}
+//				if (paths.size() > 0)
+//					return (getCurrentItem() + 1) + "/" + paths.size();
+//				else {
+//					return "0/0";
+//				}
+				return path;
 			}
 			return null;
 		}
@@ -163,8 +227,10 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener {
 
 		public Set<String> getPathsArray() {
 			return selectPaths;
-
+		}
+		
+		public List<String> getPaths() {
+			return paths;
 		}
 	}
-
 }

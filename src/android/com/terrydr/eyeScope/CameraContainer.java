@@ -16,9 +16,15 @@ import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
 import android.media.ThumbnailUtils;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.Toast;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+
 import com.terrydr.eyeScope.R;
 
 public class CameraContainer extends RelativeLayout implements CameraOperation{
@@ -28,7 +34,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	/** 相机绑定的SurfaceView */
 	private CameraView mCameraView;
 	
-	private FocusImageView mFocusImageView;
+	public FocusImageView mFocusImageView;
 
 	/** 拍照监听接口，用以在拍照始和结束后执行相应操*/
 	private TakePictureListener mListener;
@@ -46,15 +52,16 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
     public int mNumLeft=0;    //连拍左眼的张数
     public int mNumright=0;    //连拍右眼的张数
     public int stop = 0;      //触摸离开屏幕结束拍照的张数
-    
+    private SeekBar mZoomSeekBar;
+    private Handler mHandler;
+    private RelativeLayout zoom_rl;
 	
 
 	public CameraContainer(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		cActivity = (CameraActivity) context;
 		initView(context);
-//		mHandler = new Handler();
-//		setOnTouchListener(new TouchListener());
+		mHandler = new Handler();
 		
 	}
 
@@ -67,7 +74,36 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		inflate(context, R.layout.cameracontainer, this);
 		mCameraView = (CameraView) findViewById(R.id.cameraView);
 		mFocusImageView=(FocusImageView) findViewById(R.id.focusImageView);
+		zoom_rl = (RelativeLayout) findViewById(R.id.zoom_rl);
+		mZoomSeekBar=(SeekBar) findViewById(R.id.setting_zoom_seekbar);
+		//获取当前照相机支持的最大缩放级别，值小于0表示不支持缩放。当支持缩放时，加入拖动条。
+		int maxZoom=mCameraView.getMaxZoom();
+		if(maxZoom>0){
+			mZoomSeekBar.setMax(maxZoom);
+			mZoomSeekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
+		}
 	}
+	/**
+	 * 缩放seekbar事件处理
+	 */
+	private final OnSeekBarChangeListener onSeekBarChangeListener=new OnSeekBarChangeListener() {
+
+		@Override
+		public void onProgressChanged(SeekBar seekBar, int progress,
+				boolean fromUser) {
+			mCameraView.setZoom(progress);
+			mHandlerPostAtTimeZoom();
+		}
+
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {
+
+		}
+
+		@Override
+		public void onStopTrackingTouch(SeekBar seekBar) {
+		}
+	};
 
 	@Override
 	public void takePicture(PictureCallback callback,
@@ -164,11 +200,21 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 				throw new RuntimeException("mSavePath is null");
 				mDataHandler = new DataHandler();
 			mDataHandler.setMaxSize(200);
-			Bitmap bm = mDataHandler.save(data);
+			// 解析生成相机返回的图
+//			Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
+			// 生成缩略
+//			Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 213, 213);
+//			Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 320, 219);
+			// 产生新的文件
+			String imgName = FileOperateUtil.createFileNmae(".jpg");
+			String imagePath = mDataHandler.mImageFolder + File.separator + imgName;
+			String thumbPath = mDataHandler.mThumbnailFolder + File.separator + imgName;
+			
+			Bitmap bm = mDataHandler.save(data,imagePath,thumbPath);
 			// 重新打开预览图，进行下一次的拍照准备
 			camera.startPreview();
 			if (mListener != null)
-				mListener.onTakePictureEnd(bm);
+				mListener.onTakePictureEnd(bm,imagePath,thumbPath);
 		}
 	};
 	
@@ -277,7 +323,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		 * @param bm
 		 *            拍照生成的图
 		 */
-		public void onTakePictureEnd(Bitmap bm);
+		public void onTakePictureEnd(Bitmap bm,String imagePath,String thumbPath);
 
 		/**
 		 * 临时图片动画结束后触
@@ -297,9 +343,9 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	 */
 	private final class DataHandler {
 		/** 大图存放路径 */
-		private String mThumbnailFolder;
+		public String mThumbnailFolder;
 		/** 小图存放路径 */
-		private String mImageFolder;
+		public String mImageFolder;
 		/** 压缩后的图片单位KB */
 		private int maxSize = 200;
 
@@ -324,17 +370,18 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		 * @param 相机返回的文件流
 		 * @return 解析流生成的缩略
 		 */
-		public Bitmap save(byte[] data) {
+		public Bitmap save(byte[] data,String imagePath,String thumbPath) {
 			if (data != null) {
+
 				// 解析生成相机返回的图
 				Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
 				// 生成缩略
 //				Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 213, 213);
 				Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 320, 219);
 				// 产生新的文件
-				String imgName = FileOperateUtil.createFileNmae(".jpg");
-				String imagePath = mImageFolder + File.separator + imgName;
-				String thumbPath = mThumbnailFolder + File.separator + imgName;
+//				String imgName = FileOperateUtil.createFileNmae(".jpg");
+//				String imagePath = mImageFolder + File.separator + imgName;
+//				String thumbPath = mThumbnailFolder + File.separator + imgName;
 
 				File file = new File(imagePath);
 				File thumFile = new File(thumbPath);
@@ -434,4 +481,63 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		mFocusImageView.startFocus(point);
 	}
 
+	public int getMaxZoom() {
+		return mCameraView.getMaxZoom();
+	}
+
+	/**
+	 * 设置相机缩放级别
+	 * 
+	 * @param zoom
+	 */
+	public void setZoom(int zoom) {
+		mCameraView.setZoom(zoom);
+		mZoomSeekBar.setProgress(zoom);
+	}
+	
+	/**
+	 * 显示缩放seekBar
+	 */
+	public void setZoomVisibility(){
+		//移除token对象为mZoomSeekBar的延时任务
+		mHandler.removeCallbacksAndMessages(zoom_rl);
+		zoom_rl.setVisibility(View.VISIBLE);
+	}
+	
+	/**
+	 * 隐藏缩放seekBar
+	 */
+	public void setZoomGone(){
+		//移除token对象为mZoomSeekBar的延时任务
+		zoom_rl.setVisibility(View.GONE);
+	}
+	
+	/**
+	 * 双指离开屏幕三秒后隐藏seekbar
+	 */
+	public void setPostAtTimeZoom(){
+		zoom_rl.setVisibility(View.VISIBLE);
+		mHandlerPostAtTimeZoom();
+	}
+	
+	/**
+	 * 设置seekBar定时隐藏
+	 */
+	private void mHandlerPostAtTimeZoom(){
+		//移除token对象为mZoomSeekBar的延时任务
+		mHandler.removeCallbacksAndMessages(zoom_rl);
+		//ZOOM模式下 在结束两秒后隐藏seekbar 设置token为mZoomSeekBar用以在连续点击时移除前一个定时任务
+
+		mHandler.postAtTime(new Runnable() {
+			@Override
+			public void run() {
+				zoom_rl.setVisibility(View.GONE);
+			}
+		}, zoom_rl,SystemClock.uptimeMillis()+3000);
+	}
+	
+
+	public int getZoom() {
+		return mCameraView.getZoom();
+	}
 }

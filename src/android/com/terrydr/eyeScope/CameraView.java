@@ -242,7 +242,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	}
 
 	/**  
-	 * 手动聚焦 
+	 * 自动对焦 
 	 *  @param point 触屏坐标
 	 */
 	public void onFocus(Point point){
@@ -268,10 +268,10 @@ public class CameraView extends SurfaceView implements CameraOperation {
 			return;
 		}
 //		List<Area> areas=new ArrayList<Camera.Area>();
-//		int left=point.x-300;
-//		int top=point.y-300;
-//		int right=point.x+300;
-//		int bottom=point.y+300;
+//		int left=point.x-100;
+//		int top=point.y-100;
+//		int right=point.x+100;
+//		int bottom=point.y+100;
 //		left=left<-1000?-1000:left;
 //		top=top<-1000?-1000:top;
 //		right=right>1000?1000:right;
@@ -387,4 +387,49 @@ public class CameraView extends SurfaceView implements CameraOperation {
 
 	}
 	
+	/**
+	 * 获取最大缩放级别，最大为40
+	 * 
+	 * @return
+	 */
+	public int getMaxZoom() {
+		if (mCamera == null)
+			return -1;
+		Camera.Parameters parameters = mCamera.getParameters();
+		if (!parameters.isZoomSupported())
+			return -1;
+//		return parameters.getMaxZoom() > 40 ? 40 : parameters.getMaxZoom();
+//		LOG.e(TAG, "parameters.getMaxZoom():" + parameters.getMaxZoom());
+		return parameters.getMaxZoom();
+	}
+
+	/**
+	 * 设置相机缩放级别
+	 * 
+	 * @param zoom
+	 */
+	public void setZoom(int zoom) {
+		if (mCamera == null)
+			return;
+		Camera.Parameters parameters;
+		// 注意此处为录像模式下的setZoom方式。在Camera.unlock之后，调用getParameters方法会引起android框架底层的异常
+		// stackoverflow上看到的解释是由于多线程同时访问Camera导致的冲突，所以在此使用录像前保存的mParameters。
+		// if(mParameters!=null)
+		// parameters=mParameters;
+		// else {
+		parameters = mCamera.getParameters();
+		// }
+
+		if (!parameters.isZoomSupported())
+			return;
+		parameters.setZoom(zoom);
+		mCamera.setParameters(parameters);
+		mZoom = zoom;
+	}
+
+	public int getZoom() {
+		return mZoom;
+	}
+
+	private int mZoom = 0;
 }
