@@ -3,7 +3,6 @@ package com.terrydr.eyeScope;
 import java.io.File;
 import java.util.List;
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
-//import com.terrydr.eyeScope.HeadSetUtil.OnHeadSetListener;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -56,7 +55,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private boolean lightOn = true;
 	private RelativeLayout whitebalance_rl;
 	private TextView eyeleft_tv,eyeright_tv, return_index_bt,camera_camera_tv;
-	private LinearLayout linearlayou_left, seekBar_llayout;
+	private LinearLayout linearlayou_left;
 	private GestureDetector detector;
 	public boolean leftOrRight = true; // 默认为左 true:左眼，false:右眼
 	public int i_left = 0; // 记录单侧拍摄图像个数
@@ -66,7 +65,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private ImageView wb_iv, wb_auto_iv,wb_incandescent_iv,wb_warm_fluorescent_iv,wb_daylight_iv,wb_cloudy_daylight_iv;
 	private TextView wb_tv;
 	private ArcSeekBarParent arcSeekBar;
-	private SeekBarBallView seekBarBallView;
 	private int wb_level;   //白平衡模式
 	
 	/** 记录是拖拉照片模式还是放大缩小照片模式 */
@@ -105,8 +103,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		whitebalance_iv = (ImageView) findViewById(R.id.whitebalance_iv);
 		whitebalance_rl = (RelativeLayout) findViewById(R.id.whitebalance_rl);
 		linearlayou_left = (LinearLayout) findViewById(R.id.linearlayou_left);
-//		linearlayou_right = (LinearLayout) findViewById(R.id.linearlayou_right);
-		seekBar_llayout  = (LinearLayout) findViewById(R.id.seekBar_llayout);
 		camera_camera_tv = (TextView) findViewById(R.id.camera_camera_tv);
 		TextPaint tp = camera_camera_tv.getPaint();  //安体加粗
 	    tp.setFakeBoldText(true);
@@ -130,7 +126,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	    
 	    arcSeekBar = (ArcSeekBarParent) findViewById(R.id.seek_bar);
 	    arcSeekBar.setListener(onChang);
-	    seekBarBallView  = (SeekBarBallView) findViewById(R.id.seekBarBallView);
 		
 		iso_iv.setOnClickListener(this);
 		whitebalance_iv.setOnClickListener(this);
@@ -142,7 +137,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		photos_iv.setOnTouchListener(this);
 		photos_iv.setOnLongClickListener(onLongClickListener);
 		mContainer.setOnTouchListener(this);
-//		photos_iv.setLongClickable(true);
 		
 		detector = new GestureDetector(this);
 		
@@ -777,7 +771,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	}
 	
 	public void setThumbnailBitmap(Bitmap bm,String thumbPath){
-		Log.e(TAG, "---thumbPath:" + thumbPath);
+//		Log.e(TAG, "thumbPath:" + thumbPath);
 		photos_iv.setEnabled(true);
 		Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 213, 213);
 		btn_thumbnail.setImageBitmap(thumbnail);
@@ -942,37 +936,20 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 * 设置为右眼拍照模式，当屏幕向左滑动或者点击“右眼”触发
 	 */
 	private void setLeftPhotos(){
-		Log.e(TAG, "setLeftPhotos");
-//		linearlayou_left.setVisibility(View.VISIBLE);
-//		linearlayou_right.setVisibility(View.GONE);
 		if(!leftOrRight){
-//			leftOrRight = true;
 			slideview(linearlayou_left,0,getWidth);
-			
-//			setPath(leftOrRight);
-//			setCameraText(leftOrRight);
-			
 			eyeleft_tv.setTextColor(getResources().getColor(R.color.font_color));
 			eyeright_tv.setTextColor(getResources().getColor(R.color.white));
-			
 		}
 	}
 	/**
 	 * 设置为左眼拍照模式，当屏幕向右滑动或者点击“左眼”触发
 	 */
 	private void setRightPhotos(){
-		Log.e(TAG, "setRightPhotos");
-//		linearlayou_left.setVisibility(View.GONE);
-//		linearlayou_right.setVisibility(View.VISIBLE);
 		if(leftOrRight){
-//			leftOrRight = false;
 			slideview(linearlayou_left,0,-getWidth);
-			
-//			setPath(leftOrRight);
-//			setCameraText(leftOrRight);
 			eyeright_tv.setTextColor(getResources().getColor(R.color.font_color));
 			eyeleft_tv.setTextColor(getResources().getColor(R.color.white));
-			
 		}
 	}
 	
@@ -1019,7 +996,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 					setCameraText(leftOrRight);
 					eyeleft_tv.setEnabled(true);
 				}
-				Log.e(TAG, "leftOrRight:" + leftOrRight);
+//				Log.e(TAG, "leftOrRight:" + leftOrRight);
 			}
 		});
 		view.startAnimation(animation);
@@ -1260,39 +1237,32 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 		String folderRight = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "right");
 		List<File> imageListRight = FileOperateUtil.listFiles(folderRight,".jpg");
-//		if(leftOrRight){
-			if(imageList!=null){
-				if(!imageList.isEmpty())
-//					btn_thumbnail.setVisibility(View.GONE);
+		if (imageList != null) {
+			if (!imageList.isEmpty())
 				i_left = imageList.size();
-				else{
-					i_left = 0;
-				}
-			}else{
+			else {
 				i_left = 0;
-//				btn_thumbnail.setVisibility(View.GONE);
 			}
-			
-//		}else{
-			if(imageListRight!=null){
-				if(!imageListRight.isEmpty())
-//					btn_thumbnail.setVisibility(View.GONE);
+		} else {
+			i_left = 0;
+		}
+
+		if (imageListRight != null) {
+			if (!imageListRight.isEmpty())
 				i_right = imageListRight.size();
-				else{
-					i_right = 0;
-				}
-			}else{
+			else {
 				i_right = 0;
-//				btn_thumbnail.setVisibility(View.GONE);
 			}
-			if(leftOrRight)
-				camera_camera_tv.setText(Integer.toString(i_left) + "/6");
-			else
-				camera_camera_tv.setText(Integer.toString(i_right) + "/6");
-			if(i_left==0&&i_right==0){
-				btn_thumbnail.setVisibility(View.GONE);
-			}
-//		}
+		} else {
+			i_right = 0;
+		}
+		if (leftOrRight)
+			camera_camera_tv.setText(Integer.toString(i_left) + "/6");
+		else
+			camera_camera_tv.setText(Integer.toString(i_right) + "/6");
+		if (i_left == 0 && i_right == 0) {
+			btn_thumbnail.setVisibility(View.GONE);
+		}
 		super.onResume();
 	}
 	
@@ -1320,40 +1290,44 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 */
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		Log.e(TAG,"keyCode:" + keyCode);
-		Log.e(TAG,"event.getRepeatCount():" + event.getRepeatCount());
+//		Log.e(TAG,"keyCode:" + keyCode);
+//		Log.e(TAG,"event.getRepeatCount():" + event.getRepeatCount());
 		if (photos_iv.isEnabled() && event.getRepeatCount() == 0) {
 			switch (keyCode) {
-			case KeyEvent.KEYCODE_CAMERA:  //拍照键
-				Log.e(TAG,"KeyEvent.KEYCODE_CAMERA");
+			case KeyEvent.KEYCODE_ENTER:  //空格键    66
+//				Log.e(TAG,"KeyEvent.KEYCODE_ENTER");
 				takePictureing();
 				return true;
-			case KeyEvent.KEYCODE_HEADSETHOOK:
-				Log.e(TAG,"KeyEvent.KEYCODE_HEADSETHOOK");
+			case KeyEvent.KEYCODE_CAMERA:  //拍照键    27
+//				Log.e(TAG,"KeyEvent.KEYCODE_CAMERA");
 				takePictureing();
 				return true;
-			case KeyEvent.KEYCODE_VOLUME_DOWN:
+			case KeyEvent.KEYCODE_HEADSETHOOK:   //耳机中间键
+//				Log.e(TAG,"KeyEvent.KEYCODE_HEADSETHOOK");
 				takePictureing();
-				Log.e(TAG,"KeyEvent.KEYCODE_VOLUME_DOWN");
 				return true;
-			case KeyEvent.KEYCODE_VOLUME_UP:
+			case KeyEvent.KEYCODE_VOLUME_DOWN:      	//音量减小键 	 25
 				takePictureing();
-				Log.e(TAG,"KeyEvent.KEYCODE_VOLUME_UP");
+//				Log.e(TAG,"KeyEvent.KEYCODE_VOLUME_DOWN");
+				return true;
+			case KeyEvent.KEYCODE_VOLUME_UP:      //音量增加键 	24
+				takePictureing();
+//				Log.e(TAG,"KeyEvent.KEYCODE_VOLUME_UP");
 				return true;
 				
-			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-				Log.e(TAG,"KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE");
-				takePictureing();
-				return true;
-			case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-				Log.e(TAG,"KeyEvent.KEYCODE_MEDIA_PREVIOUS");
-				takePictureing();
-				return true;
-
-			case KeyEvent.KEYCODE_MEDIA_STOP:
-				Log.e(TAG,"KeyEvent.KEYCODE_MEDIA_STOP");
-				takePictureing();
-				return true;
+//			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:    // 	多媒体键 播放/暂停
+//				Log.e(TAG,"KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE");
+//				takePictureing();
+//				return true;
+//			case KeyEvent.KEYCODE_MEDIA_PREVIOUS:     //多媒体键 上一首
+//				Log.e(TAG,"KeyEvent.KEYCODE_MEDIA_PREVIOUS");
+//				takePictureing();
+//				return true;
+//
+//			case KeyEvent.KEYCODE_MEDIA_STOP:          // 	多媒体键 停止
+//				Log.e(TAG,"KeyEvent.KEYCODE_MEDIA_STOP");
+//				takePictureing();
+//				return true;
 			}
 		}else{
 			return true;
