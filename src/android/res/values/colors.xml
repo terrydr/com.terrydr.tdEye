@@ -10,6 +10,11 @@
     <color name="white">#ffffff</color>
     <color name="album_background">#f7f7f7</color>
     <color name="album_item_bottom_gackground">#f6f6f6</color>
+    <color name="text_color">#191919</color>
+    <color name="text_red">#f74c31</color>
+    <color name="text_blue">#0089f1</color>
+    <color name="black">#000000</color><!--黑色 -->
+    <color name="btntextcolor">#ff1E90FF</color><!--dialog中按钮字体颜色 -->
     
     <color name="primary_title_text_color">#ff888888</color>
     <color name="common_title_text">#ff565555</color>

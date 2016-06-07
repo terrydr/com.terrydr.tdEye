@@ -237,12 +237,11 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 
 		@Override
 		public void onAutoFocus(boolean success, Camera camera) {
-			LOG.e(TAG, "手动对焦.....");
 			if (success) {
-				LOG.e(TAG, "手动对焦成功");
+//				LOG.e(TAG, "手动对焦成功");
 				mFocusImageView.onFocusSuccess();
 			}else {
-				LOG.e(TAG, "手动对焦失败");
+//				LOG.e(TAG, "手动对焦失败");
 				mFocusImageView.onFocusFailed();
 			}
 		}

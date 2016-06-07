@@ -155,115 +155,14 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		Log.e(TAG, "width:" + width);
 		Log.e(TAG, "getWidth:" + getWidth);
 		
-		// mHeaderBar.getBackground().setAlpha(204);//透明0~255透明度 ，越小越透明
-		
-//		HeadSetUtil.getInstance().setOnHeadSetListener(headSetListener);
-//        HeadSetUtil.getInstance().open(this);
-		
-//		IntentFilter mediafilter = new IntentFilter();
-//	        //拦截按键KeyEvent.KEYCODE_MEDIA_NEXT、KeyEvent.KEYCODE_MEDIA_PREVIOUS、KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
-//	    mediafilter.addAction(Intent.ACTION_MEDIA_BUTTON);
-//	    mediafilter.setPriority(0);//设置优先级，优先级太低可能被拦截，收不到信息。一般默认优先级为0，通话优先级为1，该优先级的值域是-1000到1000。
-//	    registerReceiver(mediaButtonReceiver, mediafilter); 
 	}
-	
-//	public BroadcastReceiver mediaButtonReceiver = new BroadcastReceiver() {
-//
-//		@Override
-//		public void onReceive(Context context, Intent intent) {
-//			boolean isActionMediaButton = Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction()); // 判断是不是耳机按键事件
-//			if (!isActionMediaButton)
-//				return;
-//			KeyEvent event = (KeyEvent) intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT); // 判断有没有耳机按键事件
-//			if (event == null)
-//				return;
-//			// 过滤按下事件
-//			boolean isActionUp = (event.getAction() == KeyEvent.ACTION_UP);
-//			if (!isActionUp)
-//				return;
-//			// 避免在Receiver里做长时间的处理，使得程序在CPU使用率过高的情况下出错，把信息发给handlera处理。
-//			int keyCode = event.getKeyCode();
-//			long eventTime = event.getEventTime() - event.getDownTime();// 按键按下到松开的时长
-//			Message msg = Message.obtain();
-//			msg.what = 100;
-//			Bundle data = new Bundle();
-//			data.putInt("key_code", keyCode);
-//			data.putLong("event_time", eventTime);
-//			msg.setData(data);
-//			handler.sendMessage(msg);
-//
-//			// 终止广播(不让别的程序收到此广播，免受干扰)
-//			abortBroadcast();
-//		}
-//	};
-//
-//	private Handler handler = new Handler() {
-//		@Override
-//		public void handleMessage(Message msg) {
-//			int what = msg.what;
-//			switch (what) {
-//			case 100:
-//				Bundle data = msg.getData();
-//				// 按键值
-//				int keyCode = data.getInt("key_code");
-//				// 按键时长
-//				long eventTime = data.getLong("event_time");
-//				// 设置超过1000毫秒，就触发长按事件 //谷歌把超过1000s定义为长按。
-//				boolean isLongPress = (eventTime > 1000);
-//				switch (keyCode) {
-//				case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:// 播放或暂停
-//					Log.e(TAG, "KEYCODE_MEDIA_PLAY_PAUSE");
-//					// playOrPause();
-//					break;
-//				// 短按=播放下一首音乐，长按=音量加
-//				case KeyEvent.KEYCODE_MEDIA_NEXT:
-//					Log.e(TAG, "KEYCODE_MEDIA_NEXT");
-//					if (isLongPress) {
-//						// adjustVolume(true);//自定义
-//					} else {
-//						// playNext();//自定义
-//					}
-//					break;
-//				// 短按=播放上一首音乐，长按=音量减
-//				case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-//					Log.e(TAG, "KEYCODE_MEDIA_PREVIOUS");
-//					if (isLongPress) {
-//						// adjustVolume(false);//自定义
-//					} else {
-//						// playPrevious();//自定义
-//					}
-//					break;
-//				}
-//				break;
-//			default:// 其他消息-则扔回上层处理
-//				super.handleMessage(msg);
-//			}
-//		}
-//	};
-//	
-//	private OnHeadSetListener headSetListener = new OnHeadSetListener() {
-//        @Override
-//        public void onDoubleClick() {
-//            Log.e(TAG, "双击");
-//        }
-//        @Override
-//        public void onClick() {
-//            Log.e(TAG, "单击");
-//        }
-//        @Override
-//        public void onThreeClick() {
-//            Log.e(TAG, "三连击");
-//        }
-//    };
 	
 	/**
 	 * 弧形滑动改变事件
 	 */
     private ArcSeekBarParent.OnProgressChangedListener onChang = new ArcSeekBarParent.OnProgressChangedListener() {
-
 		@Override
 		public void OnProgressChanged(int level) {
-			
 			posthandler.removeCallbacksAndMessages(whitebalance_rl);
 			//在结束三秒后隐藏whitebalance_rl 设置token为whitebalance_rl用以在连续点击时移除前一个定时任务
 			posthandler.postAtTime(new Runnable() {
@@ -525,7 +424,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		case R.id.btn_thumbnail: //点击下方缩略图的事件跳转
 			Intent intent = new Intent(CameraActivity.this, AlbumItemAty.class);
 			
-//			Intent intent = new Intent(this, AlbumAty.class);
 			Bundle bundle = new Bundle();
 			int mexposureNum = mExposureNum; // 曝光
 			bundle.putInt("mexposureNum", mexposureNum);  
@@ -540,7 +438,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		default:
 			break;
 		}
-
 	}
 	
 	/**
@@ -662,7 +559,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 						deleteFile(deleteImgFilePath);
 					}
 				}
-				
 			}
 		}
 	}
@@ -766,10 +662,15 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			btn_thumbnail.setImageBitmap(thumbnail);
 			this.thumbPath = thumbPath;
 			btn_thumbnail.setVisibility(View.VISIBLE);
-			Log.e(TAG, "thumbPath:" + thumbPath);
+//			Log.e(TAG, "thumbPath:" + thumbPath);
 		}
 	}
 	
+	/**
+	 * 设置连拍结束时保存缩略图
+	 * @param bm
+	 * @param thumbPath
+	 */
 	public void setThumbnailBitmap(Bitmap bm,String thumbPath){
 //		Log.e(TAG, "thumbPath:" + thumbPath);
 		photos_iv.setEnabled(true);
@@ -1187,6 +1088,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 //		super.onBackPressed();
 	}
 	
+	/**
+	 * 返回事件 判断是否存在图片
+	 */
 	private void backPrevious(){
 		// 获取根目录下缩略图文件夹
 		String folder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "left");
@@ -1195,24 +1099,37 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 		String folderRight = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "right");
 		List<File> imageListRight = FileOperateUtil.listFiles(folderRight,".jpg");
-		if(imageList != null || imageListRight != null){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("是否放弃当前拍摄图片")
-					.setPositiveButton("确认", new OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							finish();
-						}
-					}).setNegativeButton("取消", new OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-						}
-					});
-			builder.create().show();
-		}else{
+		if(imageList==null && imageListRight == null){
 			finish();
+			return ;
+		}else{
+			if(imageList!=null){ 
+				if(imageList.isEmpty()){
+					finish();
+					return;
+				}
+			}
+			if(imageListRight!=null){ 
+				if(imageListRight.isEmpty()){
+					finish();
+					return;
+				}
+			}
 		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("是否放弃当前拍摄图片")
+				.setPositiveButton("确认", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				}).setNegativeButton("取消", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+		builder.create().show();
 	}
 	
 	

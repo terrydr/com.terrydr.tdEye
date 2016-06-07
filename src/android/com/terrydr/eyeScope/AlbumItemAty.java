@@ -3,15 +3,10 @@ package com.terrydr.eyeScope;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.LOG;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.terrydr.eyeScope.MatrixImageView.OnSingleTapListener;
-import com.terrydr.eyeScope.MatrixImageView.OnSlideUpListener;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -20,10 +15,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextPaint;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -144,7 +136,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		// 将点点加入到ViewGroup中
 		tips = new ImageView[files.size()];
 
-//		albumitem_selected_cb_bool = new String[files.size()];
 		List<String> new_albumitem_selected_cb_bool = new ArrayList<String>();
 
 		for (int i = 0; i < albumitem_selected_cb_bool.length; i++) {
@@ -156,19 +147,15 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		if (files.size() > 0) {
 			group.removeAllViews();
 			paths = new ArrayList<String>();
-			int currentItem = 0;
 			int i = 0;
 			for (File file : files) {
 				if (selectPath != null && file.getName().contains(selectPath))
-					currentItem = files.indexOf(file);
 				paths.add(file.getAbsolutePath());
 
 				ImageView imageView = new ImageView(this);
 				imageView.setLayoutParams(new LayoutParams(
 						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 				tips[i] = imageView;
-//				albumitem_selected_cb_bool[i] = String.valueOf(new_albumitem_selected_cb_bool.toArray()[i]);
-//				if(new_albumitem_selected_cb_bool.toArray()[i].equals("true")){
 				albumitem_selected_cb_bool[i] = String.valueOf(new_albumitem_selected_cb_bool.toArray()[i]);
 				if(albumitem_selected_cb_bool[i].equals("true")){
 					tips[i].setBackgroundResource(R.drawable.albumitem_selected_status);
@@ -182,16 +169,11 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 				group.addView(imageView, layoutParams);
 				i++;
 			}
-			// mViewPager.setAdapter(mViewPager.new
-			// ViewPagerAdapter(this,paths));
-			// mViewPager.setCurrentItem(currentItem);
-			Log.e(TAG, "currentItem:"+currentItem);
 			tips[getCurrentItem].setBackgroundResource(R.drawable.albumitem_selected_current);
 			setCountView();
 			
 			setImageBackground(getCurrentItem);
 			setCheckBoxSelected(getCurrentItem);
-//			selectPaths.remove(deletePath);
 			if (deletePath.contains("left")) {
 				selectPathsLeft.remove(deletePath);
 			} else if (deletePath.contains("right")) {

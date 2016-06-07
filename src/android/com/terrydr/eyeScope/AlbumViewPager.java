@@ -3,24 +3,28 @@ package com.terrydr.eyeScope;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import com.terrydr.eyeScope.MatrixImageView.OnMovingListener;
 import com.terrydr.eyeScope.MatrixImageView.OnSlideUpListener;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.LinearLayout;
 
 
 import com.terrydr.eyeScope.R;
@@ -42,9 +46,14 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener,OnSlid
 	/** 当前子控件是否处理拖动状 */
 	private boolean mChildIsBeingDragged = false;
 	private AlbumItemAty albumItemAty;
+	private CustomDialog.Builder ibuilder;
+	private SharedPreferences preferences;   //保存数据 勾选下次不再提示
+	private boolean isCheckeds;  //记录勾选下次不再提示
 
 	public AlbumViewPager(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		preferences = getContext().getSharedPreferences(
+				"deleteRemind", Context.MODE_PRIVATE);
 		albumItemAty = (AlbumItemAty) context;
 		mImageLoader = ImageLoader.getInstance(context);
 		// 设置图片加载参数
@@ -104,46 +113,130 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener,OnSlid
 	}
 
 	
-
 	@Override
 	public void onSlideUpTap() {
-		Log.e(TAG, "删除事件处理.......");
+//		Log.e(TAG, "删除事件处理.......");
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(albumItemAty);
-		builder.setMessage("确认删除该图片?")
-				.setPositiveButton("确认",
-						new android.content.DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								Log.e(TAG, "getPaths()1:" + getPaths());
-								int deleteCurretItem = getCurrentItem();
-								Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
-								String deletePath = deleteCurrentPath();
-								Log.e(TAG, "deletePath:" + deletePath);
-								Log.e(TAG, "getPaths()2:" + getPaths());
-								String selectPath = null;
-								if(!getPaths().isEmpty()){
-									selectPath = getPaths().get(getCurrentItem());
-								}
-								
-								Log.e(TAG, "selectPath:" + selectPath);
-								Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
-								albumItemAty.reloadAlbum(getPaths(), deletePath, selectPath,deleteCurretItem,getCurrentItem());
-							}
-						})
-				.setNegativeButton("取消",
-						new android.content.DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
+//		ibuilder = new CustomDialog.Builder(albumItemAty);
+//		ibuilder.setTitle(R.string.prompt);
+//		ibuilder.setMessage(R.string.exit_app);
+//		 view=View.inflate(albumItemAty,R.layout.customdialog, null);  
+//		checkBox = (CheckBox) view.findViewById(R.id.message);
+//		checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+//			
+//			@Override
+//			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//				Log.e(TAG, "checkBox11111111:" + isChecked);
+//				buttonView.setChecked(isChecked);
+//			}
+//		});
+//		
+////		linearLayout.setBackgroundColor(R.color.all_transparent_background);
+//
+//		ibuilder.setPositiveButton(R.string.confirm, new android.content.DialogInterface.OnClickListener() {
+//			
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//				Log.e(TAG, "checkBox:" + checkBox.isChecked());
+//				Log.e(TAG, "getPaths()1:" + getPaths());
+//				int deleteCurretItem = getCurrentItem();
+//				Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
+//				String deletePath = deleteCurrentPath();
+//				Log.e(TAG, "deletePath:" + deletePath);
+//				Log.e(TAG, "getPaths()2:" + getPaths());
+//				String selectPath = null;
+//				if(!getPaths().isEmpty()){
+//					selectPath = getPaths().get(getCurrentItem());
+//				}
+//				
+//				Log.e(TAG, "selectPath:" + selectPath);
+//				Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
+//				albumItemAty.reloadAlbum(getPaths(), deletePath, selectPath,deleteCurretItem,getCurrentItem());
+//				dialog.dismiss();
+//			}
+//		});
+//		ibuilder.setNegativeButton(R.string.cancel, new android.content.DialogInterface.OnClickListener() {
+//			
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//				Log.e(TAG, "checkBox1:" + checkBox.isChecked());
+//				dialog.dismiss();
+//			}
+//		});
+//		ibuilder.create().show();
+		
 
-							}
+		boolean isCheckVules = getSharedPreferences();
+		if (isCheckVules) {
+			int deleteCurretItem = getCurrentItem();
+			String deletePath = deleteCurrentPath();
+			String selectPath = null;
+			if (!getPaths().isEmpty()) {
+				selectPath = getPaths().get(getCurrentItem());
+			}
+			albumItemAty.reloadAlbum(getPaths(), deletePath, selectPath,deleteCurretItem, getCurrentItem());
+		} else {
+			// 定义复选框选项
+			final String[] multiChoiceItems = { "下次不再提示", };
+			// 复选框默认值：false=未选;true=选中 ,各自对应items[i]
+			final boolean[] defaultSelectedStatus = { false };
+			// LayoutInflater inflater = getLayoutInflater();
+			AlertDialog.Builder builder = new AlertDialog.Builder(albumItemAty);
+			// LinearLayout linearLayout=(LinearLayout)
+			// albumItemAty.getLayoutInflater().inflate(R.layout.nomoredialog,
+			// null);
+			// linearLayout.setBackgroundColor(R.color.all_transparent_background);
+			// builder.setView(linearLayout);
+			builder.setTitle("是否删除照片");
+			// builder.setMessage("确认删除该图片?");
+			builder.setMultiChoiceItems(
+					multiChoiceItems,
+					defaultSelectedStatus,
+					new android.content.DialogInterface.OnMultiChoiceClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which,
+								boolean isChecked) {
+							// 来回重复选择取消，得相应去改变item对应的bool值，点击确定时，根据这个bool[],得到选择的内容
+							defaultSelectedStatus[which] = isChecked;
+							isCheckeds = isChecked;
+						}
+					});
+			builder.setPositiveButton("确认",
+					new android.content.DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							Editor editor = preferences.edit();
+							editor.putBoolean("ischeck", isCheckeds);
+							editor.commit();
 
-						});
-		builder.create().show();
+							int deleteCurretItem = getCurrentItem();
+							String deletePath = deleteCurrentPath();
+							String selectPath = null;
+							if (!getPaths().isEmpty()) {
+								selectPath = getPaths().get(getCurrentItem());
+							}
+							albumItemAty.reloadAlbum(getPaths(),deletePath,selectPath,deleteCurretItem,getCurrentItem());
+							dialog.dismiss();
+						}
+					}).setNegativeButton("取消",
+					new android.content.DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							isCheckeds = false;
+							dialog.dismiss();
+						}
+					});
+			builder.create().show();
+		}
 	}
-	
+	/**
+	 * 读取数据
+	 * @return
+	 */
+	private boolean getSharedPreferences() {
+		boolean ischeck = preferences.getBoolean("ischeck", false);
+		return ischeck;
+	}
 	
 	public class ViewPagerAdapter extends PagerAdapter {
 		private List<String> paths;// 大图地址

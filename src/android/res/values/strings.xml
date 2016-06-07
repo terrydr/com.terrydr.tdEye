@@ -1,19 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">EyeScope</string>
-    <string name="title_activity_camera">EyeScope</string>   
+    <string name="title_activity_camera">EyeScope</string>
     <string name="eye_right">右眼</string>
     <string name="eye_left">左眼</string>
     <string name="header_bar_enter_selection_tv">选择</string>
-	<string name="cance_bt_tv">返回</string>
-	<string name="camera_tv">拍照</string>
-	<string name="image_browse_tv">图片浏览</string>
-	<string name="selected_tv">已选 0 张</string>
-	<string name="commit_bt">提交</string>
+    <string name="cance_bt_tv">返回</string>
+    <string name="camera_tv">拍照</string>
+    <string name="image_browse_tv">图片浏览</string>
+    <string name="selected_tv">已选 0 张</string>
+    <string name="commit_bt">提交</string>
+    <string name="prompt">是否删除照片</string>
+    <string name="exit_app">下次不再提示</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="dismiss">隐藏</string>
     <!-- 存储文件文件夹 -->
     <string name="Files">Files</string>
     <!-- 图像文件夹 -->
     <string name="Image">Image</string>
     <!-- 缩略图文件夹 -->
     <string name="Thumbnail">Thumbnail</string>
+
 </resources>

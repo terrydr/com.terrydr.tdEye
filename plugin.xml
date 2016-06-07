@@ -170,6 +170,11 @@
 			<string name="image_browse_tv">图片浏览</string>
 			<string name="selected_tv">已选 0 张</string>
 			<string name="commit_bt">提交</string>
+			<string name="prompt">是否删除照片</string>
+			<string name="exit_app">下次不再提示</string>
+			<string name="confirm">确定</string>
+			<string name="cancel">取消</string>
+			<string name="dismiss">隐藏</string>			
 			<string name="Files">Files</string>
 			<string name="Image">Image</string>
 			<string name="Thumbnail">Thumbnail</string>
@@ -207,6 +212,8 @@
                      target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/CameraView.java"
                      target-dir="src/com/terrydr/eyeScope"/>					 
+		<source-file src="src/android/com/terrydr/eyeScope/CustomDialog.java"
+                     target-dir="src/com/terrydr/eyeScope"/>	
 		<source-file src="src/android/com/terrydr/eyeScope/DisplayImageOptions.java"
                      target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/DownloadImgUtils.java"
@@ -240,9 +247,19 @@
 		<source-file src="src/android/com/terrydr/eyeScope/ThumbnaiImageView.java"
                      target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/res/anim/focusview_show.xml" target-dir="res/anim"/>
+		<source-file src="src/android/res/drawable/bg.xml" target-dir="res/drawable"/>
+		<source-file src="src/android/res/drawable/check_left_btn.xml" target-dir="res/drawable"/>
+		<source-file src="src/android/res/drawable/check_right_btn.xml" target-dir="res/drawable"/>
+		<source-file src="src/android/res/drawable/check_single_btn.xml" target-dir="res/drawable"/>
 		<source-file src="src/android/res/drawable/item_album_grid_checkbox.xml" target-dir="res/drawable"/>
 		<source-file src="src/android/res/drawable/item_page_grid_checkbox.xml" target-dir="res/drawable"/>
+		<source-file src="src/android/res/drawable/left_btn_select.xml" target-dir="res/drawable"/>
+		<source-file src="src/android/res/drawable/left_btn.xml" target-dir="res/drawable"/>
+		<source-file src="src/android/res/drawable/right_btn_select.xml" target-dir="res/drawable"/>
+		<source-file src="src/android/res/drawable/right_btn.xml" target-dir="res/drawable"/>
 		<source-file src="src/android/res/drawable/shape.xml" target-dir="res/drawable"/>
+		<source-file src="src/android/res/drawable/single_btn_select.xml" target-dir="res/drawable"/>
+		<source-file src="src/android/res/drawable/single_btn.xml" target-dir="res/drawable"/>
 		<source-file src="src/android/res/drawable/zoom_setting_progressbar.xml" target-dir="res/drawable"/>
 		<source-file src="src/android/res/drawable-xhdpi/albumitem_selected_current.png" target-dir="res/drawable-xhdpi"/>
 		<source-file src="src/android/res/drawable-xhdpi/albumitem_selected_status.png" target-dir="res/drawable-xhdpi"/>
@@ -279,11 +296,10 @@
 		<source-file src="src/android/res/drawable-xhdpi/whitebalance_progress_white.png" target-dir="res/drawable-xhdpi" />
 		<source-file src="src/android/res/drawable-xhdpi/whitebalance_right.png" target-dir="res/drawable-xhdpi" />	
 		<source-file src="src/android/res/drawable-xhdpi/whitebalance_thumb.png" target-dir="res/drawable-xhdpi" />	
-
 		<source-file src="src/android/res/drawable-xhdpi/zoom_enlargement.png" target-dir="res/drawable-xhdpi" />	
 		<source-file src="src/android/res/drawable-xhdpi/zoom_lessen.png" target-dir="res/drawable-xhdpi" />	
 		<source-file src="src/android/res/drawable-xhdpi/zoom_thumb.png" target-dir="res/drawable-xhdpi" />	
-
+		
 		<source-file src="src/android/res/drawable-xxhdpi/albumitem_selected_current.png" target-dir="res/drawable-xxhdpi"/>
 		<source-file src="src/android/res/drawable-xxhdpi/albumitem_selected_status.png" target-dir="res/drawable-xxhdpi"/>
 		<source-file src="src/android/res/drawable-xxhdpi/albumitem_unselect_status.png" target-dir="res/drawable-xxhdpi"/>
@@ -292,20 +308,23 @@
 		<source-file src="src/android/res/drawable-xxhdpi/wb_daylight.png" target-dir="res/drawable-xxhdpi" />
 		<source-file src="src/android/res/drawable-xxhdpi/wb_incandescent.png" target-dir="res/drawable-xxhdpi" />
 		<source-file src="src/android/res/drawable-xxhdpi/wb_warm_fluorescent.png" target-dir="res/drawable-xxhdpi" />
+		
 		<source-file src="src/android/res/layout/activity_camera.xml" target-dir="res/layout" />	
 		<source-file src="src/android/res/layout/album_header_bar.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/album_item_bottom_bar.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/album_item_header_bar.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/album.xml" target-dir="res/layout" />
-		<source-file src="src/android/res/layout/albumitem.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/albumitem_for_js.xml" target-dir="res/layout" />
+		<source-file src="src/android/res/layout/albumitem.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/camera_bottom_bar.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/camera_header_bar.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/cameracontainer.xml" target-dir="res/layout" />
+		<source-file src="src/android/res/layout/customdialog.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/item_album_grid.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/layout/item_album_pager.xml" target-dir="res/layout" />
 		<source-file src="src/android/res/values/attrs.xml" target-dir="res/values" />		
 		<source-file src="src/android/res/values/colors.xml" target-dir="res/values" />
-		<source-file src="src/android/res/values/dimens.xml" target-dir="res/values" />			
+		<source-file src="src/android/res/values/dimens.xml" target-dir="res/values" />		
+		<source-file src="src/android/res/values/mystyles.xml" target-dir="res/values" />			
     </platform>
 </plugin>
