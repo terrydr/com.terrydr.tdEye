@@ -83,6 +83,8 @@
         <header-file src="src/ios/Class/WYTopImgBtn.h" />
         <source-file src="src/ios/Class/WYVideoTimeView.m" />
         <header-file src="src/ios/Class/WYVideoTimeView.h" />
+        <source-file src="src/ios/Class/TDAlertView.m" />
+        <header-file src="src/ios/Class/TDAlertView.h" />
         <resource-file src="src/ios/Resource/takePhoto@2x.png" />
         <resource-file src="src/ios/Resource/takePhoto@3x.png" />
         <resource-file src="src/ios/Resource/albumSelectedicon@2x.png" />
@@ -118,6 +120,12 @@
         <resource-file src="src/ios/Resource/plus.png" />
         <resource-file src="src/ios/Resource/plus@2x.png" />
         <resource-file src="src/ios/Resource/plus@3x.png" />
+        <resource-file src="src/ios/Resource/tdaSelected.png" />
+        <resource-file src="src/ios/Resource/tdaSelected@2x.png" />
+        <resource-file src="src/ios/Resource/tdaSelected@3x.png" />
+        <resource-file src="src/ios/Resource/tdaUnselected.png" />
+        <resource-file src="src/ios/Resource/tdaUnselected@2x.png" />
+        <resource-file src="src/ios/Resource/tdaUnselected@3x.png" />
         <resource-file src="src/ios/Resource/silent.m4a" />
     </platform>
     
