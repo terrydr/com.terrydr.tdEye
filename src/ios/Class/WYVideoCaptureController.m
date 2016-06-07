@@ -863,6 +863,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [CATransaction begin];
         [CATransaction setAnimationDuration:.025];
         [self.captureVideoPreviewLayer setAffineTransform:CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale)];
+        [self.captureDevice lockForConfiguration:nil];
+        self.captureDevice.videoZoomFactor = self.effectiveScale;
+        [self.captureDevice unlockForConfiguration];
         [CATransaction commit];
     }
     
