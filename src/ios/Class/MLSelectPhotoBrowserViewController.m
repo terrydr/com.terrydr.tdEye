@@ -16,6 +16,7 @@
 #import "UIImage+MLTint.h"
 #import "JRMediaFileManage.h"
 #import "ZQBaseClassesExtended.h"
+#import "TDAlertView.h"
 
 // 分页控制器的高度
 static NSInteger ZLPickerColletionViewPadding = 20;
@@ -125,19 +126,13 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 - (void)showDeletePictureAlert{
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"是否确定删除此张图片?" message:nil preferredStyle:UIAlertControllerStyleAlert];
-    
-    // Create the actions.
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+    TDAlertView *alert = [[TDAlertView alloc] init];
+    [alert tdShowWithSelectedBlock:^(TDAlertButton buttonindex) {
+        if (buttonindex==TDAlertButtonOk) {
+            [self trashAsset];
+        }else if (buttonindex==TDAlertButtonCancel){
+        }
     }];
-    UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [self trashAsset];
-    }];
-    // Add the actions.
-    [alertController addAction:cancelAction];
-    [alertController addAction:sureAction];
-    
-    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (UIView *)pageControl{
