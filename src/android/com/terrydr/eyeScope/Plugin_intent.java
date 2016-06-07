@@ -23,15 +23,15 @@ public class Plugin_intent extends CordovaPlugin {
 			CallbackContext callbackContext) throws org.json.JSONException {
 		this.callbackContext = callbackContext;
 		if (action.equals("jrEyeTakePhotos")) {
-//			Log.e(TAG, "jrEyeTakePhotos:" + callbackContext);
+			Log.e(TAG, "jrEyeTakePhotos:" + callbackContext);
 			this.startCameraActivity();
 			return true;
 		} else if (action.equals("jrEyeSelectPhotos")) { // 相册缩略图界面
-//			Log.e(TAG, "jrEyeSelectPhotos:" + callbackContext);
+			Log.e(TAG, "jrEyeSelectPhotos:" + callbackContext);
 			startAlbumAty();
 			return true;
 		} else if (action.equals("jrEyeScanPhotos")) { // 大图片预览界面参数{data:[图片路径，图片路径]}
-//			Log.e(TAG, "jrEyeScanPhotos:" + callbackContext);
+			Log.e(TAG, "jrEyeScanPhotos:" + callbackContext);
 			infos = args.getString(0);
 			this.startAlbumItemAty(infos);
 			return true;
@@ -53,7 +53,8 @@ public class Plugin_intent extends CordovaPlugin {
 	 */
 	private void startAlbumAty() {
 //		Log.i(TAG, "startAlbumAty");
-		Intent intent = new Intent(cordova.getActivity(), AlbumAty.class);
+//		Intent intent = new Intent(cordova.getActivity(), AlbumAty.class);
+		Intent intent = new Intent(cordova.getActivity(), AlbumItemAty.class);
 		Bundle bundle = new Bundle();
 		bundle.putBoolean("isPlugin", true);
 		intent.putExtras(bundle);
@@ -65,8 +66,7 @@ public class Plugin_intent extends CordovaPlugin {
 	 */
 	private void startAlbumItemAty(String args) {
 		// cordova.getActivity() 获取当前activity的this
-		Intent intent = new Intent(cordova.getActivity(),
-				AlbumItemAtyForJs.class);
+		Intent intent = new Intent(cordova.getActivity(),AlbumItemAtyForJs.class);
 		Bundle bundle = new Bundle();
 		bundle.putString("data", args);
 		intent.putExtras(bundle);

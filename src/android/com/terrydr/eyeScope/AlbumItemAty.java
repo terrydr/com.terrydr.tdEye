@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.LOG;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,6 +59,8 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	private ArrayList<String> selectPathsRight = new ArrayList<String>();// 选中的图片  右眼图片
 	private boolean leftOrRight = true;
 	private Bundle bundle;
+	
+	private boolean isPlugin = false;  //标记是否是plugin传过来的,默认为false:否;ure:是
 	/** 
      * 装点点的ImageView数组 
      */  
@@ -68,6 +71,9 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		setContentView(R.layout.albumitem);
 
 		bundle = getIntent().getExtras();
+		if (bundle != null) {
+			isPlugin = bundle.getBoolean("isPlugin");
+		}
 		group = (ViewGroup)findViewById(R.id.imagegroup_ll); 
 		mViewPager=(AlbumViewPager)findViewById(R.id.albumviewpager);
 		mBackView=(TextView)findViewById(R.id.header_bar_photo_back);
@@ -349,7 +355,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	 * 返回上一个activity
 	 */
 	private void backPrevious(){
-		Intent intent = new Intent();
+		Intent intent = null;
 //		Bundle bundle = new Bundle();
 //		bundle.putStringArrayList("selectPaths", selectPaths);
 //		bundle.putStringArrayList("selectPathsLeft", selectPathsLeft);
@@ -358,12 +364,34 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 //		bundle.putInt("selectPathsRightSize", selectPathsRight.size());
 //		intent.putExtras(bundle);
 		
-		if (bundle != null) {
-			bundle.putBoolean("deleteFile", false);
-			intent.putExtras(bundle);
+//		if (bundle != null) {
+//			intent = new Intent();
+//			bundle.putBoolean("deleteFile", false);
+//			intent.putExtras(bundle);
+//		}
+//		this.setResult(0, intent);
+//		this.finish();
+		
+		if (!isPlugin) {
+			intent = new Intent(AlbumItemAty.this, CameraActivity.class);
+			if (bundle != null) {
+				bundle.putBoolean("deleteFile", false);
+				intent.putExtras(bundle);
+
+			}
+			// 设置返回数据
+			this.setResult(0, intent);
+			this.finish();
+		} else {
+			intent = new Intent(AlbumItemAty.this, CameraActivity.class);
+			if (bundle != null) {
+				bundle.putBoolean("deleteFile", false);
+				intent.putExtras(bundle);
+			}
+			// 设置返回数据
+			this.setResult(6, intent);
+			this.finish();
 		}
-		this.setResult(0, intent);
-		this.finish();
 	}
 	@Override
 	public void onClick(View v) {
@@ -469,6 +497,11 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		intent1.putExtras(bundle1);
 		this.setResult(5, intent1);
 		this.finish();
+		
+//		Intent intents = new Intent(AlbumItemAty.this,AlbumItemAtyForJs.class);
+//		startActivity(intents);
+		
+		
 	}
 	@Override
 	public void onBackPressed() {
