@@ -84,7 +84,7 @@ public class ImageAsyncTask extends AsyncTask<Bitmap, Void, Bitmap> {
 			Log.e(TAG, "IOException in savedata",e);
 		}
 		thumbnail.recycle();
-        retBmp.recycle();
+        
 
         return retBmp;
     }
@@ -92,7 +92,8 @@ public class ImageAsyncTask extends AsyncTask<Bitmap, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bmp) {
 //    	mCameraContainer.count();
-    	mCameraContainer.countShoot();
+    	mCameraContainer.countShoot(bmp,fileNamePath);
+    	bmp.recycle();
     	
     }
     

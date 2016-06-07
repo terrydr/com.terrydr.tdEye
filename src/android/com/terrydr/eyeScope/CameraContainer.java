@@ -142,6 +142,21 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
     /**
      * 结束连拍
      */
+    public void stopShooting(Bitmap bm,String thumbPath){
+    	cActivity.setThumbnailBitmap(bm, thumbPath);
+    	contShoot = false;
+		mMode = 0;
+    	if(mCameraView.mCamera!=null){
+    		mCameraView.mCamera.stopPreview();
+    		mCameraView.mCamera.setPreviewCallback(null);
+    		mCameraView.mCamera.startPreview();
+    	}
+    	
+    }
+    
+    /**
+     * 结束连拍
+     */
     public void stopShooting(){
     	contShoot = false;
 		mMode = 0;
@@ -156,7 +171,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
     /**
      * 每一张连拍结束的回调函数
      */
-    public void countShoot(){
+    public void countShoot(Bitmap bm,String thumbPath){
 //    	LOG.e(TAG, "cActivity.i_left"+cActivity.i_left);
     	cActivity.delectMultiFile2();
         if(mMode == 1){
@@ -165,7 +180,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
         	}
         }
         if(!contShoot){
-        	stopShooting();
+        	stopShooting(bm, thumbPath);
         }
 //        LOG.e(TAG, "mNumLeft:"+mNumLeft + "------" + cActivity.leftOrRight);
         if(cActivity.leftOrRight){
@@ -174,7 +189,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
             	cActivity.startAlbumAty();
             }else
         	if(mNumLeft>=6){
-        		stopShooting();
+        		stopShooting(bm, thumbPath);
             	cActivity.startAlbumAty();
         	}
         }else{
@@ -183,7 +198,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
             	cActivity.startAlbumAty();
             }else
         	if(mNumright>=6){
-        		stopShooting();
+        		stopShooting(bm, thumbPath);
             	cActivity.startAlbumAty();
         	}
         }
