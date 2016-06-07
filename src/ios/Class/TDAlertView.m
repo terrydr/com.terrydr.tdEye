@@ -191,8 +191,10 @@ static selectButton STAblock;
     UIButton *btn = (UIButton *)sender;
     btn.selected = !btn.isSelected;
     if (btn.isSelected) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"NoDisplay"];
        _checkView.image = [UIImage imageNamed:@"tdaSelected"];
     }else{
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"NoDisplay"];
         _checkView.image = [UIImage imageNamed:@"tdaUnselected"];
     }
 }

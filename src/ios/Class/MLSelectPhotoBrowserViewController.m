@@ -126,13 +126,18 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 - (void)showDeletePictureAlert{
-    TDAlertView *alert = [[TDAlertView alloc] init];
-    [alert tdShowWithSelectedBlock:^(TDAlertButton buttonindex) {
-        if (buttonindex==TDAlertButtonOk) {
-            [self trashAsset];
-        }else if (buttonindex==TDAlertButtonCancel){
-        }
-    }];
+    BOOL value = [[NSUserDefaults standardUserDefaults] boolForKey:@"NoDisplay"];
+    if (!value) {
+        TDAlertView *alert = [[TDAlertView alloc] init];
+        [alert tdShowWithSelectedBlock:^(TDAlertButton buttonindex) {
+            if (buttonindex==TDAlertButtonOk) {
+                [self trashAsset];
+            }else if (buttonindex==TDAlertButtonCancel){
+            }
+        }];
+    }else{
+        [self trashAsset];
+    }
 }
 
 - (UIView *)pageControl{
