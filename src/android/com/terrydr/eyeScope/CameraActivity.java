@@ -1105,14 +1105,22 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		}else{
 			if(imageList!=null){ 
 				if(imageList.isEmpty()){
-					finish();
-					return;
+					if(imageListRight!=null){ 
+						if(imageListRight.isEmpty()){
+							finish();
+							return;
+						}
+					}
 				}
 			}
 			if(imageListRight!=null){ 
 				if(imageListRight.isEmpty()){
-					finish();
-					return;
+					if(imageList!=null){ 
+						if(imageList.isEmpty()){
+							finish();
+							return;
+						}
+					}
 				}
 			}
 		}
