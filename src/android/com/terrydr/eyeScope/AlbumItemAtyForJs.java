@@ -26,30 +26,37 @@ import com.terrydr.eyeScope.R;
 public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 		OnSingleTapListener {
 	public final static String TAG = "AlbumItemAtyForJs";
-	private AlbumViewPager mViewPager;// 显示大图
+	private AlbumViewPagerForJs mViewPager;// 显示大图
 	private TextView mCountView, mBackView, header_bar_photo_commit_bt;
 	private View mHeaderBar, mBottomBar;
 	private String data;
+	private Bundle bundle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.albumitem_for_js);
 
-		mViewPager = (AlbumViewPager) findViewById(R.id.albumviewpager);
+		
 		mBackView = (TextView) findViewById(R.id.header_bar_photo_back);
 		mCountView = (TextView) findViewById(R.id.header_bar_photo_count);
 		header_bar_photo_commit_bt = (TextView) findViewById(R.id.header_bar_photo_commit_bt);
 		header_bar_photo_commit_bt.setVisibility(View.GONE);
 		mHeaderBar = findViewById(R.id.album_item_header_bar);
 
+		mViewPager = (AlbumViewPagerForJs) findViewById(R.id.js_albumviewpager);
+		
 		mBackView.setOnClickListener(this);
 		mCountView.setOnClickListener(this);
 
 		TextPaint tp = mCountView.getPaint(); // 安体加粗
 		tp.setFakeBoldText(true);
 
-		data = getIntent().getExtras().getString("data");
+//		data = getIntent().getExtras().getString("data");
+		bundle = getIntent().getExtras();
+		if (bundle != null) {
+			data = bundle.getString("data");
+		}
 		mViewPager.setOnPageChangeListener(pageChangeListener);
 
 		parseJsonMulti(data); // 解析传过来的数据并且加载图片
@@ -61,6 +68,9 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 	 * @param strResult
 	 */
 	private void parseJsonMulti(String strResult) {
+		if(strResult==null){
+			return;
+		}
 		try {
 			JSONObject jsonObjs = new JSONObject(strResult);
 			JSONArray dataArray = jsonObjs.getJSONArray("data");
