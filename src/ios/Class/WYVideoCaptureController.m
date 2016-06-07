@@ -900,7 +900,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     //将UI坐标转化为摄像头坐标
     CGPoint cameraPoint= [self.captureVideoPreviewLayer captureDevicePointOfInterestForPoint:point];
     [self setFocusCursorWithPoint:point];
-    [self focusWithMode:AVCaptureFocusModeAutoFocus exposureMode:AVCaptureExposureModeAutoExpose atPoint:cameraPoint];
+    [self focusWithMode:AVCaptureFocusModeContinuousAutoFocus
+           exposureMode:AVCaptureExposureModeContinuousAutoExposure
+                atPoint:cameraPoint];
 }
 
 /**
@@ -928,13 +930,13 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 -(void)focusWithMode:(AVCaptureFocusMode)focusMode exposureMode:(AVCaptureExposureMode)exposureMode atPoint:(CGPoint)point{
     [self changeDeviceProperty:^(AVCaptureDevice *captureDevice) {
         if ([captureDevice isFocusModeSupported:focusMode]) {
-            [captureDevice setFocusMode:AVCaptureFocusModeAutoFocus];
+            [captureDevice setFocusMode:focusMode];
         }
         if ([captureDevice isFocusPointOfInterestSupported]) {
             [captureDevice setFocusPointOfInterest:point];
         }
         if ([captureDevice isExposureModeSupported:exposureMode]) {
-            [captureDevice setExposureMode:AVCaptureExposureModeAutoExpose];
+            [captureDevice setExposureMode:exposureMode];
         }
         if ([captureDevice isExposurePointOfInterestSupported]) {
             [captureDevice setExposurePointOfInterest:point];
