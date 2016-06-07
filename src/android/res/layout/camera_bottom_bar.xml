@@ -15,7 +15,6 @@
             android:id="@+id/linearlayou"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/imageView1"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="8dp"
             android:gravity="center" >
@@ -46,32 +45,6 @@
                     android:textSize="@dimen/text_size_20" />
             </LinearLayout>
 
-            <!-- <LinearLayout
-                android:id="@+id/linearlayou_right"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingRight="70dp"
-                android:visibility="gone" >
-
-                <TextView
-                    android:id="@+id/eyeleft_tv1"
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/eye_left"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_20" />
-
-                <TextView
-                    android:id="@+id/eyeright_tv1"
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/eye_right"
-                    android:textColor="@color/font_color"
-                    android:textSize="@dimen/text_size_20" />
-            </LinearLayout> -->
         </LinearLayout>
 
         <ImageView
