@@ -105,6 +105,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [super viewWillAppear:animated];
     [_captureSession startRunning];
     [self configureNavgationBar];
+    
+    //3.监听点击音量键事件
+    [self p_addObserver];
+    
+    //4.监听打开控制中心
+    [self p_addObserverControlCenter];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -113,6 +119,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     [_captureSession stopRunning];
+    
+    [self p_removeObserver];
+    [self p_removeObserverControlCenter];
 }
 
 - (void)dealloc {
@@ -268,12 +277,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     //2.隐藏音量Icon
     [self p_hiddIcon];
     
-    //3.监听点击音量键事件
-    [self p_addObserver];
-    
-    //4.监听打开控制中心
-    [self p_addObserverControlCenter];
-    
     //5.获取当前系统音量
     [self p_getSystemVolume];
     
@@ -316,6 +319,15 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 /**
+ *  取消监听点击音量键事件
+ */
+- (void)p_removeObserver {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+    //结束远程遥控
+    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
+}
+
+/**
  *  应用程序失效或者再次进入前台，会走以下两个通知
  */
 - (void)p_addObserverControlCenter {
@@ -323,6 +335,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willResignActive) name:UIApplicationWillResignActiveNotification object:nil];
     //应用程序切回到前台
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
+- (void)p_removeObserverControlCenter {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 /**
