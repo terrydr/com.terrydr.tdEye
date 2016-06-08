@@ -2,6 +2,9 @@ package com.terrydr.eyeScope;
 
 import java.io.File;
 import java.util.List;
+
+import org.apache.cordova.LOG;
+
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
 import android.Manifest;
 import android.app.Activity;
@@ -20,6 +23,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextPaint;
 import android.util.Log;
@@ -45,7 +49,7 @@ import com.terrydr.eyeScope.R;
 
 public class CameraActivity extends Activity implements View.OnClickListener, 
 		TakePictureListener, OnGestureListener, OnTouchListener {
-
+	private static boolean isActive = false;
 	public final static String TAG = "CameraActivity";
 	private CameraContainer mContainer;
 	private ImageView photos_iv;
@@ -84,6 +88,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private WindowManager wm ;
 	private int width ;
 	private int getWidth ;
+	public static boolean PRE_CUPCAKE ; 
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -91,7 +96,15 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
 		
-		checkWriteExternalPermission();  //判断如果用户阻止了权限给提示窗，目前紧对android6.0以上版本有效
+		if(isActive){
+			finish();
+		}
+		isActive = true;
+
+		PRE_CUPCAKE = getSDKVersionNumber() < 23 ? true : false; 
+		if(!PRE_CUPCAKE){
+			checkWriteExternalPermission();  //判断如果用户阻止了权限给提示窗，目前紧对android6.0以上版本有效
+		}
 		
 		posthandler = new Handler();
 		mContainer = (CameraContainer) findViewById(R.id.container);
@@ -155,7 +168,19 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		Log.e(TAG, "width:" + width);
 		Log.e(TAG, "getWidth:" + getWidth);
 		
+		
 	}
+	
+	
+	private static int getSDKVersionNumber() {  
+	    int sdkVersion;  
+	    try {  
+	        sdkVersion = Integer.valueOf(android.os.Build.VERSION.SDK);  
+	    } catch (NumberFormatException e) {  
+	        sdkVersion = 0;  
+	    }  
+	    return sdkVersion;  
+	}  
 	
 	/**
 	 * 弧形滑动改变事件
@@ -202,25 +227,24 @@ public class CameraActivity extends Activity implements View.OnClickListener,
                 Manifest.permission.CAMERA); 
 //        LOG.e(TAG, "hasWriteContactsPermission:" + hasWriteContactsPermission + "----PackageManager.PERMISSION_GRANTED:" + PackageManager.PERMISSION_GRANTED);
         if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) { 
-        	Toast.makeText(CameraActivity.this, "未获得相机权限，请到设置中授权后再尝试。", Toast.LENGTH_SHORT) .show(); 
-        	finish();
+//        	Toast.makeText(CameraActivity.this, "未获得相机权限，请到设置中授权后再尝试。", Toast.LENGTH_SHORT) .show(); 
+//        	finish();
 //            if (!ActivityCompat.shouldShowRequestPermissionRationale(CameraActivity.this, 
 //                    Manifest.permission.CAMERA)) { 
-//                showMessageOKCancel("你需要允许获取相机权限", 
+//            			showMessageOKCancel("你需要允许获取相机权限", 
 //                        new DialogInterface.OnClickListener() { 
 //                            @Override 
 //                            public void onClick(DialogInterface dialog, int which) { 
 //                                ActivityCompat.requestPermissions(CameraActivity.this, 
-//                                        new String[] {Manifest.permission.CAMERA}, 
-//                                        REQUEST_CODE_ASK_PERMISSIONS); 
+//                                        new String[] {Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS); 
 //                            } 
 //                        }); 
 //                return; 
 //            } 
-//            ActivityCompat.requestPermissions(CameraActivity.this, 
-//                    new String[] {Manifest.permission.CAMERA}, 
-//                    REQUEST_CODE_ASK_PERMISSIONS); 
-//            return; 
+            ActivityCompat.requestPermissions(CameraActivity.this, 
+                    new String[] {Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS); 
+//
+            return; 
         } 
     } 
     
@@ -235,7 +259,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
                     // Permission Granted 
                 } else { 
                     // Permission Denied 
-                    Toast.makeText(CameraActivity.this, "WRITE_CONTACTS Denied", Toast.LENGTH_SHORT) 
+                    Toast.makeText(CameraActivity.this, "PERMISSION_GRANTED Denied", Toast.LENGTH_SHORT) 
                             .show(); 
                 } 
                 break; 
@@ -1140,7 +1164,12 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		builder.create().show();
 	}
 	
-	
+	@Override
+	protected void onDestroy() {		
+		super.onDestroy();
+		isActive = false;
+		LOG.e(TAG, "isActive:" + isActive);
+	}
 	@Override
 	protected void onResume() {		
 		setCameraText(leftOrRight);
@@ -1259,4 +1288,5 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		}
 		return super.onKeyDown(keyCode, event);
 	}
+
 }

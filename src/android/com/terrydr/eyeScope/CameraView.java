@@ -61,6 +61,16 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		openCamera();
 		mIsFrontCamera = false;
 	}
+	
+	private static int getSDKVersionNumber() {  
+	    int sdkVersion;  
+	    try {  
+	        sdkVersion = Integer.valueOf(android.os.Build.VERSION.SDK);  
+	    } catch (NumberFormatException e) {  
+	        sdkVersion = 0;  
+	    }  
+	    return sdkVersion;  
+	} 
 
 	private SurfaceHolder.Callback callback = new SurfaceHolder.Callback() {
 
@@ -73,6 +83,10 @@ public class CameraView extends SurfaceView implements CameraOperation {
 				setCameraParameters();
 				mCamera.setPreviewDisplay(getHolder());
 			} catch (Exception e) {
+				if(getSDKVersionNumber()>=23){
+					cActivity.finish();
+					return;
+				}
 				Toast.makeText(getContext(), "未获得相机权限，请到设置中授权后再尝试。", Toast.LENGTH_SHORT)
 						.show();
 				

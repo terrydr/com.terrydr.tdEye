@@ -1,8 +1,15 @@
 package com.terrydr.eyeScope;
 
+import java.util.List;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONException;
+
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningTaskInfo;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -23,9 +30,25 @@ public class Plugin_intent extends CordovaPlugin {
 			CallbackContext callbackContext) throws org.json.JSONException {
 		this.callbackContext = callbackContext;
 		if (action.equals("jrEyeTakePhotos")) {
+//			Intent intent = new Intent(cordova.getActivity(), CameraActivity.class);  
+//		    ComponentName cmpName = intent.resolveActivity(cordova.getActivity().getPackageManager());  
+//		    boolean bIsExist = false;  
+//		    if (cmpName != null) { // 说明系统中存在这个activity  
+//		        ActivityManager am = (ActivityManager) cordova.getActivity().getSystemService(Context.ACTIVITY_SERVICE);
+//		        List<RunningTaskInfo> taskInfoList = am.getRunningTasks(10);  
+//		        for (RunningTaskInfo taskInfo : taskInfoList) {  
+//		            if (taskInfo.baseActivity.equals(cmpName)) { // 说明它已经启动了  
+//		                bIsExist = true;  
+//		                break;  
+//		            }  
+//		        }  
+//		    }  
+//		    Log.e(TAG, "bIsExist:" + bIsExist);
+//		    if(!bIsExist){
 			Log.e(TAG, "jrEyeTakePhotos:" + callbackContext);
-			this.startCameraActivity();
-			return true;
+				  this.startCameraActivity();
+				  return true;
+//		    }
 		} else if (action.equals("jrEyeSelectPhotos")) { // 相册缩略图界面
 			Log.e(TAG, "jrEyeSelectPhotos:" + callbackContext);
 			startAlbumAty();
