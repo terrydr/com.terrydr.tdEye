@@ -584,6 +584,15 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             }else{
                 _rightSelectedCount--;
             }
+            if (_leftCount>0) {
+                if (_rightCount>0) {
+                    _eyeTypeLab.text = [NSString stringWithFormat:@"左眼 %d/2   右眼 %d/2",_leftSelectedCount,_rightSelectedCount];
+                }else{
+                    _eyeTypeLab.text = [NSString stringWithFormat:@"左眼 %d/2",_leftSelectedCount];
+                }
+            }else{
+                _eyeTypeLab.text = [NSString stringWithFormat:@"右眼 %d/2",_rightSelectedCount];
+            }
             if (![_selectedModelArr isValid]) {
                 self.navigationItem.rightBarButtonItem.enabled = NO;
             }
