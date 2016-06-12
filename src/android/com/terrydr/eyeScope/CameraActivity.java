@@ -171,7 +171,10 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		
 	}
 	
-	
+	/**
+	 * 获取sdk版本号
+	 * @return
+	 */
 	private static int getSDKVersionNumber() {  
 	    int sdkVersion;  
 	    try {  
@@ -243,7 +246,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 //            } 
             ActivityCompat.requestPermissions(CameraActivity.this, 
                     new String[] {Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS); 
-//
             return; 
         } 
     } 
@@ -335,7 +337,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 * 点击拍照事件
 	 */
 	private void takePictureing(){
-		Log.d(TAG, "点击拍照按钮");
+//		Log.d(TAG, "点击拍照按钮");
 		if ((i_left >= 6 && leftOrRight) || (i_right >= 6 && !leftOrRight)) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("单侧眼睛最多拍摄六张图片,是否重拍?")
@@ -348,6 +350,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 							else
 								i_right = 0;
 							deleteFolder();
+							if (i_left == 0 && i_right == 0) {
+								btn_thumbnail.setVisibility(View.GONE);
+							}
 						}
 					}).setNegativeButton("取消", new OnClickListener() {
 						@Override
@@ -372,7 +377,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			AlphaAnimation alphaAnimation = new AlphaAnimation(0.1f, 1.0f);  
 	        alphaAnimation.setDuration(100);  
 	        mContainer.startAnimation(alphaAnimation);
-	        
 		}
 	}
 
@@ -381,6 +385,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		int currentX = (int) view.getX();
 		switch (view.getId()) {
 		case R.id.photos_iv:
+			LOG.e(TAG, "onClick");
 			takePictureing();
 			break;
 		case R.id.iso_iv:
@@ -696,8 +701,10 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 * @param thumbPath
 	 */
 	public void setThumbnailBitmap(Bitmap bm,String thumbPath){
-//		Log.e(TAG, "thumbPath:" + thumbPath);
 		photos_iv.setEnabled(true);
+		if( bm == null){
+			return;
+		}
 		Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 213, 213);
 		btn_thumbnail.setImageBitmap(thumbnail);
 		this.thumbPath = thumbPath;
@@ -958,6 +965,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			switch (view.getId()) {
 			case R.id.photos_iv:
 				if (isLong) {
+//					Log.e(TAG,"setEnabled");
 					photos_iv.setEnabled(false);
 					isLong = false;
 					// Log.d(TAG,"结束连继拍照");
@@ -965,7 +973,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 						mContainer.stop = i_left;
 					} else
 						mContainer.stop = i_right;
-					stop();
+					stop(null,null);
 				}
 				return false;
 			}
@@ -1023,7 +1031,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		public boolean onLongClick(View v) {
 			isLong = true;
 			start();
-			return false;
+			return true;
 		}
 	};
 	
@@ -1037,8 +1045,12 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			camera_camera_tv.setText(Integer.toString(++i_right) + "/6");
 		}
 		if ((i_left >= 6 && leftOrRight) || (i_right >= 6 && !leftOrRight)){
-			stop();
+			stop(null,null);
         }
+		//闪屏动画效果
+		AlphaAnimation alphaAnimation = new AlphaAnimation(0.1f, 1.0f);  
+        alphaAnimation.setDuration(10);  
+        mContainer.startAnimation(alphaAnimation);
     }
     
     public void delectMultiFile(){
@@ -1075,6 +1087,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 								mContainer.mNumright = 0;
 							}
 							deleteFolder();
+							if (i_left == 0 && i_right == 0) {
+								btn_thumbnail.setVisibility(View.GONE);
+							}
 						}
 					}).setNegativeButton("取消", new OnClickListener() {
 						@Override
@@ -1084,7 +1099,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 						}
 					});
 			builder.create().show();
-			stop();
+			stop(null,null);
 		} else {
 			if (leftOrRight){
 				mContainer.mNumLeft = i_left;
@@ -1098,8 +1113,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
     /**
      * 停止连拍
      */
-    public void stop(){
-    	mContainer.stopShooting();
+    public void stop(Bitmap bm,String thumbPath){
+    	mContainer.stopShooting(bm,thumbPath);
 
     }
     
@@ -1232,12 +1247,12 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		}
 	}
 	
-	/**
-	 * 连拍结束把拍照按钮设为true
-	 */
-	public void setPhotos_iv_Enabled(){
-		photos_iv.setEnabled(true);
-	}
+//	/**
+//	 * 连拍结束把拍照按钮设为true
+//	 */
+//	public void setPhotos_iv_Enabled(boolean isTure){
+//		photos_iv.setEnabled(isTure);
+//	}
 	
 	/**
 	 * 监听系统按键 拍照

@@ -133,8 +133,9 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		// 选择合的预览尺寸
 		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
 	    Size pictureS = CameraSize.getInstance().getPreviewSize(sizeList, 1200);  
+	    Log.e(TAG, "w:" + pictureS.width +"-h:" + pictureS.height); 
 	    parameters.setPreviewSize(pictureS.width, pictureS.height);  
-//	    Log.e(TAG, "w:" + pictureS.width +"-h:" + pictureS.height);  
+	     
 		// 设置生成的图片大
 	    sizeList1 = parameters.getSupportedPictureSizes();
 		pictureS1 = CameraSize.getInstance().getPictureSize(sizeList1, 1200);  
