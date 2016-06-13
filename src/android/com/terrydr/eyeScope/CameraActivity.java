@@ -250,34 +250,34 @@ public class CameraActivity extends Activity implements View.OnClickListener,
         } 
     } 
     
-    /**
-     * android 6.0以上版本阻止权限提示是否开启权限
-     */
-    @Override 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) { 
-        switch (requestCode) { 
-            case REQUEST_CODE_ASK_PERMISSIONS: 
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { 
-                    // Permission Granted 
-                } else { 
-                    // Permission Denied 
-                    Toast.makeText(CameraActivity.this, "PERMISSION_GRANTED Denied", Toast.LENGTH_SHORT) 
-                            .show(); 
-                } 
-                break; 
-            default: 
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults); 
-        } 
-    } 
+//    /**
+//     * android 6.0以上版本阻止权限提示是否开启权限
+//     */
+//    @Override 
+//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) { 
+//        switch (requestCode) { 
+//            case REQUEST_CODE_ASK_PERMISSIONS: 
+//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { 
+//                    // Permission Granted 
+//                } else { 
+//                    // Permission Denied 
+//                    Toast.makeText(CameraActivity.this, "PERMISSION_GRANTED Denied", Toast.LENGTH_SHORT) 
+//                            .show(); 
+//                } 
+//                break; 
+//            default: 
+//                super.onRequestPermissionsResult(requestCode, permissions, grantResults); 
+//        } 
+//    } 
     
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) { 
-        new AlertDialog.Builder(CameraActivity.this) 
-                .setMessage(message) 
-                .setPositiveButton("OK", okListener) 
-                .setNegativeButton("Cancel", null) 
-                .create() 
-                .show(); 
-    } 
+//    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) { 
+//        new AlertDialog.Builder(CameraActivity.this) 
+//                .setMessage(message) 
+//                .setPositiveButton("OK", okListener) 
+//                .setNegativeButton("Cancel", null) 
+//                .create() 
+//                .show(); 
+//    } 
     
 	/**
 	 * 保存图片路径
