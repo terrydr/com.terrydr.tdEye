@@ -126,12 +126,22 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		files = new ArrayList<File>();
 		if (imageList != null && imageList.size() > 0) {
 			files.addAll(imageList);
+			eye_left_tv.setVisibility(View.VISIBLE);
+			eye_left_select_count_tv.setVisibility(View.VISIBLE);
+		} else {
+			eye_left_tv.setVisibility(View.GONE);
+			eye_left_select_count_tv.setVisibility(View.GONE);
 		}
 		FileOperateUtil.sortList(files, true);
 
 		List<File> filesRight = new ArrayList<File>();
 		if (imageListRight != null && imageListRight.size() > 0) {
 			filesRight.addAll(imageListRight);
+			eye_right_tv.setVisibility(View.VISIBLE);
+			eye_right_select_count_tv.setVisibility(View.VISIBLE);
+		} else {
+			eye_right_tv.setVisibility(View.GONE);
+			eye_right_select_count_tv.setVisibility(View.GONE);
 		}
 		FileOperateUtil.sortList(filesRight, true);
 
@@ -185,20 +195,20 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 
 			eye_left_select_count_tv.setText(selectPathsLeft.size()+ "/2");
 			eye_right_select_count_tv.setText(selectPathsRight.size()+ "/2");
-			if(selectPathsLeft.size()>0){
-				eye_left_tv.setVisibility(View.VISIBLE);
-				eye_left_select_count_tv.setVisibility(View.VISIBLE);
-			}else{
-				eye_left_tv.setVisibility(View.GONE);
-				eye_left_select_count_tv.setVisibility(View.GONE);
-			}
-			if(selectPathsRight.size()>0){
-				eye_right_tv.setVisibility(View.VISIBLE);
-				eye_right_select_count_tv.setVisibility(View.VISIBLE);
-			}else{
-				eye_right_tv.setVisibility(View.GONE);
-				eye_right_select_count_tv.setVisibility(View.GONE);
-			}
+//			if(selectPathsLeft.size()>0){
+//				eye_left_tv.setVisibility(View.VISIBLE);
+//				eye_left_select_count_tv.setVisibility(View.VISIBLE);
+//			}else{
+//				eye_left_tv.setVisibility(View.GONE);
+//				eye_left_select_count_tv.setVisibility(View.GONE);
+//			}
+//			if(selectPathsRight.size()>0){
+//				eye_right_tv.setVisibility(View.VISIBLE);
+//				eye_right_select_count_tv.setVisibility(View.VISIBLE);
+//			}else{
+//				eye_right_tv.setVisibility(View.GONE);
+//				eye_right_select_count_tv.setVisibility(View.GONE);
+//			}
 		}
 	}
 	
