@@ -25,8 +25,7 @@ public class Reflect {
     public static List<Size> getSupportedPreviewSizes(Camera.Parameters p) {   
         try {   
             if (Parameters_getSupportedPreviewSizes != null) {   
-                return (List<Size>) Parameters_getSupportedPreviewSizes   
-                        .invoke(p);   
+                return (List<Size>) Parameters_getSupportedPreviewSizes.invoke(p);   
             } else {   
                 return null;   
             }   

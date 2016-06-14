@@ -19,6 +19,7 @@ import android.media.ThumbnailUtils;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.RelativeLayout;
@@ -285,8 +286,9 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
             
 //			Size bmSize = mCameraView.returnPictureSzie();
 			Size bmSize = convertPreviewSize(data);
-            final int width = bmSize.width;
-            final int height = bmSize.height;
+            int width = bmSize.width;
+            int height = bmSize.height;
+//            Log.e(TAG, "连拍width:" + width + "-height:" + height);
             Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888); 
             cActivity.setCount();
             ImageAsyncTask taskBmp = new ImageAsyncTask(CameraContainer.this,mCameraView, data, bmSize,imagePath,thumbPath);
