@@ -159,15 +159,14 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 		int i = dip2px(30);
 		int m = px2dip(38);
-		Log.e(TAG, "i:" + i);
-		Log.e(TAG, "m:" + m);
+//		Log.e(TAG, "i:" + i);
+//		Log.e(TAG, "m:" + m);
 		
 		wm = this.getWindowManager();
 		width = wm.getDefaultDisplay().getWidth();
 		getWidth = width*140/720;
-		Log.e(TAG, "width:" + width);
-		Log.e(TAG, "getWidth:" + getWidth);
-		
+//		Log.e(TAG, "width:" + width);
+//		Log.e(TAG, "getWidth:" + getWidth);
 		
 	}
 	
@@ -385,7 +384,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		int currentX = (int) view.getX();
 		switch (view.getId()) {
 		case R.id.photos_iv:
-			LOG.e(TAG, "onClick");
 			takePictureing();
 			break;
 		case R.id.iso_iv:
@@ -493,7 +491,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			wb_tv.setText("白炽灯");
 			break;
 		case 2:
-			mContainer.setWB(Camera.Parameters.WHITE_BALANCE_WARM_FLUORESCENT);
+			mContainer.setWB(Camera.Parameters.WHITE_BALANCE_FLUORESCENT);
 			wb_iv.setImageResource(R.drawable.wb_warm_fluorescent);
 			wb_tv.setText("荧光灯");
 			break;
@@ -1183,7 +1181,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	protected void onDestroy() {		
 		super.onDestroy();
 		isActive = false;
-		LOG.e(TAG, "isActive:" + isActive);
 	}
 	@Override
 	protected void onResume() {		
