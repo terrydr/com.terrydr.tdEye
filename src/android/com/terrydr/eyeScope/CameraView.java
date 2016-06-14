@@ -113,13 +113,12 @@ public class CameraView extends SurfaceView implements CameraOperation {
 				setCameraParameters();
 				mCamera.setPreviewDisplay(getHolder());
 			} catch (Exception e) {
-				if(getSDKVersionNumber()>=23){
+				if(getSDKVersionNumber()>=23){  //android版本大于6.0直接结束返回
 					cActivity.finish();
 					return;
 				}
-				Toast.makeText(getContext(), "未获得相机权限，请到设置中授权后再尝试。", Toast.LENGTH_SHORT)
-						.show();
-				
+				//android版本小于6.0 弹窗提醒
+				Toast.makeText(getContext(), "未获得相机权限，请到设置中授权后再尝试。", Toast.LENGTH_SHORT).show();
 				Log.e(TAG, "未获得相机权限，请到设置中授权后再尝试。"+e.getMessage());
 				cActivity.finish();
 				return;
@@ -130,7 +129,14 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
-			updateCameraOrientation();
+			try{
+				updateCameraOrientation();
+			}catch(Exception ex){
+				Toast.makeText(getContext(), "打开相机失败", Toast.LENGTH_SHORT).show();
+				Log.e(TAG, "打开相机失败。"+ex.getMessage());
+				cActivity.finish();
+				return;
+			}
 		}
 		
 		@Override
