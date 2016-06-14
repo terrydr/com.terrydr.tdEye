@@ -13,7 +13,7 @@ import android.util.Log;
  */
 public class CameraSize {
 
-	private static final String tag = "CameraSize";
+	private static final String TAG = "CameraSize";
 	private CameraSizeComparator sizeComparator = new CameraSizeComparator();
 	private static CameraSize myCamPara = null;
 
@@ -32,7 +32,6 @@ public class CameraSize {
 
 	public Size getPreviewSize(List<Camera.Size> list, int th) {
 		Collections.sort(list, sizeComparator);
-
 		int i = 0;
 		for (Size s : list) {
 			if ((s.width > th) && equalRate(s, 1.333f)) {
@@ -49,7 +48,6 @@ public class CameraSize {
 
 	public Size getPictureSize(List<Camera.Size> list, int th) {
 		Collections.sort(list, sizeComparator);
-
 		int i = 0;
 		for (Size s : list) {
 			if ((s.width > th) && equalRate(s, 1.333f)) {
@@ -63,6 +61,87 @@ public class CameraSize {
         }
 		return list.get(i);
 	}
+	
+	/**
+	 * 默认查找4:3的尺寸,如果不支持4:3的尺寸则查找16:9
+	 * @param list
+	 * @param th
+	 * @param minWidth
+	 * @return
+	 */
+	public  Size getPropPreviewSize(List<Camera.Size> list, float th, int minWidth){  
+        Collections.sort(list, sizeComparator);  
+        boolean isEmpty = true;
+        int i = 0;  
+        for(Size s:list){  
+            if((s.width >= minWidth) && equalRate1(s, 1.333f)){  
+//                Log.i(TAG, "PreviewSize:w = " + s.width + "h = " + s.height);  
+            	isEmpty = false;
+                break;  
+            }  
+            i++;  
+        }  
+        if(isEmpty){  //如果为空则查找16:9的尺寸
+        	i = 0;
+            for(Size s:list){  
+                if((s.width >= minWidth) && equalRate1(s, 1.777f)){  
+                	isEmpty = true;
+                    break;  
+                }  
+                i++;  
+            } 
+        }
+        if(i == list.size()){  
+            i = 0;//如果没找到，就选最小的size  
+        }  
+        return list.get(i);  
+    }  
+	
+	/**
+	 * 默认查找4:3的尺寸,如果不支持4:3的尺寸则查找16:9
+	 * @param list
+	 * @param th
+	 * @param minWidth
+	 * @return
+	 */
+    public Size getPropPictureSize(List<Camera.Size> list, float th, int minWidth){  
+        Collections.sort(list, sizeComparator);  
+        boolean isEmpty = true;
+        int i = 0;  
+        for(Size s:list){  
+            if((s.width >= minWidth) && equalRate1(s, 1.333f)){  
+//                Log.i(TAG, "PictureSize : w = " + s.width + "h = " + s.height);  
+            	isEmpty = false;
+                break;  
+            }  
+            i++;  
+        }  
+        if(isEmpty){  //如果为空则查找16:9的尺寸
+        	i = 0;
+            for(Size s:list){  
+                if((s.width >= minWidth) && equalRate1(s, 1.777f)){  
+                	isEmpty = true;
+                    break;  
+                }  
+                i++;  
+            } 
+        }
+        if(i == list.size()){  
+            i = 0;//如果没找到，就选最小的size  
+        }  
+        return list.get(i);  
+    }  
+  
+    public boolean equalRate1(Size s, float rate){  
+        float r = (float)(s.width)/(float)(s.height);  
+        if(Math.abs(r - rate) <= 0.03)  
+        {  
+            return true;  
+        }  
+        else{  
+            return false;  
+        }  
+    }  
 
 	public boolean equalRate(Size s, float rate) {
 		float r = (float) (s.width) / (float) (s.height);

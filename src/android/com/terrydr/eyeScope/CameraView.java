@@ -20,6 +20,7 @@ import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.SurfaceHolder;
@@ -44,10 +45,12 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	private List<Size> mSupportList = null;
 
 	private CameraActivity cActivity;
+	float previewRate = -1f;  
 	
 	public CameraView(Context context) {
 		super(context);
 		cActivity = (CameraActivity) context;
+		previewRate = getScreenRate(cActivity); //默认全屏的比例预览  
 		// 初始化容
 		getHolder().addCallback(callback);
 		openCamera();
@@ -56,11 +59,38 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	public CameraView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		cActivity = (CameraActivity) context;
+		previewRate = getScreenRate(cActivity); //默认全屏的比例预览  
 		// 初始化容
 		getHolder().addCallback(callback);
 		openCamera();
 		mIsFrontCamera = false;
 	}
+	
+	/** 
+     * 获取屏幕宽度和高度，单位为px 
+     * @param context 
+     * @return 
+     */  
+    public Point getScreenMetrics(Context context){  
+        DisplayMetrics dm =context.getResources().getDisplayMetrics();  
+        int w_screen = dm.widthPixels;  
+        int h_screen = dm.heightPixels;  
+        Log.e(TAG, "Screen---Width = " + w_screen + " Height = " + h_screen + " densityDpi = " + dm.densityDpi);  
+        return new Point(w_screen, h_screen);  
+          
+    }  
+      
+    /** 
+     * 获取屏幕长宽比 
+     * @param context 
+     * @return 
+     */  
+    public float getScreenRate(Context context){  
+        Point P = getScreenMetrics(context);  
+        float H = P.y;  
+        float W = P.x;  
+        return (H/W);  
+    }  
 	
 	private static int getSDKVersionNumber() {  
 	    int sdkVersion;  
@@ -118,22 +148,29 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 */
 	private void setCameraParameters() {
 		Camera.Parameters parameters = mCamera.getParameters();
-		List<String> l = parameters.getSupportedWhiteBalance();
-		for(String s : l){
-			Log.e(TAG, "s:" + s);
-		}
 		
 		// 选择合的预览尺寸
 		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
-	    Size pictureS = CameraSize.getInstance().getPreviewSize(sizeList, 1200);  
-	    Log.e(TAG, "w:" + pictureS.width +"-h:" + pictureS.height); 
+//		Collections.sort(sizeList, sizeComparator);
+//		for(Size s : sizeList){
+//			Log.e(TAG, "previewSize:" + s.width + "*" + s.height);
+//		}
+//	    Size pictureS = CameraSize.getInstance().getPreviewSize(sizeList, 1280);  
+		Size pictureS = CameraSize.getInstance().getPropPreviewSize(sizeList,previewRate, 1280);  
+	    Log.e(TAG, "previewWidth:" + pictureS.width +"-previewHeight:" + pictureS.height); 
 	    parameters.setPreviewSize(pictureS.width, pictureS.height);  
 	     
 		// 设置生成的图片大
 	    sizeList1 = parameters.getSupportedPictureSizes();
-		pictureS1 = CameraSize.getInstance().getPictureSize(sizeList1, 1200);  
+//	    Collections.sort(sizeList1, sizeComparator);
+//		for(Size s : sizeList1){
+//			Log.e(TAG, "pictureSize:" + s.width + "*" + s.height);
+//		}
+//		pictureS1 = CameraSize.getInstance().getPictureSize(sizeList1, 1280);  
+	    Size pictureS1 = CameraSize.getInstance().getPropPictureSize(sizeList1,previewRate, 1280);  
+//		Size pictureS1 = sizeList1.get(sizeList1.size()-1);
 	    parameters.setPictureSize(pictureS1.width, pictureS1.height);  
-	    Log.e(TAG, "w1:" + pictureS1.width +"-h1:" + pictureS1.height);  
+	    Log.e(TAG, "pictureWidth:" + pictureS1.width +"-pictureHeight:" + pictureS1.height); 
 		
 		// 设置图片格式
 		parameters.setPictureFormat(ImageFormat.JPEG);
@@ -344,8 +381,6 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		if(wbValue==null){
 			return;
 		}
-		Log.e(TAG, "wbValue:" + wbValue);
-
 		parameters.setWhiteBalance(wbValue);
 		mCamera.setParameters(parameters);
 	}
