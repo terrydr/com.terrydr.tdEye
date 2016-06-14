@@ -159,19 +159,21 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 		int i = dip2px(30);
 		int m = px2dip(38);
-		Log.e(TAG, "i:" + i);
-		Log.e(TAG, "m:" + m);
+//		Log.e(TAG, "i:" + i);
+//		Log.e(TAG, "m:" + m);
 		
 		wm = this.getWindowManager();
 		width = wm.getDefaultDisplay().getWidth();
 		getWidth = width*140/720;
-		Log.e(TAG, "width:" + width);
-		Log.e(TAG, "getWidth:" + getWidth);
-		
+//		Log.e(TAG, "width:" + width);
+//		Log.e(TAG, "getWidth:" + getWidth);
 		
 	}
 	
-	
+	/**
+	 * 获取sdk版本号
+	 * @return
+	 */
 	private static int getSDKVersionNumber() {  
 	    int sdkVersion;  
 	    try {  
@@ -243,39 +245,38 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 //            } 
             ActivityCompat.requestPermissions(CameraActivity.this, 
                     new String[] {Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS); 
-//
             return; 
         } 
     } 
     
-    /**
-     * android 6.0以上版本阻止权限提示是否开启权限
-     */
-    @Override 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) { 
-        switch (requestCode) { 
-            case REQUEST_CODE_ASK_PERMISSIONS: 
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { 
-                    // Permission Granted 
-                } else { 
-                    // Permission Denied 
-                    Toast.makeText(CameraActivity.this, "PERMISSION_GRANTED Denied", Toast.LENGTH_SHORT) 
-                            .show(); 
-                } 
-                break; 
-            default: 
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults); 
-        } 
-    } 
+//    /**
+//     * android 6.0以上版本阻止权限提示是否开启权限
+//     */
+//    @Override 
+//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) { 
+//        switch (requestCode) { 
+//            case REQUEST_CODE_ASK_PERMISSIONS: 
+//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { 
+//                    // Permission Granted 
+//                } else { 
+//                    // Permission Denied 
+//                    Toast.makeText(CameraActivity.this, "PERMISSION_GRANTED Denied", Toast.LENGTH_SHORT) 
+//                            .show(); 
+//                } 
+//                break; 
+//            default: 
+//                super.onRequestPermissionsResult(requestCode, permissions, grantResults); 
+//        } 
+//    } 
     
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) { 
-        new AlertDialog.Builder(CameraActivity.this) 
-                .setMessage(message) 
-                .setPositiveButton("OK", okListener) 
-                .setNegativeButton("Cancel", null) 
-                .create() 
-                .show(); 
-    } 
+//    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) { 
+//        new AlertDialog.Builder(CameraActivity.this) 
+//                .setMessage(message) 
+//                .setPositiveButton("OK", okListener) 
+//                .setNegativeButton("Cancel", null) 
+//                .create() 
+//                .show(); 
+//    } 
     
 	/**
 	 * 保存图片路径
@@ -335,7 +336,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 * 点击拍照事件
 	 */
 	private void takePictureing(){
-		Log.d(TAG, "点击拍照按钮");
+//		Log.d(TAG, "点击拍照按钮");
 		if ((i_left >= 6 && leftOrRight) || (i_right >= 6 && !leftOrRight)) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("单侧眼睛最多拍摄六张图片,是否重拍?")
@@ -348,6 +349,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 							else
 								i_right = 0;
 							deleteFolder();
+							if (i_left == 0 && i_right == 0) {
+								btn_thumbnail.setVisibility(View.GONE);
+							}
 						}
 					}).setNegativeButton("取消", new OnClickListener() {
 						@Override
@@ -372,7 +376,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			AlphaAnimation alphaAnimation = new AlphaAnimation(0.1f, 1.0f);  
 	        alphaAnimation.setDuration(100);  
 	        mContainer.startAnimation(alphaAnimation);
-	        
 		}
 	}
 
@@ -488,7 +491,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			wb_tv.setText("白炽灯");
 			break;
 		case 2:
-			mContainer.setWB(Camera.Parameters.WHITE_BALANCE_WARM_FLUORESCENT);
+			mContainer.setWB(Camera.Parameters.WHITE_BALANCE_FLUORESCENT);
 			wb_iv.setImageResource(R.drawable.wb_warm_fluorescent);
 			wb_tv.setText("荧光灯");
 			break;
@@ -696,8 +699,10 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 * @param thumbPath
 	 */
 	public void setThumbnailBitmap(Bitmap bm,String thumbPath){
-//		Log.e(TAG, "thumbPath:" + thumbPath);
 		photos_iv.setEnabled(true);
+		if( bm == null){
+			return;
+		}
 		Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 213, 213);
 		btn_thumbnail.setImageBitmap(thumbnail);
 		this.thumbPath = thumbPath;
@@ -958,6 +963,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			switch (view.getId()) {
 			case R.id.photos_iv:
 				if (isLong) {
+//					Log.e(TAG,"setEnabled");
 					photos_iv.setEnabled(false);
 					isLong = false;
 					// Log.d(TAG,"结束连继拍照");
@@ -965,7 +971,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 						mContainer.stop = i_left;
 					} else
 						mContainer.stop = i_right;
-					stop();
+					stop(null,null);
 				}
 				return false;
 			}
@@ -1023,7 +1029,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		public boolean onLongClick(View v) {
 			isLong = true;
 			start();
-			return false;
+			return true;
 		}
 	};
 	
@@ -1037,8 +1043,12 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			camera_camera_tv.setText(Integer.toString(++i_right) + "/6");
 		}
 		if ((i_left >= 6 && leftOrRight) || (i_right >= 6 && !leftOrRight)){
-			stop();
+			stop(null,null);
         }
+		//闪屏动画效果
+		AlphaAnimation alphaAnimation = new AlphaAnimation(0.1f, 1.0f);  
+        alphaAnimation.setDuration(10);  
+        mContainer.startAnimation(alphaAnimation);
     }
     
     public void delectMultiFile(){
@@ -1075,6 +1085,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 								mContainer.mNumright = 0;
 							}
 							deleteFolder();
+							if (i_left == 0 && i_right == 0) {
+								btn_thumbnail.setVisibility(View.GONE);
+							}
 						}
 					}).setNegativeButton("取消", new OnClickListener() {
 						@Override
@@ -1084,7 +1097,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 						}
 					});
 			builder.create().show();
-			stop();
+			stop(null,null);
 		} else {
 			if (leftOrRight){
 				mContainer.mNumLeft = i_left;
@@ -1098,8 +1111,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
     /**
      * 停止连拍
      */
-    public void stop(){
-    	mContainer.stopShooting();
+    public void stop(Bitmap bm,String thumbPath){
+    	mContainer.stopShooting(bm,thumbPath);
 
     }
     
@@ -1168,7 +1181,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	protected void onDestroy() {		
 		super.onDestroy();
 		isActive = false;
-		LOG.e(TAG, "isActive:" + isActive);
 	}
 	@Override
 	protected void onResume() {		
@@ -1232,12 +1244,12 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		}
 	}
 	
-	/**
-	 * 连拍结束把拍照按钮设为true
-	 */
-	public void setPhotos_iv_Enabled(){
-		photos_iv.setEnabled(true);
-	}
+//	/**
+//	 * 连拍结束把拍照按钮设为true
+//	 */
+//	public void setPhotos_iv_Enabled(boolean isTure){
+//		photos_iv.setEnabled(isTure);
+//	}
 	
 	/**
 	 * 监听系统按键 拍照

@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -155,20 +156,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
     }
     
     /**
-     * 结束连拍
-     */
-    public void stopShooting(){
-    	contShoot = false;
-		mMode = 0;
-    	if(mCameraView.mCamera!=null){
-    		mCameraView.mCamera.stopPreview();
-    		mCameraView.mCamera.setPreviewCallback(null);
-    		mCameraView.mCamera.startPreview();
-    	}
-    	
-    }
-    
-    /**
      * 每一张连拍结束的回调函数
      */
     public void countShoot(Bitmap bm,String thumbPath){
@@ -179,28 +166,32 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
         		mCameraView.mCamera.setPreviewCallback(mPreviewCallback);    
         	}
         }
-        if(!contShoot){
-        	stopShooting(bm, thumbPath);
-        }
-//        LOG.e(TAG, "mNumLeft:"+mNumLeft + "------" + cActivity.leftOrRight);
+//        LOG.e(TAG, "contShoot:" + contShoot);
+//        if(!contShoot){
+//        	stopShooting(bm, thumbPath);
+//        }
+        
         if(cActivity.leftOrRight){
         	mNumLeft++;
+//        	LOG.e(TAG, "mNumLeft:"+mNumLeft + "------" + cActivity.leftOrRight + "stop:" + stop );
             if(stop==mNumLeft){
-            	cActivity.startAlbumAty();
-            }else
-        	if(mNumLeft>=6){
+//            	cActivity.startAlbumAty();
+            	stopShooting(bm, thumbPath);
+            }else if(mNumLeft>=6){
         		stopShooting(bm, thumbPath);
-            	cActivity.startAlbumAty();
+//            	cActivity.startAlbumAty();
         	}
         }else{
         	mNumright++;
+//        	LOG.e(TAG, "mNumLeft:"+mNumLeft + "------" + cActivity.leftOrRight + "stop:" + stop );
             if(stop==mNumright){
-            	cActivity.startAlbumAty();
-            }else
-        	if(mNumright>=6){
+//            	cActivity.startAlbumAty();
+            	stopShooting(bm, thumbPath);
+            }else if(mNumright>=6){
         		stopShooting(bm, thumbPath);
-            	cActivity.startAlbumAty();
+//            	cActivity.startAlbumAty();
         	}
+            
         }
     }
 	

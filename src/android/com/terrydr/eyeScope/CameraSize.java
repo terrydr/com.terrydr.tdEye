@@ -41,7 +41,9 @@ public class CameraSize {
 			}
 			i++;
 		}
-
+		if(i == list.size()){  
+            i = 0;//如果没找到，就选最小的size  
+        }
 		return list.get(i);
 	}
 
@@ -56,7 +58,9 @@ public class CameraSize {
 			}
 			i++;
 		}
-
+		if(i == list.size()){  
+            i = 0;//如果没找到，就选最小的size  
+        }
 		return list.get(i);
 	}
 

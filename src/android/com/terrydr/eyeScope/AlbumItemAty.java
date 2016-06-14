@@ -237,8 +237,10 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 				i++;
 			}
 			mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(this,paths));
-			mViewPager.setCurrentItem(currentItem);
-			tips[currentItem].setBackgroundResource(R.drawable.albumitem_selected_current);
+//			mViewPager.setCurrentItem(currentItem);
+//			tips[currentItem].setBackgroundResource(R.drawable.albumitem_selected_current);
+			mViewPager.setCurrentItem(0);
+			tips[0].setBackgroundResource(R.drawable.albumitem_selected_current);
 			setCountView();
 		}
 	}

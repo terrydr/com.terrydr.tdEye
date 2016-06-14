@@ -113,33 +113,27 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		}
 	};
 
-
 	/**
-	 * 设置照相机参
-	 * 白平衡设置 
-	    WHITE_BALANCE_AUTO              Constant Value: "auto" 				自动
-		WHITE_BALANCE_INCANDESCENT      Constant Value: "incandescent"    	白炽光
-		WHITE_BALANCE_FLUORESCENT		Constant Value: "fluorescent"  		日光
-		WHITE_BALANCE_WARM_FLUORESCENT	Constant Value: "warm-fluorescent"  荧光
-		WHITE_BALANCE_DAYLIGHT			Constant Value: "daylight" 			白天
-		WHITE_BALANCE_CLOUDY_DAYLIGHT	Constant Value: "cloudy-daylight" 	多云、阴天
-		WHITE_BALANCE_TWILIGHT			Constant Value: "twilight" 			黄昏
-		WHITE_BALANCE_SHADE				Constant Value: "shade" 			暧荧光灯
-	 *
+	 * 设置相机参数
 	 */
 	private void setCameraParameters() {
 		Camera.Parameters parameters = mCamera.getParameters();
+		List<String> l = parameters.getSupportedWhiteBalance();
+		for(String s : l){
+			Log.e(TAG, "s:" + s);
+		}
 		
 		// 选择合的预览尺寸
 		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
 	    Size pictureS = CameraSize.getInstance().getPreviewSize(sizeList, 1200);  
+	    Log.e(TAG, "w:" + pictureS.width +"-h:" + pictureS.height); 
 	    parameters.setPreviewSize(pictureS.width, pictureS.height);  
-//	    Log.e(TAG, "w:" + pictureS.width +"-h:" + pictureS.height);  
+	     
 		// 设置生成的图片大
 	    sizeList1 = parameters.getSupportedPictureSizes();
 		pictureS1 = CameraSize.getInstance().getPictureSize(sizeList1, 1200);  
 	    parameters.setPictureSize(pictureS1.width, pictureS1.height);  
-//	    Log.e(TAG, "w1:" + pictureS1.width +"-h1:" + pictureS1.height);  
+	    Log.e(TAG, "w1:" + pictureS1.width +"-h1:" + pictureS1.height);  
 		
 		// 设置图片格式
 		parameters.setPictureFormat(ImageFormat.JPEG);
@@ -329,6 +323,18 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	/**
 	 * 设置白平衡
 	 * @param wbValue
+	 * 	/**
+	 * 设置照相机参
+	 * 白平衡设置  
+	    WHITE_BALANCE_AUTO              Constant Value: "auto" 				自动                   			 华为、三星支持模式
+		WHITE_BALANCE_INCANDESCENT      Constant Value: "incandescent"    	白炽光                 		 华为、三星支持模式
+		WHITE_BALANCE_FLUORESCENT		Constant Value: "fluorescent"  		日光 灯、荧光灯                  华为、三星支持模式
+		WHITE_BALANCE_WARM_FLUORESCENT	Constant Value: "warm-fluorescent"  荧光
+		WHITE_BALANCE_DAYLIGHT			Constant Value: "daylight" 			白天                    			华为、三星支持模式
+		WHITE_BALANCE_CLOUDY_DAYLIGHT	Constant Value: "cloudy-daylight" 	多云、阴天     			华为、三星支持模式
+		WHITE_BALANCE_TWILIGHT			Constant Value: "twilight" 			黄昏
+		WHITE_BALANCE_SHADE				Constant Value: "shade" 			暧荧光灯
+	 *
 	 */
 	public void setWB(String wbValue){
 		if (mCamera == null) {
@@ -338,6 +344,8 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		if(wbValue==null){
 			return;
 		}
+		Log.e(TAG, "wbValue:" + wbValue);
+
 		parameters.setWhiteBalance(wbValue);
 		mCamera.setParameters(parameters);
 	}
