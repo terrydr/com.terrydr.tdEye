@@ -412,13 +412,13 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _progressView.frame = CGRectMake(0, CGRectGetMaxY(_viewContainer.frame), APP_WIDTH, 5);
     CGFloat btnW = 40;
     CGFloat leftBtnX = (APP_WIDTH - 3 * btnW - 2 * 20) *0.5;
-    CGFloat leftBtnY = APP_HEIGHT-62-btnW;
+    CGFloat leftBtnY = APP_HEIGHT-62-btnW-15;
     
     _leftBtnFrame = CGRectMake(leftBtnX, leftBtnY, btnW, btnW);
     _centerBtnFrame = CGRectOffset(_leftBtnFrame, 20 + btnW, 0);
     _rightBtnFrame = CGRectOffset(_centerBtnFrame, 20 + btnW, 0);
     [self restoreBtn];
-    _cameraBtn.frame = CGRectMake((APP_WIDTH - 67) * 0.5, APP_HEIGHT-62, 62, 62);
+    _cameraBtn.frame = CGRectMake((APP_WIDTH - 67) * 0.5, APP_HEIGHT-62-15, 62, 62);
 }
 - (void)prepareUI {
     _viewContainer = [[UIView alloc] init];
@@ -516,7 +516,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat scanViewWidth = 110.0f/2.0f;
         CGFloat scanViewHeight = 110.0f/2.0f;
         CGFloat scanViewOriginX = 10.0f;
-        CGFloat scanViewOriginY = APP_HEIGHT-scanViewHeight-5.0f;
+        CGFloat scanViewOriginY = APP_HEIGHT-scanViewHeight-20.0f;
         _pictureScanView = [[UIView alloc] initWithFrame:CGRectMake(scanViewOriginX, scanViewOriginY, scanViewWidth, scanViewHeight)];
         _pictureScanView.hidden = YES;
         [_pictureScanView addSubview:self.pictureScanImgView];
@@ -567,7 +567,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (UIView *)toolView{
     if (!_toolView) {
         CGFloat toolWidth = APP_WIDTH;
-        CGFloat toolHeight = 100.0f;
+        CGFloat toolHeight = 115.0f;
         CGFloat toolOriginX = 0.0f;
         CGFloat toolOriginY = APP_HEIGHT-toolHeight;
         _toolView = [[UIView alloc] initWithFrame:CGRectMake(toolOriginX, toolOriginY, toolWidth, toolHeight)];
@@ -581,7 +581,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat width = 553.0f/2.0f;
         CGFloat height = 70.0f/2.0f;
         CGFloat originX = (APP_WIDTH-width)/2.0f;
-        CGFloat originY = APP_HEIGHT - (200.0f+62.0f+44.0f)/2.0f;
+        CGFloat originY = APP_HEIGHT - (200.0f+62.0f+44.0f+30.0f)/2.0f;
         _whiteBalanceView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
         _whiteBalanceView.hidden = YES;
         _whiteBalanceView.backgroundColor = RGB(0x000000);
@@ -597,7 +597,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         CGFloat width = 553.0f/2.0f;
         CGFloat height = 70.0f/2.0f;
         CGFloat originX = (APP_WIDTH-width)/2.0f;
-        CGFloat originY = APP_HEIGHT - (200.0f+62.0f+44.0f)/2.0f;
+        CGFloat originY = APP_HEIGHT - (200.0f+62.0f+44.0f+30.0f)/2.0f;
         _scaleView = [[UIView alloc] initWithFrame:CGRectMake(originX, originY, width, height)];
         _scaleView.hidden = YES;
         _scaleView.backgroundColor = RGB(0x000000);
