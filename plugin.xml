@@ -167,7 +167,7 @@
 			<string name="header_bar_enter_selection_tv">选择</string>
 			<string name="cance_bt_tv">返回</string>
 			<string name="camera_tv">拍照</string>
-			<string name="image_browse_tv">图片浏览</string>
+			<string name="image_browse_tv">返回</string>
 			<string name="selected_tv">已选 0 张</string>
 			<string name="commit_bt">提交</string>
 			<string name="prompt">是否删除照片</string>
