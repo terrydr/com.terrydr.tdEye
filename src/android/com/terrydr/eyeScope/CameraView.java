@@ -129,14 +129,14 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
-			try{
+//			try{
 				updateCameraOrientation();
-			}catch(Exception ex){
-				Toast.makeText(getContext(), "打开相机失败", Toast.LENGTH_SHORT).show();
-				Log.e(TAG, "打开相机失败。"+ex.getMessage());
-				cActivity.finish();
-				return;
-			}
+//			}catch(Exception ex){
+//				Toast.makeText(getContext(), "打开相机失败", Toast.LENGTH_SHORT).show();
+//				Log.e(TAG, "打开相机失败。"+ex.getMessage());
+//				cActivity.finish();
+//				return;
+//			}
 		}
 		
 		@Override
@@ -186,7 +186,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		mCamera.setParameters(parameters);
 		
 		// 启屏幕朝向监
-		startOrientationChangeListener();
+//		startOrientationChangeListener();
 	}
 	
 	/**
@@ -226,6 +226,14 @@ public class CameraView extends SurfaceView implements CameraOperation {
 					return;
 				mOrientation = rotation;
 				updateCameraOrientation();
+//				try{
+//					updateCameraOrientation();
+//				}catch(Exception ex){
+//					Toast.makeText(getContext(), "打开相机失败", Toast.LENGTH_SHORT).show();
+//					Log.e(TAG, "打开相机失败。"+ex.getMessage());
+//					cActivity.finish();
+//					return;
+//				}
 			}
 		};
 		mOrEventListener.enable();
@@ -237,6 +245,9 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	private void updateCameraOrientation() {
 		if (mCamera != null) {
 			Camera.Parameters parameters = mCamera.getParameters();
+			if(parameters == null){
+				return ;
+			}
 			parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
 			// rotation参数水平方向为
 			int rotation = 90 + mOrientation == 360 ? 0 : 90 + mOrientation;
@@ -298,7 +309,13 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 */
 	public void onFocus(Point point){
 		mCamera.cancelAutoFocus();
+		if(mCamera == null){
+			return ;
+		}
 		Camera.Parameters parameters=mCamera.getParameters();
+		if(parameters == null){
+			return ;
+		}
 		//不支持设置自定义聚焦，则使用自动聚焦，返回
 		if (parameters.getMaxNumFocusAreas()<=0) {
 			mCamera.autoFocus(autoFocusCallback);
@@ -312,7 +329,13 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 *  @param point 触屏坐标
 	 */
 	public void onFocus(Point point,AutoFocusCallback callback){
+		if(mCamera == null){
+			return ;
+		}
 		Camera.Parameters parameters=mCamera.getParameters();
+		if(parameters == null){
+			return ;
+		}
 		//不支持设置自定义聚焦，则使用自动聚焦，返回
 		if (parameters.getMaxNumFocusAreas()<=0) {
 			mCamera.autoFocus(callback);

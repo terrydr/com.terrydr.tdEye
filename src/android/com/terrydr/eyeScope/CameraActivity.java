@@ -13,7 +13,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -89,17 +91,24 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private int width ;
 	private int getWidth ;
 	public static boolean PRE_CUPCAKE ; 
+	private SharedPreferences preferences;   //保存数据 勾选下次不再提示
 	
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
+//		preferences = this.getSharedPreferences("isStart", Context.MODE_PRIVATE);
+//		Editor editor = preferences.edit();
+//		editor.putBoolean("isStart", false);
+//		editor.commit();
 		
-		if(isActive){
-			finish();
-		}
-		isActive = true;
+//		if(isActive){
+//			this.setResult(0);
+//			this.finish();
+//			return;
+//		}
+//		isActive = true;
 
 		PRE_CUPCAKE = getSDKVersionNumber() < 23 ? true : false; 
 		if(!PRE_CUPCAKE){
@@ -1176,6 +1185,16 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 				});
 		builder.create().show();
 	}
+//	@Override
+//	protected void onStart() {
+//		super.onStart();
+//		if(isActive){
+//			this.setResult(0);
+//			this.finish();
+//			return;
+//		}
+//		isActive = true;
+//	}
 	
 	@Override
 	protected void onDestroy() {		

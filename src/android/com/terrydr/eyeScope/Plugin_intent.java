@@ -11,6 +11,8 @@ import android.app.ActivityManager.RunningTaskInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,36 +21,46 @@ import android.widget.Toast;
 public class Plugin_intent extends CordovaPlugin {
 	private final static String TAG = "Plugin_intent";
 	private String infos;
+	private SharedPreferences preferences;   //保存数据 勾选下次不再提示
+	private int i = 0;
 
 	public Plugin_intent() {
 	}
 
 	CallbackContext callbackContext;
+	
+	/**
+	 * 读取数据
+	 * @return
+	 */
+	private boolean getSharedPreferences() {
+		boolean ischeck = preferences.getBoolean("isStart", false);
+		return ischeck;
+	}
 
 	@Override
 	public boolean execute(String action, org.json.JSONArray args,
 			CallbackContext callbackContext) throws org.json.JSONException {
 		this.callbackContext = callbackContext;
 		if (action.equals("jrEyeTakePhotos")) {
-//			Intent intent = new Intent(cordova.getActivity(), CameraActivity.class);  
-//		    ComponentName cmpName = intent.resolveActivity(cordova.getActivity().getPackageManager());  
-//		    boolean bIsExist = false;  
-//		    if (cmpName != null) { // 说明系统中存在这个activity  
-//		        ActivityManager am = (ActivityManager) cordova.getActivity().getSystemService(Context.ACTIVITY_SERVICE);
-//		        List<RunningTaskInfo> taskInfoList = am.getRunningTasks(10);  
-//		        for (RunningTaskInfo taskInfo : taskInfoList) {  
-//		            if (taskInfo.baseActivity.equals(cmpName)) { // 说明它已经启动了  
-//		                bIsExist = true;  
-//		                break;  
-//		            }  
-//		        }  
-//		    }  
-//		    Log.e(TAG, "bIsExist:" + bIsExist);
-//		    if(!bIsExist){
+			preferences = cordova.getActivity().getSharedPreferences("isStart", Context.MODE_PRIVATE);
+			boolean isStart = getSharedPreferences();
+			int ii = preferences.getInt("i", 0);
+			Editor editor = preferences.edit();
+			if(ii==0){
+				if(isStart && i == 0){
+					i++;
+					editor.putInt("i", i);
+					editor.commit();
+					return false;
+				}
+			}
 			Log.e(TAG, "jrEyeTakePhotos:" + callbackContext);
-				  this.startCameraActivity();
-				  return true;
-//		    }
+			this.startCameraActivity();
+			
+			editor.putBoolean("isStart", true);
+			editor.commit();
+			return true;
 		} else if (action.equals("jrEyeSelectPhotos")) { // 相册缩略图界面
 			Log.e(TAG, "jrEyeSelectPhotos:" + callbackContext);
 			startAlbumAty();
