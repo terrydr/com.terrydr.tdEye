@@ -923,6 +923,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self focusWithMode:AVCaptureFocusModeContinuousAutoFocus
            exposureMode:AVCaptureExposureModeContinuousAutoExposure
                 atPoint:cameraPoint];
+    [self focusWithMode:AVCaptureFocusModeContinuousAutoFocus
+           exposureMode:AVCaptureExposureModeContinuousAutoExposure
+                atPoint:cameraPoint];
 }
 
 /**
