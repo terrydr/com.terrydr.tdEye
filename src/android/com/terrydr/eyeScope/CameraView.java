@@ -333,30 +333,34 @@ public class CameraView extends SurfaceView implements CameraOperation {
 			return ;
 		}
 		Camera.Parameters parameters=mCamera.getParameters();
-		if(parameters == null){
-			return ;
-		}
+//		if(parameters == null){
+//			return ;
+//		}
 		//不支持设置自定义聚焦，则使用自动聚焦，返回
 		if (parameters.getMaxNumFocusAreas()<=0) {
 			mCamera.autoFocus(callback);
 			return;
 		}
-//		List<Area> areas=new ArrayList<Camera.Area>();
-//		int left=point.x-100;
-//		int top=point.y-100;
-//		int right=point.x+100;
-//		int bottom=point.y+100;
-//		left=left<-1000?-1000:left;
-//		top=top<-1000?-1000:top;
-//		right=right>1000?1000:right;
-//		bottom=bottom>1000?1000:bottom;
-//		areas.add(new Area(new Rect(left,top,right,bottom), 100));
-//		parameters.setFocusAreas(areas);
-//		try {
-//			mCamera.setParameters(parameters);
-//		} catch (Exception e) {
-//			Log.e(TAG,"手动聚焦失败", e);
-//		}
+		List<Area> areas = new ArrayList<Camera.Area>();
+		int left = point.x - 100;
+		int top = point.y - 100;
+		int right = point.x + 100;
+		int bottom = point.y + 100;
+		left = left < -1000 ? -1000 : left;
+		top = top < -1000 ? -1000 : top;
+		right = right > 1000 ? 1000 : right;
+		bottom = bottom > 1000 ? 1000 : bottom;
+//		LOG.e(TAG, "left:" + left);
+//		LOG.e(TAG, "top:" + top);
+//		LOG.e(TAG, "right:" + right);
+//		LOG.e(TAG, "bottom:" + bottom);
+		areas.add(new Area(new Rect(left, top, right, bottom), 100));
+		parameters.setFocusAreas(areas);
+		try {
+			mCamera.setParameters(parameters);
+		} catch (Exception e) {
+			Log.e(TAG, "手动聚焦失败", e);
+		}
 //		parameters.setFocusMode(Parameters.FOCUS_MODE_MACRO);
 		mCamera.autoFocus(callback);
 	}
