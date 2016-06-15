@@ -527,6 +527,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 			return;
 		}
 //		Log.e(TAG, "5");
+		Log.e(TAG, "result_Json.toString():" + result_Json.toString());
 		Intent intent1 = new Intent();
 		Bundle bundle1 = new Bundle();
 		bundle1.putString("result_Json", result_Json.toString());

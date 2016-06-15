@@ -41,7 +41,7 @@ public class Plugin_intent extends CordovaPlugin {
 	@Override
 	public boolean execute(String action, org.json.JSONArray args,
 			CallbackContext callbackContext) throws org.json.JSONException {
-		this.callbackContext = callbackContext;
+		
 		if (action.equals("jrEyeTakePhotos")) {
 			preferences = cordova.getActivity().getSharedPreferences("isStart", Context.MODE_PRIVATE);
 			boolean isStart = getSharedPreferences();
@@ -55,17 +55,19 @@ public class Plugin_intent extends CordovaPlugin {
 					return false;
 				}
 			}
+			this.callbackContext = callbackContext;
 			Log.e(TAG, "jrEyeTakePhotos:" + callbackContext);
 			this.startCameraActivity();
-			
 			editor.putBoolean("isStart", true);
 			editor.commit();
 			return true;
 		} else if (action.equals("jrEyeSelectPhotos")) { // 相册缩略图界面
+			this.callbackContext = callbackContext;
 			Log.e(TAG, "jrEyeSelectPhotos:" + callbackContext);
 			startAlbumAty();
 			return true;
 		} else if (action.equals("jrEyeScanPhotos")) { // 大图片预览界面参数{data:[图片路径，图片路径]}
+			this.callbackContext = callbackContext;
 			Log.e(TAG, "jrEyeScanPhotos:" + callbackContext);
 			infos = args.getString(0);
 			this.startAlbumItemAty(infos);
@@ -125,7 +127,7 @@ public class Plugin_intent extends CordovaPlugin {
 			} catch (JSONException e) {
 				Log.e(TAG, "String to Json error!");
 			}
-//			Log.e(TAG, "callbackContext:" + callbackContext);
+			Log.e(TAG, "callbackContext:555555555:" + callbackContext);
 			callbackContext.success(result);
 			break;
 		case 6:
