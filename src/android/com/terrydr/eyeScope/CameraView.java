@@ -332,6 +332,8 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		if(mCamera == null){
 			return ;
 		}
+		mCamera.cancelAutoFocus();
+
 		Camera.Parameters parameters=mCamera.getParameters();
 //		if(parameters == null){
 //			return ;
