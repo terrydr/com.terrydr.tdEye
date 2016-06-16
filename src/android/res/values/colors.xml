@@ -5,7 +5,7 @@
     <color name="transparent_background">#80000000</color>  
     <color name="whitebalance_background">#90000000</color>  
     <color name="all_transparent_background">#00000000</color>  
-    <color name="common_title_bg">#3691e6</color>
+    <color name="common_title_bg">#0089f1</color>
     <color name="line_bg">#dddddd</color>
     <color name="white">#ffffff</color>
     <color name="album_background">#f7f7f7</color>

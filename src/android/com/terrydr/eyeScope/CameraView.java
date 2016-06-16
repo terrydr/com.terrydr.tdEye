@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import org.apache.cordova.LOG;
-
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
 import android.content.Context;
 import android.graphics.ImageFormat;
@@ -22,6 +19,7 @@ import android.hardware.Camera.Size;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -92,6 +90,10 @@ public class CameraView extends SurfaceView implements CameraOperation {
         return (H/W);  
     }  
 	
+    /**
+     * 获取sdk版本号
+     * @return
+     */
 	private static int getSDKVersionNumber() {  
 	    int sdkVersion;  
 	    try {  
@@ -129,14 +131,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
-//			try{
-				updateCameraOrientation();
-//			}catch(Exception ex){
-//				Toast.makeText(getContext(), "打开相机失败", Toast.LENGTH_SHORT).show();
-//				Log.e(TAG, "打开相机失败。"+ex.getMessage());
-//				cActivity.finish();
-//				return;
-//			}
+			updateCameraOrientation();
 		}
 		
 		@Override
@@ -157,7 +152,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		
 		// 选择合的预览尺寸
 		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
-//		Collections.sort(sizeList, sizeComparator);
+//		CameraSize.getInstance().sortCameraSize(sizeList, false);  //降序排序
 //		for(Size s : sizeList){
 //			Log.e(TAG, "previewSize:" + s.width + "*" + s.height);
 //		}
@@ -165,10 +160,11 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		Size pictureS = CameraSize.getInstance().getPropPreviewSize(sizeList,previewRate, 1280);  
 	    Log.e(TAG, "previewWidth:" + pictureS.width +"-previewHeight:" + pictureS.height); 
 	    parameters.setPreviewSize(pictureS.width, pictureS.height);  
+//	    parameters.setPreviewSize(3840, 2160);  
 	     
 		// 设置生成的图片大
 	    sizeList1 = parameters.getSupportedPictureSizes();
-//	    Collections.sort(sizeList1, sizeComparator);
+//	    CameraSize.getInstance().sortCameraSize(sizeList1, false);  //降序排序
 //		for(Size s : sizeList1){
 //			Log.e(TAG, "pictureSize:" + s.width + "*" + s.height);
 //		}
@@ -176,6 +172,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	    Size pictureS1 = CameraSize.getInstance().getPropPictureSize(sizeList1,previewRate, 1280);  
 //		Size pictureS1 = sizeList1.get(sizeList1.size()-1);
 	    parameters.setPictureSize(pictureS1.width, pictureS1.height);  
+//	    parameters.setPictureSize(3840, 2160);  
 	    Log.e(TAG, "pictureWidth:" + pictureS1.width +"-pictureHeight:" + pictureS1.height); 
 		
 		// 设置图片格式
@@ -186,7 +183,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		mCamera.setParameters(parameters);
 		
 		// 启屏幕朝向监
-//		startOrientationChangeListener();
+		startOrientationChangeListener();
 	}
 	
 	/**
@@ -328,6 +325,83 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 * 手动聚焦 
 	 *  @param point 触屏坐标
 	 */
+	public void onFocus(MotionEvent event,AutoFocusCallback callback){
+		if(mCamera == null){
+			return ;
+		}
+		mCamera.cancelAutoFocus();
+
+		Camera.Parameters parameters=mCamera.getParameters();
+		//不支持设置自定义聚焦，则使用自动聚焦，返回
+		if (parameters.getMaxNumFocusAreas()<=0) {
+			mCamera.autoFocus(callback);
+			return;
+		}
+		Rect focusRect = calculateTapArea(event.getRawX(), event.getRawY(), 1f);  
+        Rect meteringRect = calculateTapArea(event.getRawX(), event.getRawY(), 1.5f);  
+  
+        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);  
+          
+        if (parameters.getMaxNumFocusAreas() > 0) {  
+            List<Camera.Area> focusAreas = new ArrayList<Camera.Area>();  
+            focusAreas.add(new Camera.Area(focusRect, 1000));  
+            parameters.setFocusAreas(focusAreas);  
+        }  
+  
+//        if (parameters.getMaxNumMeteringAreas() > 0) {  
+//            List<Camera.Area> meteringAreas = new ArrayList<Camera.Area>();  
+//            meteringAreas.add(new Camera.Area(meteringRect, 1000));  
+//            parameters.setMeteringAreas(meteringAreas);  
+//        }  
+  
+//        mCamera.setParameters(parameters);  
+		try {
+			mCamera.setParameters(parameters);
+		} catch (Exception e) {
+			Log.e(TAG, "手动聚焦失败1", e);
+		}
+		mCamera.autoFocus(callback);
+	}
+	
+	/**
+	 * Convert touch position x:y to {@link Camera.Area} position -1000:-1000 to
+	 * 1000:1000.
+	 */
+	private Rect calculateTapArea(float x, float y, float coefficient) {
+		float focusAreaSize = 300;
+		int areaSize = Float.valueOf(focusAreaSize * coefficient).intValue();
+
+		int centerX = (int) (x / getResolution().width * 2000 - 1000);
+		int centerY = (int) (y / getResolution().height * 2000 - 1000);
+
+		int left = clamp(centerX - areaSize / 2, -1000, 1000);
+		int right = clamp(left + areaSize, -1000, 1000);
+		int top = clamp(centerY - areaSize / 2, -1000, 1000);
+		int bottom = clamp(top + areaSize, -1000, 1000);
+
+		return new Rect(left, top, right, bottom);
+	}
+
+	private int clamp(int x, int min, int max) {
+		if (x > max) {
+			return max;
+		}
+		if (x < min) {
+			return min;
+		}
+		return x;
+	}
+
+	private Camera.Size getResolution() {
+		Camera.Parameters params = mCamera.getParameters();
+		Camera.Size s = params.getPreviewSize();
+		return s;
+	}
+	
+	/**  
+	 * 手动聚焦 
+	 *  @param point 触屏坐标
+	 */
 	public void onFocus(Point point,AutoFocusCallback callback){
 		if(mCamera == null){
 			return ;
@@ -365,6 +439,30 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		}
 //		parameters.setFocusMode(Parameters.FOCUS_MODE_MACRO);
 		mCamera.autoFocus(callback);
+		
+//		Camera.Parameters parameters=mCamera.getParameters();
+//		//不支持设置自定义聚焦，则使用自动聚焦，返回
+//		if (parameters.getMaxNumFocusAreas()<=0) {
+//			mCamera.autoFocus(callback);
+//			return;
+//		}
+//		List<Area> areas=new ArrayList<Camera.Area>();
+//		int left=point.x-300;
+//		int top=point.y-300;
+//		int right=point.x+300;
+//		int bottom=point.y+300;
+//		left=left<-1000?-1000:left;
+//		top=top<-1000?-1000:top;
+//		right=right>1000?1000:right;
+//		bottom=bottom>1000?1000:bottom;
+//		areas.add(new Area(new Rect(left,top,right,bottom), 100));
+//		parameters.setFocusAreas(areas);
+//		try {
+//			mCamera.setParameters(parameters);
+//		} catch (Exception e) {
+//			Log.e(TAG, "手动聚焦失败", e);
+//		}
+//		mCamera.autoFocus(callback);
 	}
 	
 	@Override

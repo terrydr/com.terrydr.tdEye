@@ -2,7 +2,6 @@ package com.terrydr.eyeScope;
 
 import android.content.Context;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.FrameLayout;
@@ -54,10 +53,8 @@ public class ThumbnaiImageView extends FrameLayout  {
 		
 		if (editable) {
 			checkBox.setChecked(checked);
-//			if(checked){
-				checkBox.setVisibility(View.VISIBLE);
-//			}
-		}else {
+			checkBox.setVisibility(View.VISIBLE);
+		} else {
 			checkBox.setVisibility(View.GONE);
 		}
 	}

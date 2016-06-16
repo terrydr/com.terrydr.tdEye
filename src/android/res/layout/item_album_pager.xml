@@ -9,16 +9,4 @@
         android:layout_height="fill_parent"
         android:layout_centerInParent="true" />
 
-<!--     <CheckBox
-        android:id="@+id/albumitem_selected_cb"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10dip"
-        android:layout_marginTop="10dip"
-        android:background="@drawable/item_album_grid_checkbox"
-        android:button="@null"
-        android:checked="false"
-        android:focusable="false" /> -->
-
 </RelativeLayout>

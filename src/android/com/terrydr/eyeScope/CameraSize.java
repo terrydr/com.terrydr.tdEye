@@ -151,6 +151,37 @@ public class CameraSize {
 			return false;
 		}
 	}
+	
+	/**
+	 * Camera.size排序
+	 * 
+	 * @param sizeList
+	 *            排序的Camera.size
+	 * @param asc
+	 *            是否升序排序 true为升、 false为降
+	 */
+	public void sortCameraSize(List<Camera.Size> sizeList, final boolean asc) {
+		// 按大小排序
+		Collections.sort(sizeList, new Comparator<Camera.Size>() {
+			public int compare(Size size, Size newSize) {
+				if (size.width > newSize.width) {
+					if (asc) {
+						return 1;
+					} else {
+						return -1;
+					}
+				} else if (size.width == newSize.width) {
+					return 0;
+				} else {
+					if (asc) {
+						return -1;
+					} else {
+						return 1;
+					}
+				}
+			}
+		});
+	}
 
 	public class CameraSizeComparator implements Comparator<Camera.Size> {
 		// 按升序排列
@@ -165,4 +196,6 @@ public class CameraSize {
 		}
 
 	}
+	
+	
 }

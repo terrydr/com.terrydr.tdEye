@@ -4,9 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-
-import org.apache.cordova.LOG;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,9 +16,8 @@ import android.media.ThumbnailUtils;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -400,21 +396,16 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 					fos.flush();
 					fos.close();
 					// 存图片小
-					BufferedOutputStream bufferos = new BufferedOutputStream(
-							new FileOutputStream(thumFile));
-					thumbnail
-							.compress(Bitmap.CompressFormat.JPEG, 50, bufferos);
+					BufferedOutputStream bufferos = new BufferedOutputStream(new FileOutputStream(thumFile));
+					thumbnail.compress(Bitmap.CompressFormat.JPEG, 50, bufferos);
 					bufferos.flush();
 					bufferos.close();
 					return bm;
 				} catch (Exception e) {
-					Toast.makeText(getContext(), "解析相机返回流失败",
-							Toast.LENGTH_SHORT).show();
-
+					Toast.makeText(getContext(), "解析相机返回流失败",Toast.LENGTH_SHORT).show();
 				}
 			} else {
-				Toast.makeText(getContext(), "拍照失败，请重试", Toast.LENGTH_SHORT)
-						.show();
+				Toast.makeText(getContext(), "拍照失败，请重试", Toast.LENGTH_SHORT).show();
 			}
 			return null;
 		}
@@ -486,6 +477,11 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	public void setOnFocus(Point point,AutoFocusCallback callback) {		
 		mCameraView.onFocus(point, aFocusCallback);
 		mFocusImageView.startFocus(point);
+	}
+	
+	public void setOnFocus(MotionEvent e,Point point,AutoFocusCallback callback) {	
+		mFocusImageView.startFocus(point);
+		mCameraView.onFocus(e, aFocusCallback);
 	}
 
 	public int getMaxZoom() {

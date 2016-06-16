@@ -2,20 +2,15 @@ package com.terrydr.eyeScope;
 
 import java.io.File;
 import java.util.List;
-
-import org.apache.cordova.LOG;
-
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -23,12 +18,10 @@ import android.hardware.Camera;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextPaint;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.KeyEvent;
@@ -45,7 +38,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.terrydr.eyeScope.R;
 
@@ -303,7 +295,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	/**
 	 * 根据手机的分辨率从 dip 的单位 转成为 px(像素)
 	 * 
-	 * @param dipValue
+	 * @param dipValue  dip数值
 	 * @return
 	 */
 	private int dip2px(float dipValue) {
@@ -313,6 +305,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	
 	/**
 	 * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
+	 * @param pxValue  px数值
+	 * @return
 	 */
 	private int px2dip(float pxValue) {
 		 final float scale = getResources().getDisplayMetrics().density;
@@ -817,7 +811,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		}
 		//触摸对焦显示
 		Point point=new Point((int)e.getX(), (int)e.getY());
-		mContainer.setOnFocus(point,null);
+//		mContainer.setOnFocus(point,null);
+		mContainer.setOnFocus(e,point,null);
 		return true;
 	}
 
@@ -835,8 +830,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	
 	/**
 	 * 判断是否点击该view
-	 * @param view
-	 * @param ev
+	 * @param view  view控件
+	 * @param ev    移动事件 
 	 * @return
 	 */
 	private boolean inRangeOfView(View view, MotionEvent ev) {
@@ -892,6 +887,12 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		}
 	}
 	
+	/**
+	 * 控件滑动动画效果
+	 * @param view  要滑动的控件
+	 * @param p1   起始位置
+	 * @param p2  如果为正数则向右滑动，否则向左滑动
+	 */
 	public void slideview(final View view,final float p1, final float p2) {
 //		LOG.e(TAG, "view.getX:" + view.getX());
 //		LOG.e(TAG, "View.getY:" + view.getY());
@@ -913,9 +914,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				int left = view.getLeft() + (int) (p2 - p1);
-				int top = view.getTop();
-				int width = view.getWidth();
-				int height = view.getHeight();
+//				int top = view.getTop();
+//				int width = view.getWidth();
+//				int height = view.getHeight();
 				view.clearAnimation();
 //				view.layout(left, top, left + width, top + height);
 //				LOG.e(TAG, "left:" + left);
@@ -942,7 +943,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	}
 
 //	/**
-//	 * 添加触摸事件
+//	 * 添加触摸事件， activity触摸事件
 //	 */
 //	@Override
 //	public boolean onTouchEvent(MotionEvent event) {
@@ -951,8 +952,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	
 
 	/**
-	 * 触摸对焦
-	 * 
+	 * 触摸事件处理
+	 * 1. case MotionEvent.ACTION_MOVE 相机焦距的放大、缩小
+	 * 2. MotionEvent.ACTION_UP 离开拍照按钮时触发长按事件 结束连拍
 	 */
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
@@ -1030,7 +1032,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	}
 
 	/**
-	 * 长按连拍事件处理
+	 * 长按连拍事件处理,开始连拍
 	 */
 	private OnLongClickListener onLongClickListener = new OnLongClickListener() {
 
@@ -1043,7 +1045,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	};
 	
 	/**
-	 * 连拍时改变拍照张数
+	 * 连拍时改变拍照张数,拍状顶端数字改变 
+	 * 添加连拍时闪屏动画效果
 	 */
     public void setCount(){
 		if (leftOrRight) {
@@ -1135,7 +1138,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	}
 	
 	/**
-	 * 返回事件 判断是否存在图片
+	 * 返回事件,先 判断是否存在图片
 	 */
 	private void backPrevious(){
 		// 获取根目录下缩略图文件夹
@@ -1262,13 +1265,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			camera_camera_tv.setText(i_right + "/6");
 		}
 	}
-	
-//	/**
-//	 * 连拍结束把拍照按钮设为true
-//	 */
-//	public void setPhotos_iv_Enabled(boolean isTure){
-//		photos_iv.setEnabled(isTure);
-//	}
 	
 	/**
 	 * 监听系统按键 拍照

@@ -19,7 +19,7 @@ import com.terrydr.eyeScope.R;
 
 /**
  * @ClassName: AlbumItemAtyForJs
- * @Description:点击JS查看相册大图Activity
+ * @Description:从JS端跳转过来，查看相册大图Activity
  * @date 20160429
  * 
  */
@@ -64,8 +64,8 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 	}
 
 	/**
-	 *  解析数据的Json
-	 * @param strResult
+	 *  解析数据的Json，差配置mViewPager Adapter
+	 * @param strResult  前端js传过来的json数据
 	 */
 	private void parseJsonMulti(String strResult) {
 		if(strResult==null){
@@ -94,6 +94,9 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 		}
 	}
 
+	/**
+	 * 图片滑动事件处理,相应修改状态栏的数字变化
+	 */
 	private OnPageChangeListener pageChangeListener = new OnPageChangeListener() {
 
 		@Override

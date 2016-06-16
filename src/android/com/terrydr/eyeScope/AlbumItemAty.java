@@ -109,6 +109,14 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 //		mViewPager.setOnSlideUpListener(AlbumItemAty.this);
 	}
 	
+	/**
+	 * 删除照片重新加载图片，以及修改一些状态
+	 * @param paths
+	 * @param deletePath
+	 * @param selectPath
+	 * @param deleteCurretItem
+	 * @param getCurrentItem
+	 */
 	public void reloadAlbum(List<String> paths, String deletePath,String selectPath,int deleteCurretItem,int getCurrentItem) {
 		if(paths.isEmpty()){
 			backPrevious();
@@ -195,20 +203,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 
 			eye_left_select_count_tv.setText(selectPathsLeft.size()+ "/2");
 			eye_right_select_count_tv.setText(selectPathsRight.size()+ "/2");
-//			if(selectPathsLeft.size()>0){
-//				eye_left_tv.setVisibility(View.VISIBLE);
-//				eye_left_select_count_tv.setVisibility(View.VISIBLE);
-//			}else{
-//				eye_left_tv.setVisibility(View.GONE);
-//				eye_left_select_count_tv.setVisibility(View.GONE);
-//			}
-//			if(selectPathsRight.size()>0){
-//				eye_right_tv.setVisibility(View.VISIBLE);
-//				eye_right_select_count_tv.setVisibility(View.VISIBLE);
-//			}else{
-//				eye_right_tv.setVisibility(View.GONE);
-//				eye_right_select_count_tv.setVisibility(View.GONE);
-//			}
 		}
 	}
 	
@@ -300,7 +294,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	}
 	/** 
      * 设置标题imageview的状态 
-     * @param selectItems 
+     * @param selectItems 选中当前图片的索引
      */  
 	private void setImageBackground(int selectItems) {
 		for (int i = 0; i < tips.length; i++) {
@@ -319,7 +313,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
     
 	/** 
      * 设置选中的tip的背景 
-     * @param selectItems 
+     * @param selectItems   选中当前图片的索引
      */  
     private void setCheckBoxSelected(int selectItems){  
         for(int i=0; i<albumitem_selected_cb_bool.length; i++){  
@@ -333,7 +327,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
     } 
 	
     /**
-     * 图片左右滑动改变事件
+     * 图片左右滑动改变事件,理处相关事件状态
      */
 	private OnPageChangeListener pageChangeListener=new OnPageChangeListener() {
 		@Override
@@ -466,20 +460,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 					}
 					eye_left_select_count_tv.setText(selectPathsLeft.size()+ "/2");
 					eye_right_select_count_tv.setText(selectPathsRight.size()+ "/2");
-//					if(selectPathsLeft.size()>0){
-//						eye_left_tv.setVisibility(View.VISIBLE);
-//						eye_left_select_count_tv.setVisibility(View.VISIBLE);
-//					}else{
-//						eye_left_tv.setVisibility(View.GONE);
-//						eye_left_select_count_tv.setVisibility(View.GONE);
-//					}
-//					if(selectPathsRight.size()>0){
-//						eye_right_tv.setVisibility(View.VISIBLE);
-//						eye_right_select_count_tv.setVisibility(View.VISIBLE);
-//					}else{
-//						eye_right_tv.setVisibility(View.GONE);
-//						eye_right_select_count_tv.setVisibility(View.GONE);
-//					}
 				}
 			}
 			break;
@@ -492,7 +472,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	}
 	
 	/**
-	 * 提交事件
+	 * 提交事件,如果没有选中任何图片则弹出提示信息窗
 	 */
 	private void commitOnClick(){
 		JSONObject result_Json = new JSONObject();

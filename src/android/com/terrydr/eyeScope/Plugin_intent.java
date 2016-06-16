@@ -1,22 +1,14 @@
 package com.terrydr.eyeScope;
 
-import java.util.List;
-
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONException;
-
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningTaskInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 public class Plugin_intent extends CordovaPlugin {
 	private final static String TAG = "Plugin_intent";
@@ -123,11 +115,11 @@ public class Plugin_intent extends CordovaPlugin {
 			org.json.JSONObject result = null;
 			try {
 				result = new org.json.JSONObject(result_Json);
-				Log.e(TAG, "result:" + result);
+//				Log.e(TAG, "result:" + result);
 			} catch (JSONException e) {
-				Log.e(TAG, "String to Json error!");
+				Log.e(TAG, "String to Json error!",e);
 			}
-			Log.e(TAG, "callbackContext:555555555:" + callbackContext);
+//			Log.e(TAG, "callbackContext:555555555:" + callbackContext);
 			callbackContext.success(result);
 			break;
 		case 6:

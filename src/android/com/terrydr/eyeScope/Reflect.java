@@ -3,7 +3,6 @@ package com.terrydr.eyeScope;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
-
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 

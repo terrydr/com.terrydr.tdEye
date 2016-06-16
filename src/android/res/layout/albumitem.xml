@@ -34,15 +34,6 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <!--
-         <include
-        android:id="@+id/album_item_bottom_bar"
-        android:layout_width="fill_parent"
-        android:layout_height="@dimen/album_bottom_height"
-        android:layout_alignParentBottom="true"
-        layout="@layout/album_item_bottom_bar" />
-    -->
-
     <RelativeLayout
         android:id="@+id/album_item_bottom_bar"
         android:layout_width="match_parent"
@@ -77,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/eye_left_select_count_tv"
-            android:paddingLeft="20dip"
+            android:paddingLeft="10dip"
             android:text="@string/eye_right"
             android:textColor="@android:color/white"
             android:textSize="@dimen/text_size" />
@@ -88,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/eye_right_tv"
-            android:paddingLeft="10dip"
+            android:paddingLeft="5dip"
             android:textColor="@android:color/white"
             android:textSize="@dimen/text_size" />
 

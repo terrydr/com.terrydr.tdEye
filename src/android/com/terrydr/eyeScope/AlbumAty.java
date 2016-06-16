@@ -301,7 +301,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			String thumbnail = this.getString(R.string.Thumbnail);
 			JSONObject result_Json = new JSONObject();
 //			Set<String> left_mAlbumView = mAlbumView.getSelectedItems(); 
-			Set<String> left_mAlbumView = itemSelectedLeft; 
+			Set<String> left_mAlbumView = itemSelectedLeft;    //获得左眼选中图片
 			if (left_mAlbumView != null) {
 				if (!left_mAlbumView.isEmpty()) {
 					JSONArray path = new JSONArray();
@@ -318,7 +318,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 				}
 			}
 //			Set<String> right_mAlbumView = mAlbumView_right.getSelectedItems();
-			Set<String> right_mAlbumView = itemSelectedRight;
+			Set<String> right_mAlbumView = itemSelectedRight; //获得右眼选中图片
 			if (right_mAlbumView != null) {
 				if (!right_mAlbumView.isEmpty()) {
 					JSONArray path = new JSONArray();
@@ -466,7 +466,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	 * @param format
 	 *            要加载的文件格式
 	 */
-	public void loadAlbumBySelectImage(String rootPath, String format, AlbumGridView alvumGridView, Set<String> _itemSelectedSet) {
+	private void loadAlbumBySelectImage(String rootPath, String format, AlbumGridView alvumGridView, Set<String> _itemSelectedSet) {
 		// 获取根目录下缩略图文件夹
 		String thumbFolder = FileOperateUtil.getFolderPath(this, FileOperateUtil.TYPE_THUMBNAIL, rootPath);
 		List<File> files = FileOperateUtil.listFiles(thumbFolder, format);

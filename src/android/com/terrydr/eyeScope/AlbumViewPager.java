@@ -112,59 +112,12 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener,OnSlid
 		mChildIsBeingDragged = false;
 	}
 
-	
+	/**
+	 * 删除事件处理,删除先读取配置文件‘deleteRemind.xml’中有没有写入不提示弹窗的保存值‘ischeck’，如果有值并为 true 则不提示弹窗
+	 */
 	@Override
 	public void onSlideUpTap() {
 //		Log.e(TAG, "删除事件处理.......");
-		
-//		ibuilder = new CustomDialog.Builder(albumItemAty);
-//		ibuilder.setTitle(R.string.prompt);
-//		ibuilder.setMessage(R.string.exit_app);
-//		 view=View.inflate(albumItemAty,R.layout.customdialog, null);  
-//		checkBox = (CheckBox) view.findViewById(R.id.message);
-//		checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-//			
-//			@Override
-//			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//				Log.e(TAG, "checkBox11111111:" + isChecked);
-//				buttonView.setChecked(isChecked);
-//			}
-//		});
-//		
-////		linearLayout.setBackgroundColor(R.color.all_transparent_background);
-//
-//		ibuilder.setPositiveButton(R.string.confirm, new android.content.DialogInterface.OnClickListener() {
-//			
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				Log.e(TAG, "checkBox:" + checkBox.isChecked());
-//				Log.e(TAG, "getPaths()1:" + getPaths());
-//				int deleteCurretItem = getCurrentItem();
-//				Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
-//				String deletePath = deleteCurrentPath();
-//				Log.e(TAG, "deletePath:" + deletePath);
-//				Log.e(TAG, "getPaths()2:" + getPaths());
-//				String selectPath = null;
-//				if(!getPaths().isEmpty()){
-//					selectPath = getPaths().get(getCurrentItem());
-//				}
-//				
-//				Log.e(TAG, "selectPath:" + selectPath);
-//				Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
-//				albumItemAty.reloadAlbum(getPaths(), deletePath, selectPath,deleteCurretItem,getCurrentItem());
-//				dialog.dismiss();
-//			}
-//		});
-//		ibuilder.setNegativeButton(R.string.cancel, new android.content.DialogInterface.OnClickListener() {
-//			
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				Log.e(TAG, "checkBox1:" + checkBox.isChecked());
-//				dialog.dismiss();
-//			}
-//		});
-//		ibuilder.create().show();
-		
 
 		boolean isCheckVules = getSharedPreferences();
 		if (isCheckVules) {
@@ -238,6 +191,11 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener,OnSlid
 		return ischeck;
 	}
 	
+	/**
+	 * 大图数据适配器
+	 * @author ty
+	 *
+	 */
 	public class ViewPagerAdapter extends PagerAdapter {
 		private List<String> paths;// 大图地址
 		private Set<String> selectPaths = new HashSet<String>();// 选中的图片
