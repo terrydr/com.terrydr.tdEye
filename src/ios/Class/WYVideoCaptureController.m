@@ -105,6 +105,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [super viewWillAppear:animated];
     [_captureSession startRunning];
     [self configureNavgationBar];
+    [self initNavTitle];
     
     //3.监听点击音量键事件
     [self p_addObserver];
@@ -126,6 +127,14 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)dealloc {
     NSLog(@"我是拍照控制器,我被销毁了");
+}
+
+- (void)initNavTitle{
+    if (_isLeftEye) {
+        self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
+    }else{
+        self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
+    }
 }
 
 - (void)configureNavgationBar{
@@ -662,6 +671,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 #pragma mark - ButtonClick
 - (void)pushToPictureScan:(BOOL)animated{
+    self.title = @"返回";
+    
     MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
     [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
     browserVc.isModelData = YES;
