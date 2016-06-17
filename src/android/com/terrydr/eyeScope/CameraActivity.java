@@ -22,6 +22,7 @@ import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextPaint;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.KeyEvent;
@@ -90,6 +91,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
+		
+//		Log.e(TAG,"onCreate");
 //		preferences = this.getSharedPreferences("isStart", Context.MODE_PRIVATE);
 //		Editor editor = preferences.edit();
 //		editor.putBoolean("isStart", false);
@@ -168,6 +171,11 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		getWidth = width*140/720;
 //		Log.e(TAG, "width:" + width);
 //		Log.e(TAG, "getWidth:" + getWidth);
+		
+		String rootPath_left = getFolderPath(this, mSaveRoot_left);
+		deleteFolder(rootPath_left);
+		String rootPath_right = getFolderPath(this, mSaveRoot_right);
+		deleteFolder(rootPath_right);
 		
 	}
 	
@@ -1188,35 +1196,57 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 				});
 		builder.create().show();
 	}
-//	@Override
-//	protected void onStart() {
-//		super.onStart();
+	@Override
+	protected void onStart() {
+		super.onStart();
 //		if(isActive){
 //			this.setResult(0);
 //			this.finish();
 //			return;
 //		}
 //		isActive = true;
-//	}
+//		Log.e(TAG,"onStart");
+	}
+	@Override
+	protected void onRestart(){
+		super.onRestart();
+//		Log.e(TAG,"onRestart");
+	}
+	@Override
+	protected void onPause(){
+		super.onPause();
+//		Log.e(TAG,"onPause");
+	}
+	@Override
+	protected void onStop(){
+		super.onStop();
+//		Log.e(TAG,"onStop");
+	}
 	
 	@Override
 	protected void onDestroy() {		
 		super.onDestroy();
 		isActive = false;
+//		Log.e(TAG,"onDestroy");
+//		String rootPath_left = getFolderPath(this, mSaveRoot_left);
+//		deleteFolder(rootPath_left);
+//		String rootPath_right = getFolderPath(this, mSaveRoot_right);
+//		deleteFolder(rootPath_right);
 	}
 	@Override
 	protected void onResume() {		
+//		Log.e(TAG,"onResume");
 		setCameraText(leftOrRight);
-		Bundle bundle = getIntent().getExtras();
-		if(bundle!=null){
-			deleteFile = bundle.getBoolean("deleteFile");
-		}
-		if(deleteFile){
-			String rootPath_left = getFolderPath(this, mSaveRoot_left);
-			deleteFolder(rootPath_left);
-			String rootPath_right = getFolderPath(this, mSaveRoot_right);
-			deleteFolder(rootPath_right);
-		}
+//		Bundle bundle = getIntent().getExtras();
+//		if(bundle!=null){
+//			deleteFile = bundle.getBoolean("deleteFile");
+//		}
+//		if(deleteFile){
+//			String rootPath_left = getFolderPath(this, mSaveRoot_left);
+//			deleteFolder(rootPath_left);
+//			String rootPath_right = getFolderPath(this, mSaveRoot_right);
+//			deleteFolder(rootPath_right);
+//		}
 		
 		// 获取根目录下缩略图文件夹
 		String folder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "left");
