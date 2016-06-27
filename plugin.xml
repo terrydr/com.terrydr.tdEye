@@ -3,16 +3,16 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-eyecamera"
-        version="0.4.2">
+        version="0.0.1">
     
     <name>TDEye</name>
     
-    <description>This plugin for Cordova and PhoneGap allows you to check if an app is installed. It requires an URI Scheme (iOS) or a Package Name (Android).</description>
+    <description>This plugin for Cordova</description>
     
-    <keywords>Cordova,PhoneGap,plugin,app,availability,installed, URIScheme,URI,Scheme,PackageName,Package,Name,iOS,Android</keywords>
+    <keywords>iOS</keywords>
     
-    <repo>https://github.com/ohh2ahh/AppAvailability.git</repo>
-    <issue>https://github.com/ohh2ahh/AppAvailability/issues</issue>
+    <repo>https://github.com/terrydr/com.terrydr.tdEye.git</repo>
+    <issue>https://github.com/terrydr/com.terrydr.tdEye.git</issue>
     
     <license>MIT</license>
     
