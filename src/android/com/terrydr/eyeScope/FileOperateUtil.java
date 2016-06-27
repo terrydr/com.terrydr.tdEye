@@ -2,17 +2,12 @@ package com.terrydr.eyeScope;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import android.content.Context;
-import com.terrydr.eyeScope.R;
 
 /**
  * @ClassName: FileOperateUtil
@@ -54,9 +49,6 @@ public class FileOperateUtil {
 		case TYPE_IMAGE:
 			pathBuilder.append(context.getString(R.string.Image));
 			break;
-//		case TYPE_VIDEO:
-//			pathBuilder.append(context.getString(R.string.Video));
-//			break;
 		case TYPE_THUMBNAIL:
 			pathBuilder.append(context.getString(R.string.Thumbnail));
 			break;
@@ -153,15 +145,11 @@ public class FileOperateUtil {
 	}
 
 	/**
-	 * 
+	 * 生成文件命明规则
 	 * @param extension
 	 * @return
 	 */
 	public static String createFileNmae(String extension) {
-//		DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss",
-//				Locale.getDefault());
-//		// 转换为字符串
-//		String formatDate = format.format(new Date());
 		long formatDate = System.currentTimeMillis();
 		// 查看是否
 		if (!extension.startsWith("."))

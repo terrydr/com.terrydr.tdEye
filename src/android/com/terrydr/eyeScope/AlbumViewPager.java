@@ -7,27 +7,15 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import com.terrydr.eyeScope.MatrixImageView.OnMovingListener;
 import com.terrydr.eyeScope.MatrixImageView.OnSlideUpListener;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.LinearLayout;
-
-
-import com.terrydr.eyeScope.R;
 
 /**
  * @ClassName: AlbumViewPager
@@ -46,7 +34,7 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener,OnSlid
 	/** 当前子控件是否处理拖动状 */
 	private boolean mChildIsBeingDragged = false;
 	private AlbumItemAty albumItemAty;
-	private CustomDialog.Builder ibuilder;
+//	private CustomDialog.Builder ibuilder;
 	private SharedPreferences preferences;   //保存数据 勾选下次不再提示
 	private boolean isCheckeds;  //记录勾选下次不再提示
 
@@ -113,12 +101,11 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener,OnSlid
 	}
 
 	/**
-	 * 删除事件处理,删除先读取配置文件‘deleteRemind.xml’中有没有写入不提示弹窗的保存值‘ischeck’，如果有值并为 true 则不提示弹窗
+	 * 删除事件处理,删除先读取配置文件‘deleteRemind.xml’中有没有写入不提示弹窗的保存值‘ischeck’，
+	 * 如果有值并为 true 则不提示弹窗
 	 */
 	@Override
 	public void onSlideUpTap() {
-//		Log.e(TAG, "删除事件处理.......");
-
 		boolean isCheckVules = getSharedPreferences();
 		if (isCheckVules) {
 			int deleteCurretItem = getCurrentItem();
@@ -133,15 +120,8 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener,OnSlid
 			final String[] multiChoiceItems = { "下次不再提示", };
 			// 复选框默认值：false=未选;true=选中 ,各自对应items[i]
 			final boolean[] defaultSelectedStatus = { false };
-			// LayoutInflater inflater = getLayoutInflater();
 			AlertDialog.Builder builder = new AlertDialog.Builder(albumItemAty);
-			// LinearLayout linearLayout=(LinearLayout)
-			// albumItemAty.getLayoutInflater().inflate(R.layout.nomoredialog,
-			// null);
-			// linearLayout.setBackgroundColor(R.color.all_transparent_background);
-			// builder.setView(linearLayout);
 			builder.setTitle("是否删除照片");
-			// builder.setMessage("确认删除该图片?");
 			builder.setMultiChoiceItems(
 					multiChoiceItems,
 					defaultSelectedStatus,

@@ -9,7 +9,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -22,7 +21,6 @@ import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextPaint;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.KeyEvent;
@@ -40,11 +38,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.terrydr.eyeScope.R;
-
+/**
+ * 启动拍照界面
+ * @author ty
+ *
+ */
 public class CameraActivity extends Activity implements View.OnClickListener, 
 		TakePictureListener, OnGestureListener, OnTouchListener {
-	private static boolean isActive = false;
 	public final static String TAG = "CameraActivity";
 	private CameraContainer mContainer;
 	private ImageView photos_iv;
@@ -84,27 +84,14 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private int width ;
 	private int getWidth ;
 	public static boolean PRE_CUPCAKE ; 
-	private SharedPreferences preferences;   //保存数据 勾选下次不再提示
 	
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);  //保持屏幕长亮
 		
-//		Log.e(TAG,"onCreate");
-//		preferences = this.getSharedPreferences("isStart", Context.MODE_PRIVATE);
-//		Editor editor = preferences.edit();
-//		editor.putBoolean("isStart", false);
-//		editor.commit();
-		
-//		if(isActive){
-//			this.setResult(0);
-//			this.finish();
-//			return;
-//		}
-//		isActive = true;
-
 		PRE_CUPCAKE = getSDKVersionNumber() < 23 ? true : false; 
 		if(!PRE_CUPCAKE){
 			checkWriteExternalPermission();  //判断如果用户阻止了权限给提示窗，目前紧对android6.0以上版本有效
@@ -154,28 +141,27 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		photos_iv.setOnTouchListener(this);
 		photos_iv.setOnLongClickListener(onLongClickListener);
 		mContainer.setOnTouchListener(this);
-		
+		//手势事件处理
 		detector = new GestureDetector(this);
 		
 		mSaveRoot_left = "left";
 		mSaveRoot_right = "right";
 		setPath(leftOrRight);
-
-		int i = dip2px(30);
-		int m = px2dip(38);
-//		Log.e(TAG, "i:" + i);
-//		Log.e(TAG, "m:" + m);
 		
 		wm = this.getWindowManager();
 		width = wm.getDefaultDisplay().getWidth();
 		getWidth = width*140/720;
-//		Log.e(TAG, "width:" + width);
-//		Log.e(TAG, "getWidth:" + getWidth);
 		
+		//每次启动拍照界面删除已经存在的图片
 		String rootPath_left = getFolderPath(this, mSaveRoot_left);
 		deleteFolder(rootPath_left);
 		String rootPath_right = getFolderPath(this, mSaveRoot_right);
 		deleteFolder(rootPath_right);
+		
+//		int i = dip2px(30);
+//		int m = px2dip(38);
+//		Log.e(TAG, "i:" + i);
+//		Log.e(TAG, "m:" + m);
 		
 	}
 	
@@ -236,7 +222,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
     private void checkWriteExternalPermission() { 
         int hasWriteContactsPermission = ContextCompat.checkSelfPermission(CameraActivity.this, 
                 Manifest.permission.CAMERA); 
-//        LOG.e(TAG, "hasWriteContactsPermission:" + hasWriteContactsPermission + "----PackageManager.PERMISSION_GRANTED:" + PackageManager.PERMISSION_GRANTED);
         if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) { 
 //        	Toast.makeText(CameraActivity.this, "未获得相机权限，请到设置中授权后再尝试。", Toast.LENGTH_SHORT) .show(); 
 //        	finish();
@@ -347,7 +332,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 * 点击拍照事件
 	 */
 	private void takePictureing(){
-//		Log.d(TAG, "点击拍照按钮");
 		if ((i_left >= 6 && leftOrRight) || (i_right >= 6 && !leftOrRight)) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("单侧眼睛最多拍摄六张图片,是否重拍?")
@@ -749,7 +733,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (resultCode) { // resultCode为回传的标记，回传的是RESULT_OK
 		case 0:
-//			Log.e(TAG,"0");
 			Bundle b = data.getExtras();
 			if(b!=null){
 				mExposureNum = b.getInt("mexposureNum");
@@ -763,7 +746,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			photos_iv.setEnabled(true);
 			break;
 		case 5:
-//			Log.e(TAG,"5");
 			Intent intent = new Intent();
 			Bundle b1 = data.getExtras();
 			intent.putExtras(b1);
@@ -771,7 +753,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			this.finish();
 			break;
 		case 6:
-//			Log.e(TAG,"6");
 			Intent intent1 = new Intent();
 			Bundle b11 = data.getExtras();
 			intent1.putExtras(b11);
@@ -902,9 +883,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 * @param p2  如果为正数则向右滑动，否则向左滑动
 	 */
 	public void slideview(final View view,final float p1, final float p2) {
-//		LOG.e(TAG, "view.getX:" + view.getX());
-//		LOG.e(TAG, "View.getY:" + view.getY());
-//		LOG.e(TAG, "left:" + left);
 		TranslateAnimation animation = new TranslateAnimation(p1, p2, 0, 0);
 		animation.setInterpolator(new OvershootInterpolator());
 		animation.setDuration(500);
@@ -922,15 +900,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				int left = view.getLeft() + (int) (p2 - p1);
-//				int top = view.getTop();
-//				int width = view.getWidth();
-//				int height = view.getHeight();
 				view.clearAnimation();
-//				view.layout(left, top, left + width, top + height);
-//				LOG.e(TAG, "left:" + left);
-//				LOG.e(TAG, "top" + top);
-//				LOG.e(TAG, "left + width" + left + "+" + width);
-//				LOG.e(TAG, "top + height" + top + "+" + height);
 				view.setX(left + view.getX());
 				view.setY(view.getY());
 				if(leftOrRight){
@@ -944,20 +914,10 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 					setCameraText(leftOrRight);
 					eyeleft_tv.setEnabled(true);
 				}
-//				Log.e(TAG, "leftOrRight:" + leftOrRight);
 			}
 		});
 		view.startAnimation(animation);
 	}
-
-//	/**
-//	 * 添加触摸事件， activity触摸事件
-//	 */
-//	@Override
-//	public boolean onTouchEvent(MotionEvent event) {
-//		return this.detector.onTouchEvent(event);
-//	}
-	
 
 	/**
 	 * 触摸事件处理
@@ -968,7 +928,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	public boolean onTouch(View view, MotionEvent event) {
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
-			// Log.e(TAG,"MotionEvent.ACTION_DOWN");
 			mode = MODE_INIT;
 			switch (view.getId()) {
 			case R.id.photos_iv:
@@ -982,10 +941,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			switch (view.getId()) {
 			case R.id.photos_iv:
 				if (isLong) {
-//					Log.e(TAG,"setEnabled");
 					photos_iv.setEnabled(false);
 					isLong = false;
-					// Log.d(TAG,"结束连继拍照");
 					if (leftOrRight) {
 						mContainer.stop = i_left;
 					} else
@@ -1003,7 +960,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			startDis = distance(event);
 			break;
 		case MotionEvent.ACTION_MOVE:
-			// Log.e(TAG,"MotionEvent.ACTION_MOVE");
 			if (mode == MODE_ZOOM) {
 				// 只有同时触屏两个点的时候才执行
 				if (event.getPointerCount() < 2)
@@ -1199,13 +1155,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	@Override
 	protected void onStart() {
 		super.onStart();
-//		if(isActive){
-//			this.setResult(0);
-//			this.finish();
-//			return;
-//		}
-//		isActive = true;
-//		Log.e(TAG,"onStart");
 	}
 	@Override
 	protected void onRestart(){
@@ -1226,16 +1175,9 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	@Override
 	protected void onDestroy() {		
 		super.onDestroy();
-		isActive = false;
-//		Log.e(TAG,"onDestroy");
-//		String rootPath_left = getFolderPath(this, mSaveRoot_left);
-//		deleteFolder(rootPath_left);
-//		String rootPath_right = getFolderPath(this, mSaveRoot_right);
-//		deleteFolder(rootPath_right);
 	}
 	@Override
 	protected void onResume() {		
-//		Log.e(TAG,"onResume");
 		setCameraText(leftOrRight);
 //		Bundle bundle = getIntent().getExtras();
 //		if(bundle!=null){
@@ -1301,44 +1243,23 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 */
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-//		Log.e(TAG,"keyCode:" + keyCode);
-//		Log.e(TAG,"event.getRepeatCount():" + event.getRepeatCount());
 		if (photos_iv.isEnabled() && event.getRepeatCount() == 0) {
 			switch (keyCode) {
 			case KeyEvent.KEYCODE_ENTER:  //空格键    66
-//				Log.e(TAG,"KeyEvent.KEYCODE_ENTER");
 				takePictureing();
 				return true;
 			case KeyEvent.KEYCODE_CAMERA:  //拍照键    27
-//				Log.e(TAG,"KeyEvent.KEYCODE_CAMERA");
 				takePictureing();
 				return true;
 			case KeyEvent.KEYCODE_HEADSETHOOK:   //耳机中间键
-//				Log.e(TAG,"KeyEvent.KEYCODE_HEADSETHOOK");
 				takePictureing();
 				return true;
 			case KeyEvent.KEYCODE_VOLUME_DOWN:      	//音量减小键 	 25
 				takePictureing();
-//				Log.e(TAG,"KeyEvent.KEYCODE_VOLUME_DOWN");
 				return true;
 			case KeyEvent.KEYCODE_VOLUME_UP:      //音量增加键 	24
 				takePictureing();
-//				Log.e(TAG,"KeyEvent.KEYCODE_VOLUME_UP");
 				return true;
-				
-//			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:    // 	多媒体键 播放/暂停
-//				Log.e(TAG,"KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE");
-//				takePictureing();
-//				return true;
-//			case KeyEvent.KEYCODE_MEDIA_PREVIOUS:     //多媒体键 上一首
-//				Log.e(TAG,"KeyEvent.KEYCODE_MEDIA_PREVIOUS");
-//				takePictureing();
-//				return true;
-//
-//			case KeyEvent.KEYCODE_MEDIA_STOP:          // 	多媒体键 停止
-//				Log.e(TAG,"KeyEvent.KEYCODE_MEDIA_STOP");
-//				takePictureing();
-//				return true;
 			}
 		}else{
 			return true;

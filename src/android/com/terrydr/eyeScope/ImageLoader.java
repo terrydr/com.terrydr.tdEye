@@ -17,12 +17,11 @@ import android.os.Message;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.widget.ImageView;
-import com.terrydr.eyeScope.R;
+
 /**
  * @ClassName: ImageLoader
  * @Description: 图片加载
  * @date 20160418
- * 
  */
 public class ImageLoader {
 	private static final String TAG = "ImageLoader";

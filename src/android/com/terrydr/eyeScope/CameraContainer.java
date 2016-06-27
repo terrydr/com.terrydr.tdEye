@@ -23,26 +23,19 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
-import com.terrydr.eyeScope.R;
-
 public class CameraContainer extends RelativeLayout implements CameraOperation{
 
 	public final static String TAG = "CameraContainer";
 
 	/** 相机绑定的SurfaceView */
 	private CameraView mCameraView;
-	
 	public FocusImageView mFocusImageView;
-
 	/** 拍照监听接口，用以在拍照始和结束后执行相应操*/
 	private TakePictureListener mListener;
-
 	/** 存放照片的根目录 */
 	private String mSavePath;
-
 	/** 照片字节流处理类 */
 	private DataHandler mDataHandler;
-	
 	private PreviewCallback mPreviewCallback = null;
 	private CameraActivity cActivity;
 	private boolean contShoot = false;
@@ -53,14 +46,12 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
     private SeekBar mZoomSeekBar;
     private Handler mHandler;
     private RelativeLayout zoom_rl;
-	
 
 	public CameraContainer(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		cActivity = (CameraActivity) context;
 		initView(context);
 		mHandler = new Handler();
-		
 	}
 
 	/**
@@ -156,39 +147,26 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
      * 每一张连拍结束的回调函数
      */
     public void countShoot(Bitmap bm,String thumbPath){
-//    	LOG.e(TAG, "cActivity.i_left"+cActivity.i_left);
     	cActivity.delectMultiFile2();
         if(mMode == 1){
         	if(mCameraView.mCamera!=null){
         		mCameraView.mCamera.setPreviewCallback(mPreviewCallback);    
         	}
         }
-//        LOG.e(TAG, "contShoot:" + contShoot);
-//        if(!contShoot){
-//        	stopShooting(bm, thumbPath);
-//        }
-        
         if(cActivity.leftOrRight){
         	mNumLeft++;
-//        	LOG.e(TAG, "mNumLeft:"+mNumLeft + "------" + cActivity.leftOrRight + "stop:" + stop );
             if(stop==mNumLeft){
-//            	cActivity.startAlbumAty();
             	stopShooting(bm, thumbPath);
             }else if(mNumLeft>=6){
         		stopShooting(bm, thumbPath);
-//            	cActivity.startAlbumAty();
         	}
         }else{
         	mNumright++;
-//        	LOG.e(TAG, "mNumLeft:"+mNumLeft + "------" + cActivity.leftOrRight + "stop:" + stop );
             if(stop==mNumright){
-//            	cActivity.startAlbumAty();
             	stopShooting(bm, thumbPath);
             }else if(mNumright>=6){
         		stopShooting(bm, thumbPath);
-//            	cActivity.startAlbumAty();
         	}
-            
         }
     }
 	
@@ -221,20 +199,20 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		}
 	};
 	
+	/**
+	 * 手动对焦
+	 */
 	private final AutoFocusCallback aFocusCallback=new AutoFocusCallback() {
 
 		@Override
 		public void onAutoFocus(boolean success, Camera camera) {
 			if (success) {
-//				LOG.e(TAG, "手动对焦成功");
 				mFocusImageView.onFocusSuccess();
 			}else {
-//				LOG.e(TAG, "手动对焦失败");
 				mFocusImageView.onFocusFailed();
 			}
 		}
 	};
-	
 	
 	/**
 	 * 连拍保存图片接口 
@@ -338,7 +316,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		 * */
 		public void onAnimtionEnd(Bitmap bm, boolean isVideo);
 	}
-
 	
 	/**
 	 * 拍照返回的byte数据处理
@@ -539,7 +516,10 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 		}, zoom_rl,SystemClock.uptimeMillis()+3000);
 	}
 	
-
+	/**
+	 * 获取相机缩放级别
+	 * @return
+	 */
 	public int getZoom() {
 		return mCameraView.getZoom();
 	}

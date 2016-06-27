@@ -3,17 +3,11 @@ package com.terrydr.eyeScope;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import com.terrydr.eyeScope.MatrixImageView.OnMovingListener;
 import com.terrydr.eyeScope.MatrixImageView.OnSlideUpListener;
-
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-
-import android.content.DialogInterface.OnClickListener;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -21,9 +15,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-
-
-import com.terrydr.eyeScope.R;
 
 /**
  * @ClassName: AlbumViewPager
@@ -103,12 +94,8 @@ public class AlbumViewPagerForJs extends ViewPager implements OnMovingListener,O
 		mChildIsBeingDragged = false;
 	}
 
-	
-
 	@Override
 	public void onSlideUpTap() {
-		Log.e(TAG, "删除事件处理.......");
-		
 		AlertDialog.Builder builder = new AlertDialog.Builder(albumItemAty);
 		builder.setMessage("确认删除该图片?")
 				.setPositiveButton("确认",
@@ -177,7 +164,7 @@ public class AlbumViewPagerForJs extends ViewPager implements OnMovingListener,O
 			MatrixImageView imageView = (MatrixImageView) imageLayout.findViewById(R.id.image);
 			imageView.setOnMovingListener(AlbumViewPagerForJs.this);
 			
-			imageView.setOnSlideUpListener(AlbumViewPagerForJs.this);  //上滑删除事件
+//			imageView.setOnSlideUpListener(AlbumViewPagerForJs.this);  //上滑删除事件
 			String path = paths.get(position);
 			imageLayout.setTag(path);
 			mImageLoader.loadImage(path, imageView, mOptions);

@@ -43,11 +43,6 @@ public class SeekBarBallView extends View {
     private void init(Context context) {
         paint = new Paint();
         scroller = new Scroller(context);
-//        res = context.getResources();  
-//        bmp = BitmapFactory  
-//                .decodeResource(res, R.drawable.wb_thumb);  
-//        thumb = new BitmapDrawable(bmp); 
-        
         final Resources res = getResources();
 		thumb = res.getDrawable(R.drawable.wb_thumb);
     }
@@ -78,11 +73,10 @@ public class SeekBarBallView extends View {
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
-//        Rect rect = thumb.getBounds();  
         
-//        zoomDrawable(thumb,bmp.getWidth(),bmp.getHeight());
-        
-        
+        /**
+         * 自适应不同分辨率画圆球效果,这里以720P的分辨率为基准
+         */
 		thumb.setBounds(
 				(int) (getMeasuredWidth() / 2 - getMeasuredWidth() * 40 / 720),
 				(int) (getMeasuredWidth() / 2 - getMeasuredWidth() * 40 / 720),
@@ -90,11 +84,6 @@ public class SeekBarBallView extends View {
 				(int) (getMeasuredWidth() / 2 + getMeasuredWidth() * 40 / 720));
         
         this.thumb.draw(canvas);
-        
-//        canvas.drawBitmap(bmp, getMeasuredWidth() / 2,getMeasuredWidth() / 2, paint);
-        
-//        canvas.drawCircle(getMeasuredWidth() / 2, getMeasuredWidth() / 2, getMeasuredWidth() / 2, paint);
-        
     }
     
     /**

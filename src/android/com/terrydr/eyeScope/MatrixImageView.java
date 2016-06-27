@@ -1,7 +1,5 @@
 package com.terrydr.eyeScope;
 
-import org.apache.cordova.LOG;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -14,9 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.terrydr.eyeScope.R;
 /**
  * @ClassName: MatrixImageView
  * @Description: 带放大移动效果的ImageView

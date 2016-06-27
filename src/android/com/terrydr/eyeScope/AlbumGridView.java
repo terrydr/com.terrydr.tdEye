@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
 import android.widget.GridView;
-import com.terrydr.eyeScope.R;
+
 /**
  * @ClassName: AlbumView
  * @Description: Photo album View, extends the GridView, encapsulates the Adapter and image loading method 
@@ -248,33 +248,6 @@ public class AlbumGridView extends GridView {
 		@Override
 		public void onCheckedChanged(final CompoundButton buttonView,
 				boolean isChecked) {
-//			if(itemSelectedSet.size()>=2 && isChecked){
-//				AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//				builder.setMessage("单侧眼睛最多选择两张图片")
-//						.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
-//							@Override
-//							public void onClick(DialogInterface dialog,
-//									int which) {
-//								buttonView.setChecked(false);
-//							}
-//						});
-//				builder.create().show();
-//			}else{
-//				if (buttonView.getTag() == null)
-//					return;
-//				if (isChecked){
-//					itemSelectedSet.add(buttonView.getTag().toString());
-//				}else{
-//					itemSelectedSet.remove(buttonView.getTag().toString());
-//				}
-////				if (listener != null)
-////					listener.onCheckedChanged(itemSelectedSet);
-//			}
-//			if(isChecked){
-//				buttonView.setVisibility(View.VISIBLE);
-//			}else{
-//				buttonView.setVisibility(View.GONE);
-//			}
 		}
 	}
 }

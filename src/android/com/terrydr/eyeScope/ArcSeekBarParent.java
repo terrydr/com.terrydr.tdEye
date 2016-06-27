@@ -3,10 +3,8 @@ package com.terrydr.eyeScope;
 import android.content.Context;
 import android.graphics.PointF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
-
 import java.math.BigDecimal;
 
 /**

@@ -2,7 +2,6 @@ package com.terrydr.eyeScope;
 
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
 import android.hardware.Camera.PictureCallback;
-import com.terrydr.eyeScope.R;
 
 public interface CameraOperation {
 

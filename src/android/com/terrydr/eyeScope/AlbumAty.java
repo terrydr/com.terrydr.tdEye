@@ -27,8 +27,6 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
 
-import com.terrydr.eyeScope.R;
-
 /**
  * @ClassName: AlbumAty
  * @Description: 相册Activity
@@ -55,7 +53,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	private ThumbnaiImageView view;
 	private LinearLayout linearLayou_left,linearLayou_right;
 	private ImageView header_bar_back_iv,header_bar_back_iv1;
-	private boolean returnB = false;
+//	private boolean returnB = false;
 
 	
 	Set<String> itemSelectedLeft = new HashSet<String>();
@@ -437,7 +435,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			} else {
 				enterEdit();
 			}
-			returnB = true;
+//			returnB = true;
 			loadAlbumBySelectImage(mSaveRoot_left, ".jpg", mAlbumView, sl);
 			loadAlbumBySelectImage(mSaveRoot_right, ".jpg", mAlbumView_right, sr);
 			left_count_tv.setText(selectPathsLeftSize + "/2");

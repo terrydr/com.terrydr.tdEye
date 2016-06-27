@@ -196,8 +196,6 @@
                      target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/AlbumViewPagerForJs.java"
                      target-dir="src/com/terrydr/eyeScope"/>
-		<source-file src="src/android/com/terrydr/eyeScope/ArcSeekBar.java"
-                     target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/ArcSeekBarParent.java"
                      target-dir="src/com/terrydr/eyeScope"/>
 		<source-file src="src/android/com/terrydr/eyeScope/BitmapDisplayer.java"

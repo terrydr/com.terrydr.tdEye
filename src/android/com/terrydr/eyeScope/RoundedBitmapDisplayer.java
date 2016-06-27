@@ -14,7 +14,7 @@ import android.graphics.Shader;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
-import com.terrydr.eyeScope.R;
+
 /** 
 * @ClassName: RoundedBitmapDisplayer 
 * @Description:  圆形图片

@@ -3,7 +3,6 @@ package com.terrydr.eyeScope;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import com.terrydr.eyeScope.R;
 
 /** 
 * @ClassName: MatrixBitmapDisplayer 

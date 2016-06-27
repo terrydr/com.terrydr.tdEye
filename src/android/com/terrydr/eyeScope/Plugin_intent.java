@@ -10,19 +10,23 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * cordovaplugin启动插件类
+ * @author ty
+ *
+ */
 public class Plugin_intent extends CordovaPlugin {
 	private final static String TAG = "Plugin_intent";
 	private String infos;
 	private SharedPreferences preferences;   //保存数据 勾选下次不再提示
 	private int i = 0;
-
+	private CallbackContext callbackContext;
+	
 	public Plugin_intent() {
 	}
 
-	CallbackContext callbackContext;
-	
 	/**
-	 * 读取数据
+	 * 读取本地存储数据
 	 * @return
 	 */
 	private boolean getSharedPreferences() {
@@ -30,11 +34,14 @@ public class Plugin_intent extends CordovaPlugin {
 		return ischeck;
 	}
 
+	/**
+	 * 启动插件的主要方法
+	 */
 	@Override
 	public boolean execute(String action, org.json.JSONArray args,
 			CallbackContext callbackContext) throws org.json.JSONException {
 		
-		if (action.equals("jrEyeTakePhotos")) {
+		if (action.equals("tdEyeTakePhotos")) { //启动拍照
 			preferences = cordova.getActivity().getSharedPreferences("isStart", Context.MODE_PRIVATE);
 			boolean isStart = getSharedPreferences();
 			int ii = preferences.getInt("i", 0);
@@ -48,25 +55,24 @@ public class Plugin_intent extends CordovaPlugin {
 				}
 			}
 			this.callbackContext = callbackContext;
-			Log.e(TAG, "jrEyeTakePhotos:" + callbackContext);
+			Log.e(TAG, "tdEyeTakePhotos:" + callbackContext);
 			this.startCameraActivity();
 			editor.putBoolean("isStart", true);
 			editor.commit();
 			return true;
-		} else if (action.equals("jrEyeSelectPhotos")) { // 相册缩略图界面
+		} else if (action.equals("tdEyeSelectPhotos")) { // 相册缩略图界面
 			this.callbackContext = callbackContext;
-			Log.e(TAG, "jrEyeSelectPhotos:" + callbackContext);
+			Log.e(TAG, "tdEyeSelectPhotos:" + callbackContext);
 			startAlbumAty();
 			return true;
-		} else if (action.equals("jrEyeScanPhotos")) { // 大图片预览界面参数{data:[图片路径，图片路径]}
+		} else if (action.equals("tdEyeScanPhotos")) { // 大图片预览界面参数{data:[图片路径，图片路径]}
 			this.callbackContext = callbackContext;
-			Log.e(TAG, "jrEyeScanPhotos:" + callbackContext);
+			Log.e(TAG, "tdEyeScanPhotos:" + callbackContext);
 			infos = args.getString(0);
 			this.startAlbumItemAty(infos);
 			return true;
 		}
 		return true;
-
 	}
 
 	/**
@@ -81,8 +87,6 @@ public class Plugin_intent extends CordovaPlugin {
 	 * 跳转到相册缩略图界面
 	 */
 	private void startAlbumAty() {
-//		Log.i(TAG, "startAlbumAty");
-//		Intent intent = new Intent(cordova.getActivity(), AlbumAty.class);
 		Intent intent = new Intent(cordova.getActivity(), AlbumItemAty.class);
 		Bundle bundle = new Bundle();
 		bundle.putBoolean("isPlugin", true);
@@ -94,7 +98,6 @@ public class Plugin_intent extends CordovaPlugin {
 	 * 大图片预览界面 参数{data:[图片路径，图片路径]}
 	 */
 	private void startAlbumItemAty(String args) {
-		// cordova.getActivity() 获取当前activity的this
 		Intent intent = new Intent(cordova.getActivity(),AlbumItemAtyForJs.class);
 		Bundle bundle = new Bundle();
 		bundle.putString("data", args);
@@ -109,21 +112,17 @@ public class Plugin_intent extends CordovaPlugin {
 		case 0:
 			break;
 		case 5:
-//			Log.e(TAG, "5");
 			Bundle b = intent.getExtras();
 			String result_Json = b.getString("result_Json");
 			org.json.JSONObject result = null;
 			try {
 				result = new org.json.JSONObject(result_Json);
-//				Log.e(TAG, "result:" + result);
 			} catch (JSONException e) {
 				Log.e(TAG, "String to Json error!",e);
 			}
-//			Log.e(TAG, "callbackContext:555555555:" + callbackContext);
 			callbackContext.success(result);
 			break;
 		case 6:
-//			Log.e(TAG, "6");
 			Intent intent1 = new Intent(cordova.getActivity(), CameraActivity.class);
 			Bundle bundle = new Bundle();
 			bundle.putBoolean("deleteFile", false);

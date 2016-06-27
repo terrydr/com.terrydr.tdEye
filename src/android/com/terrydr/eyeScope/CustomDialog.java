@@ -11,6 +11,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+/**
+ * 自定义弹出框IOS效果
+ * @author ty
+ *
+ */
 public class CustomDialog extends Dialog {
 
 	public CustomDialog(Context context) {
