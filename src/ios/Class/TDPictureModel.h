@@ -1,5 +1,5 @@
 //
-//  JRPictureModel.h
+//  TDPictureModel.h
 //  EyeDemo
 //
 //  Created by 路亮亮 on 16/3/9.
@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface JRPictureModel : NSObject
+@interface TDPictureModel : NSObject
 
 @property(nonatomic,strong)NSString *pictureName;
 @property (nonatomic) BOOL isSelected;

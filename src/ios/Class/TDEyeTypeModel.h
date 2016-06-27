@@ -1,5 +1,5 @@
 //
-//  JREyeTypeModel.h
+//  TDEyeTypeModel.h
 //  EyeDemo
 //
 //  Created by 路亮亮 on 16/3/15.
@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface JREyeTypeModel : NSObject
+@interface TDEyeTypeModel : NSObject
 
 @property (nonatomic) BOOL isLeftEye;
 @property(nonatomic,strong)NSString *typeName;

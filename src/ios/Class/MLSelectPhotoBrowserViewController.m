@@ -14,7 +14,7 @@
 #import "MLSelectPhotoPickerBrowserPhotoScrollView.h"
 #import "MLSelectPhotoCommon.h"
 #import "UIImage+MLTint.h"
-#import "JRMediaFileManage.h"
+#import "TDMediaFileManage.h"
 #import "ZQBaseClassesExtended.h"
 #import "TDAlertView.h"
 
@@ -242,7 +242,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 - (void)seclectedBtnClick:(id)sender{
     UIButton *btn = (UIButton *)sender;
     btn.selected = !btn.isSelected;
-    JRPictureModel *pictureModel = self.photos[_currentPage];
+    TDPictureModel *pictureModel = self.photos[_currentPage];
     
     BOOL isLeftEye;
     if (_leftCount>0) {
@@ -255,7 +255,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         isLeftEye=NO;
     }
     
-    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:isLeftEye];
+    NSString *imgPath = [[TDMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:isLeftEye];
     UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
     UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
     if (btn.selected) {
@@ -518,10 +518,10 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 
 - (void)trashAsset{
     NSMutableArray *trashAssets = [NSMutableArray arrayWithArray:self.photos];
-    JRPictureModel *pictureModel = self.photos[self.currentPage];
+    TDPictureModel *pictureModel = self.photos[self.currentPage];
     if ([trashAssets containsObject:pictureModel]) {
         [trashAssets removeObject:pictureModel];
-        [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:pictureModel.pictureName
+        [[TDMediaFileManage shareInstance] deleteSingleFileWithPictureName:pictureModel.pictureName
                                                                  isLeftEye:_isCurrentLeftEye];
         NSString *eyeType;
         if (_isCurrentLeftEye) {
@@ -531,18 +531,18 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             if (index != totalCount) {
                 //重新排序
                 for (int i=index; i<totalCount; i++) {
-                    JRPictureModel *tempPictureModel = self.photos[i];
-                    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:tempPictureModel.pictureName isLeftEye:YES];
+                    TDPictureModel *tempPictureModel = self.photos[i];
+                    NSString *imgPath = [[TDMediaFileManage shareInstance] getImagePathWithPictureName:tempPictureModel.pictureName isLeftEye:YES];
                     NSData *imgData = [NSData dataWithContentsOfFile:imgPath];
                     
-                    JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
+                    TDMediaFileManage *fileManage = [TDMediaFileManage shareInstance];
                     NSString *filePath = [fileManage getJRMediaPathWithType:YES];
                     NSString *imageName = [NSString stringWithFormat:@"0%d.jpg",i];
                     NSString *destinationImgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
                     BOOL result = [fileManage saveFileWithPath:destinationImgPath fileData:imgData];
                     NSLog(@"result:%d",result);
                     
-                    [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:tempPictureModel.pictureName
+                    [[TDMediaFileManage shareInstance] deleteSingleFileWithPictureName:tempPictureModel.pictureName
                                                                              isLeftEye:YES];
                     tempPictureModel.pictureName = imageName;
                 }
@@ -557,18 +557,18 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             if (index != totalCount) {
                 //重新排序
                 for (int i=index; i<totalCount; i++) {
-                    JRPictureModel *tempPictureModel = self.photos[i];
-                    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:tempPictureModel.pictureName isLeftEye:NO];
+                    TDPictureModel *tempPictureModel = self.photos[i];
+                    NSString *imgPath = [[TDMediaFileManage shareInstance] getImagePathWithPictureName:tempPictureModel.pictureName isLeftEye:NO];
                     NSData *imgData = [NSData dataWithContentsOfFile:imgPath];
                     
-                    JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
+                    TDMediaFileManage *fileManage = [TDMediaFileManage shareInstance];
                     NSString *filePath = [fileManage getJRMediaPathWithType:NO];
                     NSString *imageName = [NSString stringWithFormat:@"0%d.jpg",i];
                     NSString *destinationImgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
                     BOOL result = [fileManage saveFileWithPath:destinationImgPath fileData:imgData];
                     NSLog(@"result:%d",result);
                     
-                    [[JRMediaFileManage shareInstance] deleteSingleFileWithPictureName:tempPictureModel.pictureName
+                    [[TDMediaFileManage shareInstance] deleteSingleFileWithPictureName:tempPictureModel.pictureName
                                                                              isLeftEye:NO];
                     tempPictureModel.pictureName = imageName;
                 }
@@ -683,8 +683,8 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             }else{
                 isLeftEye=NO;
             }
-            JRPictureModel *pictureModel = self.photos[indexPath.item];
-            NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:isLeftEye];
+            TDPictureModel *pictureModel = self.photos[indexPath.item];
+            NSString *imgPath = [[TDMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:isLeftEye];
             photo = [UIImage imageWithContentsOfFile:imgPath];
         }else{
             NSDictionary *paramDic = self.photos[indexPath.item];
@@ -809,7 +809,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         
         if ([_selectedModelArr isValid]) {
             NSMutableArray *indexArr = [[NSMutableArray alloc] initWithCapacity:0];
-            for (JRPictureModel *model in _selectedModelArr) {
+            for (TDPictureModel *model in _selectedModelArr) {
                 NSUInteger index = [_photos indexOfObject:model];
                 [indexArr addObject:[NSNumber numberWithUnsignedInteger:index]];
             }
@@ -830,7 +830,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         dotView.backgroundColor = RGB(0x3691e6);
         _currentPageView = dotView;
         
-        JRPictureModel *pictureModel = self.photos[page];
+        TDPictureModel *pictureModel = self.photos[page];
         UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
         UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
         if (pictureModel.isSelected) {

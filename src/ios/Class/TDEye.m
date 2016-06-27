@@ -1,25 +1,25 @@
 //
-//  JREye.m
+//  TDEye.m
 //  HelloCordova
 //
 //  Created by 路亮亮 on 16/3/15.
 //
 //
 
-#import "JREye.h"
+#import "TDEye.h"
 #import "TDNavgationController.h"
 #import "WYVideoCaptureController.h"
 #import "MLSelectPhotoBrowserViewController.h"
 
-@interface JREye (){
+@interface TDEye (){
     NSString *_callbackId;
 }
 
 @end
 
-@implementation JREye
+@implementation TDEye
 
-- (void)jrEyeTakePhotos:(CDVInvokedUrlCommand*)command{
+- (void)tdEyeTakePhotos:(CDVInvokedUrlCommand*)command{
     
     _callbackId = command.callbackId;
     NSArray *paramArr = command.arguments;
@@ -43,7 +43,7 @@
     [self.commandDelegate sendPluginResult:result callbackId:_callbackId];
 }
 
-- (void)jrEyeSelectPhotos:(CDVInvokedUrlCommand*)command{
+- (void)tdEyeSelectPhotos:(CDVInvokedUrlCommand*)command{
     _callbackId = command.callbackId;
     WYVideoCaptureController *videoVC = [[WYVideoCaptureController alloc] init];
     videoVC.isScan = YES;
@@ -52,7 +52,7 @@
     }];
 }
 
-- (void)jrEyeScanPhotos:(CDVInvokedUrlCommand*)command{
+- (void)tdEyeScanPhotos:(CDVInvokedUrlCommand*)command{
     _callbackId = command.callbackId;
     NSArray *paramArr = command.arguments;
     NSString *jsonStr = [paramArr objectAtIndex:0];

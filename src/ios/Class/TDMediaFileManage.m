@@ -1,21 +1,21 @@
 //
-//  JRMediaFileManage.m
-//  JRCamera
+//  TDMediaFileManage.m
+//  TDCamera
 //
 //  Created by 路亮亮 on 16/2/24.
 //
 //
 
-#import "JRMediaFileManage.h"
+#import "TDMediaFileManage.h"
 
-@implementation JRMediaFileManage
+@implementation TDMediaFileManage
 
-+ (JRMediaFileManage*)shareInstance
++ (TDMediaFileManage*)shareInstance
 {
     static dispatch_once_t onceToken;
-    static JRMediaFileManage* interface = nil;
+    static TDMediaFileManage* interface = nil;
     dispatch_once(&onceToken, ^{
-        interface = [[JRMediaFileManage alloc]init];
+        interface = [[TDMediaFileManage alloc]init];
     });
     return interface;
 }

@@ -5,7 +5,7 @@
         id="cordova-plugin-eyecamera"
         version="0.4.2">
     
-    <name>JREye</name>
+    <name>TDEye</name>
     
     <description>This plugin for Cordova and PhoneGap allows you to check if an app is installed. It requires an URI Scheme (iOS) or a Package Name (Android).</description>
     
@@ -20,30 +20,30 @@
         <engine name="cordova" version=">=3.0.0" />
     </engines>
     
-    <js-module src="www/JREye.js" name="JREye">
-        <!--jreye:js调用方法时的对象 -->
-        <clobbers target="jreye" />
+    <js-module src="www/TDEye.js" name="TDEye">
+        <!--tdeye:js调用方法时的对象 -->
+        <clobbers target="tdeye" />
     </js-module>
     
     <platform name="ios">
         <config-file  target="config.xml" parent="/*">
-            <feature  name="JREye">
-                <!--JREye:继承CDVPlugin的类名 -->
-                <param  name="ios-package"  value="JREye"/>
+            <feature  name="TDEye">
+                <!--TDEye:继承CDVPlugin的类名 -->
+                <param  name="ios-package"  value="TDEye"/>
             </feature>
         </config-file>
         
-        <source-file src="src/ios/Class/JREye.m" />
-        <header-file src="src/ios/Class/JREye.h" />
+        <source-file src="src/ios/Class/TDEye.m" />
+        <header-file src="src/ios/Class/TDEye.h" />
         <header-file src="src/ios/Class/TDHeader.h" />
         <source-file src="src/ios/Class/TDNavgationController.m" />
         <header-file src="src/ios/Class/TDNavgationController.h" />
         <source-file src="src/ios/Class/WYVideoCaptureController.m" />
         <header-file src="src/ios/Class/WYVideoCaptureController.h" />
-        <source-file src="src/ios/Class/JRPictureModel.m" />
-        <header-file src="src/ios/Class/JRPictureModel.h" />
-        <source-file src="src/ios/Class/JREyeTypeModel.m" />
-        <header-file src="src/ios/Class/JREyeTypeModel.h" />
+        <source-file src="src/ios/Class/TDPictureModel.m" />
+        <header-file src="src/ios/Class/TDPictureModel.h" />
+        <source-file src="src/ios/Class/TDEyeTypeModel.m" />
+        <header-file src="src/ios/Class/TDEyeTypeModel.h" />
         <source-file src="src/ios/Class/PictureScanViewController.m" />
         <header-file src="src/ios/Class/PictureScanViewController.h" />
         <source-file src="src/ios/Class/ShootCollectionHeaderView.m" />
@@ -52,8 +52,8 @@
         <header-file src="src/ios/Class/ShootCollectionButton.h" />
         <source-file src="src/ios/Class/ShootCollectionViewCell.m" />
         <header-file src="src/ios/Class/ShootCollectionViewCell.h" />
-        <source-file src="src/ios/Class/JRMediaFileManage.m" />
-        <header-file src="src/ios/Class/JRMediaFileManage.h" />
+        <source-file src="src/ios/Class/TDMediaFileManage.m" />
+        <header-file src="src/ios/Class/TDMediaFileManage.h" />
         <source-file src="src/ios/Class/MLSelectPhotoBrowserViewController.m" />
         <header-file src="src/ios/Class/MLSelectPhotoBrowserViewController.h" />
         <source-file src="src/ios/Class/MLSelectPhotoPickerBrowserPhotoScrollView.m" />
@@ -131,8 +131,8 @@
     
 	<platform name="android">
         <config-file  target="res/xml/config.xml" parent="/*">
-            <feature  name="JREye">
-                <!--JREye:继承CDVPlugin的类名 -->
+            <feature  name="TDEye">
+                <!--TDEye:继承CDVPlugin的类名 -->
                 <param  name="android-package"  value="com.terrydr.eyeScope.Plugin_intent"/>
             </feature>
         </config-file>

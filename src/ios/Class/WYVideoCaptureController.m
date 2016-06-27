@@ -14,8 +14,8 @@
 #import "NSTimer+Addtion.h"
 #import "ProgressView.h"
 #import "UIView+AutoLayoutViews.h"
-#import "JRMediaFileManage.h"
-#import "JRPictureModel.h"
+#import "TDMediaFileManage.h"
+#import "TDPictureModel.h"
 #import "ZQBaseClassesExtended.h"
 #import "MLSelectPhotoBrowserViewController.h"
 
@@ -178,7 +178,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)cleanOlderData{
-    [[JRMediaFileManage shareInstance] deleteAllFiles];
+    [[TDMediaFileManage shareInstance] deleteAllFiles];
 }
 
 - (void)setupCaptureView {
@@ -682,18 +682,18 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     NSMutableArray *rightEyeDataArr = [[NSMutableArray alloc] initWithCapacity:0];
     NSMutableArray *tempMutableArr = [[NSMutableArray alloc] initWithCapacity:0];
     
-    NSString *leftFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:YES];
+    NSString *leftFilePath = [[TDMediaFileManage shareInstance] getJRMediaPathWithType:YES];
     NSError *le = nil;
     NSArray *leftFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:leftFilePath error:&le];
     NSLog(@"leftFileArr:%@",leftFileArr);
-    NSString *rightFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:NO];
+    NSString *rightFilePath = [[TDMediaFileManage shareInstance] getJRMediaPathWithType:NO];
     NSError *re = nil;
     NSArray *rightFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:rightFilePath error:&re];
     NSLog(@"rightFileArr:%@",rightFileArr);
     
     if ([leftFileArr isValid]) {
         for (NSString *fileName in leftFileArr) {
-            JRPictureModel *picture = [[JRPictureModel alloc] init];
+            TDPictureModel *picture = [[TDPictureModel alloc] init];
             picture.pictureName = fileName;
             picture.isSelected = NO;
             [leftEyeDataArr addObject:picture];
@@ -704,7 +704,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         
         if ([rightFileArr isValid]) {
             for (NSString *fileName in rightFileArr) {
-                JRPictureModel *picture = [[JRPictureModel alloc] init];
+                TDPictureModel *picture = [[TDPictureModel alloc] init];
                 picture.pictureName = fileName;
                 picture.isSelected = NO;
                 [rightEyeDataArr addObject:picture];
@@ -720,7 +720,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         
         if ([rightFileArr isValid]) {
             for (NSString *fileName in rightFileArr) {
-                JRPictureModel *picture = [[JRPictureModel alloc] init];
+                TDPictureModel *picture = [[TDPictureModel alloc] init];
                 picture.pictureName = fileName;
                 picture.isSelected = NO;
                 [rightEyeDataArr addObject:picture];
@@ -1100,7 +1100,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         if (_leftTakenPictureCount==0 && _rightTakenPictureCount==0) {
             _pictureScanView.hidden = YES;
         }
-        [[JRMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
+        [[TDMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
         //[wself takePictureMethod];
     }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
@@ -1131,7 +1131,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _pictureScanImgView.image = saveImg;
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
     
-    JRMediaFileManage *fileManage = [JRMediaFileManage shareInstance];
+    TDMediaFileManage *fileManage = [TDMediaFileManage shareInstance];
     NSString *filePath = [fileManage getJRMediaPathWithType:_isLeftEye];
     NSString *imageName;
     if (_isLeftEye) {

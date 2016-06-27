@@ -9,9 +9,9 @@
 #import "PictureScanViewController.h"
 #import "ShootCollectionHeaderView.h"
 #import "ShootCollectionViewCell.h"
-#import "JRMediaFileManage.h"
-#import "JREyeTypeModel.h"
-#import "JRPictureModel.h"
+#import "TDMediaFileManage.h"
+#import "TDEyeTypeModel.h"
+#import "TDPictureModel.h"
 #import "ZQBaseClassesExtended.h"
 #import "MLSelectPhotoBrowserViewController.h"
 
@@ -123,7 +123,7 @@
     }else{
         [_rightItem setTitle:@"选择"];
         if ([_selectedModelsArr isValid]) {
-            for (JRPictureModel *model in _selectedModelsArr) {
+            for (TDPictureModel *model in _selectedModelsArr) {
                 model.isSelected = NO;
             }
             [_selectedModelsArr removeAllObjects];
@@ -150,20 +150,20 @@
     self.leftSelectedPictureModelArr = [[NSMutableArray alloc] initWithCapacity:0];
     self.rightSelectedPictureModelArr = [[NSMutableArray alloc] initWithCapacity:0];
     
-    NSString *leftFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:YES];
+    NSString *leftFilePath = [[TDMediaFileManage shareInstance] getJRMediaPathWithType:YES];
     NSError *le = nil;
     NSArray *leftFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:leftFilePath error:&le];
     NSLog(@"leftFileArr:%@",leftFileArr);
     if ([leftFileArr isValid]) {
         _isLeftValid = YES;
         for (NSString *fileName in leftFileArr) {
-            JRPictureModel *picture = [[JRPictureModel alloc] init];
+            TDPictureModel *picture = [[TDPictureModel alloc] init];
             picture.pictureName = fileName;
             picture.isSelected = NO;
             [leftEyeDataArr addObject:picture];
         }
         
-        JREyeTypeModel *typeModel = [[JREyeTypeModel alloc] init];
+        TDEyeTypeModel *typeModel = [[TDEyeTypeModel alloc] init];
         typeModel.isLeftEye = YES;
         typeModel.typeName = @"左眼";
         typeModel.pictureArr = leftEyeDataArr;
@@ -172,20 +172,20 @@
         _isLeftValid = NO;
     }
     
-    NSString *rightFilePath = [[JRMediaFileManage shareInstance] getJRMediaPathWithType:NO];
+    NSString *rightFilePath = [[TDMediaFileManage shareInstance] getJRMediaPathWithType:NO];
     NSError *re = nil;
     NSArray *rightFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:rightFilePath error:&re];
     NSLog(@"rightFileArr:%@",rightFileArr);
     if ([rightFileArr isValid]) {
         _isRightValid = YES;
         for (NSString *fileName in rightFileArr) {
-            JRPictureModel *picture = [[JRPictureModel alloc] init];
+            TDPictureModel *picture = [[TDPictureModel alloc] init];
             picture.pictureName = fileName;
             picture.isSelected = NO;
             [rightEyeDataArr addObject:picture];
         }
         
-        JREyeTypeModel *typeModel = [[JREyeTypeModel alloc] init];
+        TDEyeTypeModel *typeModel = [[TDEyeTypeModel alloc] init];
         typeModel.isLeftEye = NO;
         typeModel.typeName = @"右眼";
         typeModel.pictureArr = rightEyeDataArr;
@@ -207,7 +207,7 @@
     }
     if (kind == UICollectionElementKindSectionHeader) {
         ShootCollectionHeaderView *collectionHeaderView = [[ShootCollectionHeaderView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), (87.0f/2.0f))];
-        JREyeTypeModel *model = [_sectionArr objectAtIndex:indexPath.section];
+        TDEyeTypeModel *model = [_sectionArr objectAtIndex:indexPath.section];
         collectionHeaderView.typeNameLabel.text = model.typeName;
         if ([model.typeName isEqualToString:@"左眼"]) {
             collectionHeaderView.iconImgView.image = [UIImage imageNamed:@"leftEyeicon"];
@@ -248,7 +248,7 @@
 //定义展示的UICollectionViewCell的个数
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    JREyeTypeModel *model = [_sectionArr objectAtIndex:section];
+    TDEyeTypeModel *model = [_sectionArr objectAtIndex:section];
     return model.pictureArr.count;
 }
 //每个UICollectionView展示的内容
@@ -261,9 +261,9 @@
         NSLog(@"无法创建CollectionViewCell时打印，自定义的cell就不可能进来了。");
     }
     
-    JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:indexPath.section];
-    JRPictureModel *pictureModel = [typeModel.pictureArr objectAtIndex:indexPath.row];
-    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:typeModel.isLeftEye];
+    TDEyeTypeModel *typeModel = [_sectionArr objectAtIndex:indexPath.section];
+    TDPictureModel *pictureModel = [typeModel.pictureArr objectAtIndex:indexPath.row];
+    NSString *imgPath = [[TDMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:typeModel.isLeftEye];
     cell.imgView.image = [UIImage imageWithContentsOfFile:imgPath];
     if (pictureModel.isSelected) {
         cell.selectedImgView.hidden = NO;
@@ -274,9 +274,9 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:indexPath.section];
-    JRPictureModel *pictureModel = [typeModel.pictureArr objectAtIndex:indexPath.row];
-    NSString *imgPath = [[JRMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:typeModel.isLeftEye];
+    TDEyeTypeModel *typeModel = [_sectionArr objectAtIndex:indexPath.section];
+    TDPictureModel *pictureModel = [typeModel.pictureArr objectAtIndex:indexPath.row];
+    NSString *imgPath = [[TDMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:typeModel.isLeftEye];
     if (_isCollectionSelected) {
         pictureModel.isSelected = !pictureModel.isSelected;
         if (pictureModel.isSelected) {
@@ -318,20 +318,20 @@
         if (indexPath.section==0) {
             browserVc.currentPage = indexPath.row;
         }else{
-            JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:0];
+            TDEyeTypeModel *typeModel = [_sectionArr objectAtIndex:0];
             NSInteger pageIndex = typeModel.pictureArr.count + indexPath.row;
             browserVc.currentPage = pageIndex;
         }
         
         NSMutableArray *tempMutableArr = [[NSMutableArray alloc] initWithCapacity:0];
         if (_isLeftValid) {
-            JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:0];
+            TDEyeTypeModel *typeModel = [_sectionArr objectAtIndex:0];
             [tempMutableArr addObjectsFromArray:typeModel.pictureArr];
             
             browserVc.leftCount = typeModel.pictureArr.count;
             
             if (_isRightValid) {
-                JREyeTypeModel *rTypeModel = [_sectionArr objectAtIndex:1];
+                TDEyeTypeModel *rTypeModel = [_sectionArr objectAtIndex:1];
                 [tempMutableArr addObjectsFromArray:rTypeModel.pictureArr];
                 
                 browserVc.rightCount = rTypeModel.pictureArr.count;
@@ -342,7 +342,7 @@
             browserVc.leftCount = 0;
             
             if (_isRightValid) {
-                JREyeTypeModel *typeModel = [_sectionArr objectAtIndex:0];
+                TDEyeTypeModel *typeModel = [_sectionArr objectAtIndex:0];
                 [tempMutableArr addObjectsFromArray:typeModel.pictureArr];
                 
                 browserVc.rightCount = typeModel.pictureArr.count;

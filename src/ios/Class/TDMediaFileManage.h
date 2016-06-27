@@ -1,18 +1,18 @@
 //
-//  JRMediaFileManage.h
-//  JRCamera
+//  TDMediaFileManage.h
+//  TDCamera
 //
 //  Created by 路亮亮 on 16/2/24.
 //
 //
 
 #import <Foundation/Foundation.h>
-#import "JREyeTypeModel.h"
-#import "JRPictureModel.h"
+#import "TDEyeTypeModel.h"
+#import "TDPictureModel.h"
 
-@interface JRMediaFileManage : NSObject
+@interface TDMediaFileManage : NSObject
 
-+ (JRMediaFileManage*)shareInstance;
++ (TDMediaFileManage*)shareInstance;
 //获取图片,视频ID
 - (NSString *)getPictureSign;
 //图片储路径
