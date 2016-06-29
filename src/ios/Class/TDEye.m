@@ -34,7 +34,6 @@
     videoVC.isScan = NO;
     TDNavgationController *nav = [[TDNavgationController alloc] initWithRootViewController:videoVC];
     [self.viewController presentViewController:nav animated:YES completion:^{
-        [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
     }];
 }
 
@@ -42,8 +41,6 @@
     NSDictionary *pathDic = notify.userInfo;
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:pathDic];
     [self.commandDelegate sendPluginResult:result callbackId:_callbackId];
-    
-    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:@"TakePhotosFinishedNotification"
@@ -61,7 +58,6 @@
     videoVC.isScan = YES;
     TDNavgationController *nav = [[TDNavgationController alloc] initWithRootViewController:videoVC];
     [self.viewController presentViewController:nav animated:YES completion:^{
-        [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
     }];
 }
 

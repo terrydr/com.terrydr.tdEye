@@ -112,6 +112,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     //4.监听打开控制中心
     [self p_addObserverControlCenter];
+    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -123,6 +124,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     [self p_removeObserver];
     [self p_removeObserverControlCenter];
+    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
 }
 
 - (void)dealloc {
