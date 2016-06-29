@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.ImageView;
-import com.terrydr.eyeScope.R;
+
 /**
  * @ClassName: FilterImageView
  * @Description: 点击时显示明暗变(滤镜效果)的ImageView，该View捕获了Touch事件，会导致容器的Click事件无法触发

@@ -5,9 +5,11 @@ import android.graphics.BitmapFactory.Options;
 import android.util.DisplayMetrics;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
-import com.terrydr.eyeScope.R;
+
 /**
- * 
+ * @ClassName: ImageSizeUtil
+ * @Description: 图片大小工具类  
+ * @date 20160418
  */
 public class ImageSizeUtil {
 	/**

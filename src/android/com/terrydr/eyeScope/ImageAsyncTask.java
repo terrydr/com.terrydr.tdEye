@@ -1,36 +1,34 @@
 package com.terrydr.eyeScope;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Calendar;
-
-import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.hardware.Camera.Size;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
-import android.os.Environment;
-import android.provider.MediaStore.Images;
 import android.util.Log;
 
+/**
+ * @ClassName: ImageAsyncTask
+ * @Description: 连拍时后台线程保存图片处理 
+ * @date 20160418
+ */
 public class ImageAsyncTask extends AsyncTask<Bitmap, Void, Bitmap> {
     public static final String TAG = "ImageAsyncTask";
 
-    Context mContext = null;
-    CameraView mCameraPreview;
-    CameraContainer mCameraContainer;
-    byte[] mData;
-    String fileNamePath;
-    Size mSize;
-    String thumbPath;
+    private Context mContext = null;
+    private CameraView mCameraPreview;
+    private CameraContainer mCameraContainer;
+    private byte[] mData;
+    private String fileNamePath;
+    private Size mSize;
+    private String thumbPath;
     
 
     ImageAsyncTask(CameraContainer mCameraContainer,CameraView camera, byte[] data,Size size,String filePath,String _thumbPath){
@@ -84,14 +82,11 @@ public class ImageAsyncTask extends AsyncTask<Bitmap, Void, Bitmap> {
 			Log.e(TAG, "IOException in savedata",e);
 		}
 		thumbnail.recycle();
-        
-
         return retBmp;
     }
 
     @Override
     protected void onPostExecute(Bitmap bmp) {
-//    	mCameraContainer.count();
     	mCameraContainer.countShoot(bmp,fileNamePath);
     	bmp.recycle();
     	
@@ -125,8 +120,12 @@ public class ImageAsyncTask extends AsyncTask<Bitmap, Void, Bitmap> {
         }
     }
     
+    /**
+     * 保存缩略图
+     * @param data
+     * @param filePath
+     */
     public void savedata(byte[] data,String filePath){
-//
         FileOutputStream fos = null;
         File savefile = null;
 
@@ -137,7 +136,6 @@ public class ImageAsyncTask extends AsyncTask<Bitmap, Void, Bitmap> {
             fos.flush();
             fos.close();
         }catch(IOException e){
-            //Log.e(TAG, "IOException in savedata");
             if(fos != null){
                 try {
                     fos.close();

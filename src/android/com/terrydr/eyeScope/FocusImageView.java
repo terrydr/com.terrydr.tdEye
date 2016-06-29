@@ -1,6 +1,5 @@
 package com.terrydr.eyeScope;
 
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Point;
@@ -12,12 +11,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import com.terrydr.eyeScope.R;
 
 /** 
  * @ClassName: FocusImageView 
  * @Description:对焦显示ImagView  
- *  
+ * @date 20160418
  */
 public class FocusImageView extends ImageView {
 	public final static String TAG="FocusImageView";
@@ -58,14 +56,10 @@ public class FocusImageView extends ImageView {
 		if (mFocusImg==NO_ID||mFocusSucceedImg==NO_ID||mFocusFailedImg==NO_ID) 
 			throw new RuntimeException("focus image is null");
 		RelativeLayout.LayoutParams params=(RelativeLayout.LayoutParams) getLayoutParams();
-//		LOG.e("point.y", ""+point.y);
-//		LOG.e("point.x", ""+point.x);
-//		LOG.e("getHeight", ""+getHeight());
-//		LOG.e("getWidth", ""+getWidth());
 		WindowManager wm = (WindowManager) getContext()
 				.getSystemService(Context.WINDOW_SERVICE);
 		int height = wm.getDefaultDisplay().getHeight();
-		int y = height*250/1920;
+//		int y = height*250/1920;
 		params.topMargin= point.y-getHeight()/2;
 //		params.topMargin= point.y-y-getHeight()/2;
 		params.leftMargin=point.x-getWidth()/2;

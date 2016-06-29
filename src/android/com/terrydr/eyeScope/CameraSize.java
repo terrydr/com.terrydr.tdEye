@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
-import android.util.Log;
 
 /**
  * 20160506 获取预览图片大小和拍照图片大小

@@ -6,7 +6,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import com.terrydr.eyeScope.R;
+
 /** 
  * @ClassName: AlbumItemView 
  * @Description:  相册Item 提取出来主要是为了实现点击ImageView变暗效果
@@ -27,7 +27,6 @@ public class ThumbnaiImageView extends FrameLayout  {
 		inflate(context, R.layout.item_album_grid, this);
 		FilterImageView imageView=(FilterImageView) findViewById(R.id.imgThumbnail);
 		checkBox=(CheckBox) findViewById(R.id.checkbox);
-//		checkBox.setVisibility(View.GONE);
 		mViewHolder=new ViewHolder(imageView,checkBox,null);
 		this.mImageLoader=imageLoader;
 		this.mOptions=options;

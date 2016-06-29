@@ -24,7 +24,6 @@ import android.view.OrientationEventListener;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
-import com.terrydr.eyeScope.R;
 
 public class CameraView extends SurfaceView implements CameraOperation {
 
@@ -104,8 +103,14 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	    return sdkVersion;  
 	} 
 
+	/**
+	 * 用于控制SurfaceView  
+	 */
 	private SurfaceHolder.Callback callback = new SurfaceHolder.Callback() {
 
+		/** 
+	     * 当SurfaceView创建的时候，调用此函数 
+	     */  
 		@Override
 		public void surfaceCreated(SurfaceHolder holder) {
 			try {
@@ -128,12 +133,18 @@ public class CameraView extends SurfaceView implements CameraOperation {
 			mCamera.startPreview();
 		}
 
+		/** 
+	     * 当SurfaceView的视图发生改变的时候，调用此函数 
+	     */ 
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
 			updateCameraOrientation();
 		}
 		
+		/** 
+	     * 当SurfaceView销毁的时候，调用此函数 
+	     */ 
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
 			if (mCamera != null) {
@@ -223,14 +234,6 @@ public class CameraView extends SurfaceView implements CameraOperation {
 					return;
 				mOrientation = rotation;
 				updateCameraOrientation();
-//				try{
-//					updateCameraOrientation();
-//				}catch(Exception ex){
-//					Toast.makeText(getContext(), "打开相机失败", Toast.LENGTH_SHORT).show();
-//					Log.e(TAG, "打开相机失败。"+ex.getMessage());
-//					cActivity.finish();
-//					return;
-//				}
 			}
 		};
 		mOrEventListener.enable();
@@ -407,11 +410,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 			return ;
 		}
 		mCamera.cancelAutoFocus();
-
 		Camera.Parameters parameters=mCamera.getParameters();
-//		if(parameters == null){
-//			return ;
-//		}
 		//不支持设置自定义聚焦，则使用自动聚焦，返回
 		if (parameters.getMaxNumFocusAreas()<=0) {
 			mCamera.autoFocus(callback);
@@ -426,10 +425,6 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		top = top < -1000 ? -1000 : top;
 		right = right > 1000 ? 1000 : right;
 		bottom = bottom > 1000 ? 1000 : bottom;
-//		LOG.e(TAG, "left:" + left);
-//		LOG.e(TAG, "top:" + top);
-//		LOG.e(TAG, "right:" + right);
-//		LOG.e(TAG, "bottom:" + bottom);
 		areas.add(new Area(new Rect(left, top, right, bottom), 100));
 		parameters.setFocusAreas(areas);
 		try {
@@ -439,30 +434,6 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		}
 //		parameters.setFocusMode(Parameters.FOCUS_MODE_MACRO);
 		mCamera.autoFocus(callback);
-		
-//		Camera.Parameters parameters=mCamera.getParameters();
-//		//不支持设置自定义聚焦，则使用自动聚焦，返回
-//		if (parameters.getMaxNumFocusAreas()<=0) {
-//			mCamera.autoFocus(callback);
-//			return;
-//		}
-//		List<Area> areas=new ArrayList<Camera.Area>();
-//		int left=point.x-300;
-//		int top=point.y-300;
-//		int right=point.x+300;
-//		int bottom=point.y+300;
-//		left=left<-1000?-1000:left;
-//		top=top<-1000?-1000:top;
-//		right=right>1000?1000:right;
-//		bottom=bottom>1000?1000:bottom;
-//		areas.add(new Area(new Rect(left,top,right,bottom), 100));
-//		parameters.setFocusAreas(areas);
-//		try {
-//			mCamera.setParameters(parameters);
-//		} catch (Exception e) {
-//			Log.e(TAG, "手动聚焦失败", e);
-//		}
-//		mCamera.autoFocus(callback);
 	}
 	
 	@Override
@@ -523,23 +494,18 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		if (mCamera == null) {
 			mCamera = Camera.open();
 		}
-		
 		Camera.Parameters parameters = mCamera.getParameters();
-//		int i = parameters.getExposureCompensation();
-//		int i1 = parameters.getMinExposureCompensation();
-//		int i2 = parameters.getMaxExposureCompensation();
-//		float i3 = parameters.getExposureCompensationStep();
-//		LOG.e(TAG, "i:" + i);
-//		LOG.e(TAG, "i1:" + i1);
-//		LOG.e(TAG, "i2:" + i2);
-//		LOG.e(TAG, "i3:" + i3);
 		setBestExposure(parameters,lightOn);
-//		parameters.setExposureCompensation(3);
 		mCamera.setParameters(parameters);
 	}
 	
 	private final float MAX_EXPOSURE_COMPENSATION = 1.0f;
 	private final float MIN_EXPOSURE_COMPENSATION = 0.0f;
+	/**
+	 * 自适应设置ISO
+	 * @param parameters
+	 * @param lightOn
+	 */
 	public void setBestExposure(Camera.Parameters parameters, boolean lightOn) {
 		int minExposure = parameters.getMinExposureCompensation();
 		int maxExposure = parameters.getMaxExposureCompensation();
@@ -604,12 +570,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		Camera.Parameters parameters;
 		// 注意此处为录像模式下的setZoom方式。在Camera.unlock之后，调用getParameters方法会引起android框架底层的异常
 		// stackoverflow上看到的解释是由于多线程同时访问Camera导致的冲突，所以在此使用录像前保存的mParameters。
-		// if(mParameters!=null)
-		// parameters=mParameters;
-		// else {
 		parameters = mCamera.getParameters();
-		// }
-
 		if (!parameters.isZoomSupported())
 			return;
 		parameters.setZoom(zoom);

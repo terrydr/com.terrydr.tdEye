@@ -1,7 +1,5 @@
 package com.terrydr.eyeScope;
 
-import com.terrydr.eyeScope.R;
-
 /** 
 * @ClassName: DisplayImageOptions 
 * @Description:  图片加载参数

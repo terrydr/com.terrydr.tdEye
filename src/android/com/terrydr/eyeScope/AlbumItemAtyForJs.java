@@ -15,7 +15,6 @@ import android.view.View.OnClickListener;
 import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
 import com.terrydr.eyeScope.MatrixImageView.OnSingleTapListener;
-import com.terrydr.eyeScope.R;
 
 /**
  * @ClassName: AlbumItemAtyForJs
@@ -36,8 +35,6 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.albumitem_for_js);
-
-		
 		mBackView = (TextView) findViewById(R.id.header_bar_photo_back);
 		mCountView = (TextView) findViewById(R.id.header_bar_photo_count);
 		header_bar_photo_commit_bt = (TextView) findViewById(R.id.header_bar_photo_commit_bt);
@@ -51,8 +48,6 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 
 		TextPaint tp = mCountView.getPaint(); // 安体加粗
 		tp.setFakeBoldText(true);
-
-//		data = getIntent().getExtras().getString("data");
 		bundle = getIntent().getExtras();
 		if (bundle != null) {
 			data = bundle.getString("data");
@@ -64,7 +59,7 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 	}
 
 	/**
-	 *  解析数据的Json，差配置mViewPager Adapter
+	 *  解析数据的Json，配置mViewPager Adapter
 	 * @param strResult  前端js传过来的json数据
 	 */
 	private void parseJsonMulti(String strResult) {

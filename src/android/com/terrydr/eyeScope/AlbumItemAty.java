@@ -26,7 +26,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.terrydr.eyeScope.R;
 /** 
  * @ClassName: AlbumItemAty 
  * @Description:相册图片大图Activity 包含图片编辑功能
@@ -433,10 +432,8 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 			} else {
 				if (mViewPager.getAdapter() != null) {
 					String filePath = mViewPager.getSelectPath();
-//					Log.e(TAG, "filePath:" + filePath);
 					int index = 0;
 					for (File file : files) {
-//						Log.e(TAG, "file:" + file.getName());
 						if (filePath != null && filePath.contains(file.getName())) {
 							index = files.indexOf(file);
 							if (albumitem_selected_cb.isChecked()) {
@@ -506,19 +503,12 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 			Toast.makeText(getApplicationContext(), "请选择图片再提交!",Toast.LENGTH_SHORT).show();
 			return;
 		}
-//		Log.e(TAG, "5");
-		Log.e(TAG, "result_Json.toString():" + result_Json.toString());
 		Intent intent1 = new Intent();
 		Bundle bundle1 = new Bundle();
 		bundle1.putString("result_Json", result_Json.toString());
 		intent1.putExtras(bundle1);
 		this.setResult(5, intent1);
 		this.finish();
-		
-//		Intent intents = new Intent(AlbumItemAty.this,AlbumItemAtyForJs.class);
-//		startActivity(intents);
-		
-		
 	}
 	@Override
 	public void onBackPressed() {
