@@ -598,6 +598,10 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             }
         }
         
+        if (self.currentPage == self.photos.count-1) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"deleteLastPictureNotify" object:nil];
+        }
+        
         self.currentPage --;
         if (self.currentPage < 0) {
             self.currentPage = 0;

@@ -59,6 +59,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UIView *pictureScanView;
 @property (nonatomic, strong) UIImageView *pictureScanImgView;
 @property (nonatomic, strong) UIButton *pictureScanBtn;
+@property (nonatomic, strong) NSMutableArray *takenPicturesArr;
 @property (nonatomic, strong) UIButton *ISOBtn;
 @property (nonatomic, strong) UIButton *whiteBalanceBtn;
 @property (nonatomic, strong) UIView *whiteBalanceView;
@@ -89,6 +90,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     self.view.backgroundColor = RGB(0x16161b);
     [self setupUI];
+    [self addNotifications];
     [self initTakenParameters];
     [self ChangeToLeft:YES];
     [self setupCaptureView];
@@ -129,6 +131,25 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)dealloc {
     NSLog(@"我是拍照控制器,我被销毁了");
+}
+
+- (void)addNotifications{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(deleteLastPictureMethod)
+                                                 name:@"deleteLastPictureNotify"
+                                               object:nil];
+}
+
+- (void)deleteLastPictureMethod{
+    if ([_takenPicturesArr isValid]) {
+        [_takenPicturesArr removeLastObject];
+        if ([_takenPicturesArr isValid]) {
+            UIImage *showImg = [_takenPicturesArr lastObject];
+            _pictureScanImgView.image = showImg;
+        }else{
+            _pictureScanView.hidden = YES;
+        }
+    }
 }
 
 - (void)initNavTitle{
@@ -1131,6 +1152,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     UIImage *image = [UIImage imageWithData:imgData];
     UIImage *saveImg = [self cropImage:image withCropSize:self.viewContainer.size];
     _pictureScanImgView.image = saveImg;
+    [_takenPicturesArr addObject:saveImg];
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
     
     TDMediaFileManage *fileManage = [TDMediaFileManage shareInstance];
@@ -1188,6 +1210,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _rightTakenPictureCount = 0;
     self.effectiveScale = 1.0f;
     self.beginGestureScale = 1.0f;
+    self.takenPicturesArr = [[NSMutableArray alloc] initWithCapacity:0];
 }
 /// 切换拍照和视频录制
 ///
