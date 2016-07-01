@@ -267,6 +267,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
                     _leftSelectedCount++;
                     [_mlLeftselectedArr addObject:imgPath];
                     [_selectedModelArr addObject:pictureModel];
+                    [_selectedPathArr addObject:pictureModel.pictureName];
                     pictureModel.isSelected = YES;
                     [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
                 }
@@ -277,6 +278,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
                     _rightSelectedCount++;
                     [_mlRightselectedArr addObject:imgPath];
                     [_selectedModelArr addObject:pictureModel];
+                    [_selectedPathArr addObject:pictureModel.pictureName];
                     pictureModel.isSelected = YES;
                     [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
                 }
@@ -288,6 +290,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
                 _rightSelectedCount++;
                 [_mlRightselectedArr addObject:imgPath];
                 [_selectedModelArr addObject:pictureModel];
+                [_selectedPathArr addObject:pictureModel.pictureName];
                 pictureModel.isSelected = YES;
                 [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
             }
@@ -306,6 +309,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             [_mlRightselectedArr removeObject:imgPath];
         }
         [_selectedModelArr removeObject:pictureModel];
+        [_selectedPathArr removeObject:pictureModel.pictureName];
         pictureModel.isSelected = NO;
         [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
     }
@@ -579,6 +583,7 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         }
         if ([_selectedModelArr isValid] && [_selectedModelArr containsObject:pictureModel]) {
             [_selectedModelArr removeObject:pictureModel];
+            [_selectedPathArr removeObject:pictureModel.pictureName];
             if (_isCurrentLeftEye) {
                 _leftSelectedCount--;
             }else{
@@ -596,10 +601,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             if (![_selectedModelArr isValid]) {
                 self.navigationItem.rightBarButtonItem.enabled = NO;
             }
-        }
-        
-        if (self.currentPage == self.photos.count-1) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"deleteLastPictureNotify" object:nil];
         }
         
         self.currentPage --;

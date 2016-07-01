@@ -59,11 +59,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UIView *pictureScanView;
 @property (nonatomic, strong) UIImageView *pictureScanImgView;
 @property (nonatomic, strong) UIButton *pictureScanBtn;
-@property (nonatomic, strong) NSMutableArray *takenPicturesArr;
 @property (nonatomic, strong) UIButton *ISOBtn;
 @property (nonatomic, strong) UIButton *whiteBalanceBtn;
 @property (nonatomic, strong) UIView *whiteBalanceView;
 @property (nonatomic, strong) UIView *scaleView;
+
+@property (nonatomic, strong) NSMutableArray *selectedPathArr;
 
 /// 负责输入和输出设备之间数据传递
 @property (nonatomic, strong) AVCaptureSession *captureSession;
@@ -90,7 +91,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     self.view.backgroundColor = RGB(0x16161b);
     [self setupUI];
-    [self addNotifications];
     [self initTakenParameters];
     [self ChangeToLeft:YES];
     [self setupCaptureView];
@@ -114,7 +114,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     //4.监听打开控制中心
     [self p_addObserverControlCenter];
-    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -126,37 +125,17 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     [self p_removeObserver];
     [self p_removeObserverControlCenter];
-    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
 }
 
 - (void)dealloc {
     NSLog(@"我是拍照控制器,我被销毁了");
 }
 
-- (void)addNotifications{
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(deleteLastPictureMethod)
-                                                 name:@"deleteLastPictureNotify"
-                                               object:nil];
-}
-
-- (void)deleteLastPictureMethod{
-    if ([_takenPicturesArr isValid]) {
-        [_takenPicturesArr removeLastObject];
-        if ([_takenPicturesArr isValid]) {
-            UIImage *showImg = [_takenPicturesArr lastObject];
-            _pictureScanImgView.image = showImg;
-        }else{
-            _pictureScanView.hidden = YES;
-        }
-    }
-}
-
 - (void)initNavTitle{
     if (_isLeftEye) {
-        self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount<0?0:_leftTakenPictureCount];
+        self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
     }else{
-        self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount<0?0:_rightTakenPictureCount];
+        self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
     }
 }
 
@@ -718,7 +697,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         for (NSString *fileName in leftFileArr) {
             TDPictureModel *picture = [[TDPictureModel alloc] init];
             picture.pictureName = fileName;
-            picture.isSelected = NO;
+            if ([_selectedPathArr containsObject:fileName]) {
+                picture.isSelected = YES;
+            }else{
+                picture.isSelected = NO;
+            }
             [leftEyeDataArr addObject:picture];
         }
         
@@ -729,7 +712,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             for (NSString *fileName in rightFileArr) {
                 TDPictureModel *picture = [[TDPictureModel alloc] init];
                 picture.pictureName = fileName;
-                picture.isSelected = NO;
+                if ([_selectedPathArr containsObject:fileName]) {
+                    picture.isSelected = YES;
+                }else{
+                    picture.isSelected = NO;
+                }
                 [rightEyeDataArr addObject:picture];
             }
             
@@ -745,7 +732,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             for (NSString *fileName in rightFileArr) {
                 TDPictureModel *picture = [[TDPictureModel alloc] init];
                 picture.pictureName = fileName;
-                picture.isSelected = NO;
+                if ([_selectedPathArr containsObject:fileName]) {
+                    picture.isSelected = YES;
+                }else{
+                    picture.isSelected = NO;
+                }
                 [rightEyeDataArr addObject:picture];
             }
             
@@ -756,6 +747,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         }
     }
     
+    browserVc.selectedPathArr = self.selectedPathArr;
     browserVc.photos = [NSArray arrayWithArray:tempMutableArr];
     browserVc.selectedModelArr = [NSMutableArray arrayWithCapacity:0];
     browserVc.mlLeftselectedArr = [NSMutableArray arrayWithCapacity:0];
@@ -765,6 +757,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             _leftTakenPictureCount--;
         }else{
             _rightTakenPictureCount--;
+        }
+        if (_isLeftEye) {
+            self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
+        }else{
+            self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
         }
         if (_leftTakenPictureCount==0 && _rightTakenPictureCount==0) {
             _pictureScanView.hidden = YES;
@@ -1135,7 +1132,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)saveTakenPictureData:(NSData *)imgData{
     [self begainScreenFlashAnimation];
-    [self initNavTitle];
+    if (_isLeftEye) {
+        self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
+    }else{
+        self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
+    }
     if (_pictureScanView.hidden) {
         _pictureScanView.hidden = NO;
     }
@@ -1143,7 +1144,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     UIImage *image = [UIImage imageWithData:imgData];
     UIImage *saveImg = [self cropImage:image withCropSize:self.viewContainer.size];
     _pictureScanImgView.image = saveImg;
-    [_takenPicturesArr addObject:saveImg];
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
     
     TDMediaFileManage *fileManage = [TDMediaFileManage shareInstance];
@@ -1201,7 +1201,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _rightTakenPictureCount = 0;
     self.effectiveScale = 1.0f;
     self.beginGestureScale = 1.0f;
-    self.takenPicturesArr = [[NSMutableArray alloc] initWithCapacity:0];
+    self.selectedPathArr = [[NSMutableArray alloc] initWithCapacity:0];
 }
 /// 切换拍照和视频录制
 ///
@@ -1209,7 +1209,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)ChangeToLeft:(BOOL)isLeft{
     [self restoreBtn];
     _isLeftEye = isLeft;
-    [self initNavTitle];
+    self.title = [NSString stringWithFormat:@"%d/6",isLeft?_leftTakenPictureCount:_rightTakenPictureCount];
     NSString *centerTitle = isLeft ? @"左眼" : @"右眼";
     [_centerBtn setTitle:centerTitle forState:UIControlStateNormal];
     _leftBtn.hidden = isLeft;
