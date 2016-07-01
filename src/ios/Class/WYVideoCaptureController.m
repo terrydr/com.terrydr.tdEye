@@ -678,6 +678,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     int leftSelectedCount = 0;
     int rightSelectedCount = 0;
     NSMutableArray *selectedModelArr = [[NSMutableArray alloc] initWithCapacity:0];
+    NSMutableArray *leftSelectedArr = [[NSMutableArray alloc] initWithCapacity:0];
+    NSMutableArray *rightSelectedArr = [[NSMutableArray alloc] initWithCapacity:0];
     
     MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
     [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
@@ -704,6 +706,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             if ([_selectedPathArr containsObject:fileName]) {
                 picture.isSelected = YES;
                 leftSelectedCount++;
+                NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:YES];
+                [leftSelectedArr addObject:imgPath];
                 [selectedModelArr addObject:picture];
             }else{
                 picture.isSelected = NO;
@@ -721,6 +725,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                 if ([_selectedPathArr containsObject:fileName]) {
                     picture.isSelected = YES;
                     rightSelectedCount++;
+                    NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:NO];
+                    [rightSelectedArr addObject:imgPath];
                     [selectedModelArr addObject:picture];
                 }else{
                     picture.isSelected = NO;
@@ -743,6 +749,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                 if ([_selectedPathArr containsObject:fileName]) {
                     picture.isSelected = YES;
                     rightSelectedCount++;
+                    NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:NO];
+                    [rightSelectedArr addObject:imgPath];
                     [selectedModelArr addObject:picture];
                 }else{
                     picture.isSelected = NO;
@@ -762,8 +770,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     browserVc.leftSelectedCount = leftSelectedCount;
     browserVc.rightSelectedCount = rightSelectedCount;
     browserVc.photos = [NSArray arrayWithArray:tempMutableArr];
-    browserVc.mlLeftselectedArr = [NSMutableArray arrayWithCapacity:0];
-    browserVc.mlRightselectedArr = [NSMutableArray arrayWithCapacity:0];
+    browserVc.mlLeftselectedArr = leftSelectedArr;
+    browserVc.mlRightselectedArr = rightSelectedArr;
     browserVc.deleteCallBack = ^(NSArray *assets,NSString *eyeType){
         if ([eyeType isEqualToString:@"left"]) {
             _leftTakenPictureCount--;
@@ -781,6 +789,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     };
     [self.navigationController pushViewController:browserVc animated:animated];
 }
+
+- (NSString *)getImagePathWithImageName:(NSString *)name isLeftEye:(BOOL)isLeft{
+    NSString *imgPath = [[TDMediaFileManage shareInstance] getImagePathWithPictureName:name isLeftEye:isLeft];
+    return imgPath;
+}
+
 - (void)wbSliderValueChanged:(id)sender{
     [NSObject cancelPreviousPerformRequestsWithTarget:self
                                              selector:@selector(hideWhiteBalanceView:)
