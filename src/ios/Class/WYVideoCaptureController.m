@@ -675,6 +675,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)pushToPictureScan:(BOOL)animated{
     self.title = @"返回";
     
+    int leftSelectedCount = 0;
+    int rightSelectedCount = 0;
+    NSMutableArray *selectedModelArr = [[NSMutableArray alloc] initWithCapacity:0];
+    
     MLSelectPhotoBrowserViewController *browserVc = [[MLSelectPhotoBrowserViewController alloc] init];
     [browserVc setValue:@(NO) forKeyPath:@"isTrashing"];
     browserVc.isModelData = YES;
@@ -699,6 +703,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             picture.pictureName = fileName;
             if ([_selectedPathArr containsObject:fileName]) {
                 picture.isSelected = YES;
+                leftSelectedCount++;
+                [selectedModelArr addObject:picture];
             }else{
                 picture.isSelected = NO;
             }
@@ -714,6 +720,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                 picture.pictureName = fileName;
                 if ([_selectedPathArr containsObject:fileName]) {
                     picture.isSelected = YES;
+                    rightSelectedCount++;
+                    [selectedModelArr addObject:picture];
                 }else{
                     picture.isSelected = NO;
                 }
@@ -734,6 +742,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                 picture.pictureName = fileName;
                 if ([_selectedPathArr containsObject:fileName]) {
                     picture.isSelected = YES;
+                    rightSelectedCount++;
+                    [selectedModelArr addObject:picture];
                 }else{
                     picture.isSelected = NO;
                 }
@@ -748,8 +758,10 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     }
     
     browserVc.selectedPathArr = self.selectedPathArr;
+    browserVc.selectedModelArr = selectedModelArr;
+    browserVc.leftSelectedCount = leftSelectedCount;
+    browserVc.rightSelectedCount = rightSelectedCount;
     browserVc.photos = [NSArray arrayWithArray:tempMutableArr];
-    browserVc.selectedModelArr = [NSMutableArray arrayWithCapacity:0];
     browserVc.mlLeftselectedArr = [NSMutableArray arrayWithCapacity:0];
     browserVc.mlRightselectedArr = [NSMutableArray arrayWithCapacity:0];
     browserVc.deleteCallBack = ^(NSArray *assets,NSString *eyeType){

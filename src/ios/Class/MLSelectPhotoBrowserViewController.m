@@ -26,8 +26,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     
     UIBarButtonItem *_leftItem;
     UIBarButtonItem *_rightItem;
-    int _leftSelectedCount;
-    int _rightSelectedCount;
     UIView *_currentPageView;
     BOOL _isCurrentLeftEye;
 }
@@ -103,6 +101,10 @@ static NSString *_cellIdentifier = @"collectionViewCell";
             [self.view addSubview:self.infoView];
             [self.view addSubview:self.pageControl];
             [self.infoView addSubview:self.selectedBtn];
+            
+            if ([_selectedModelArr isValid]) {
+                [self reloadInfoView];
+            }
         }
         self.collectionView = collectionView;
         
@@ -428,13 +430,16 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     
     self.view.backgroundColor = [UIColor blackColor];
     self.extendedLayoutIncludesOpaqueBars = YES;
-    _leftSelectedCount = 0;
-    _rightSelectedCount = 0;
 }
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     [self configureNavgationBar];
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    
 }
 
 - (void)configureNavgationBar{
@@ -477,6 +482,33 @@ static NSString *_cellIdentifier = @"collectionViewCell";
                                                         object:nil
                                                       userInfo:pathDic];
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)reloadInfoView{
+    NSMutableArray *indexArr = [[NSMutableArray alloc] initWithCapacity:0];
+    for (TDPictureModel *model in _selectedModelArr) {
+        NSUInteger index = [_photos indexOfObject:model];
+        [indexArr addObject:[NSNumber numberWithUnsignedInteger:index]];
+    }
+    
+    for (int i=0; i<_photos.count; i++) {
+        UIView *dotView = [_pageControl.subviews objectAtIndex:i];
+        if ([indexArr containsObject:[NSNumber numberWithInt:i]]) {
+            dotView.backgroundColor = RGB(0x76c000);
+        }else{
+            dotView.backgroundColor = [UIColor whiteColor];
+        }
+    }
+    
+    if (_leftCount>0) {
+        if (_rightCount>0) {
+            _eyeTypeLab.text = [NSString stringWithFormat:@"左眼 %d/2   右眼 %d/2",_leftSelectedCount,_rightSelectedCount];
+        }else{
+            _eyeTypeLab.text = [NSString stringWithFormat:@"左眼 %d/2",_leftSelectedCount];
+        }
+    }else{
+        _eyeTypeLab.text = [NSString stringWithFormat:@"右眼 %d/2",_rightSelectedCount];
+    }
 }
 
 #pragma mark -初始化底部ToorBar

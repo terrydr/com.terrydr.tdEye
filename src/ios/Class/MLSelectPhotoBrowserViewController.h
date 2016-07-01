@@ -19,10 +19,13 @@ typedef void(^deleteCallBackBlock)();
 @property (strong,nonatomic) NSMutableArray *mlLeftselectedArr;
 @property (strong,nonatomic) NSMutableArray *mlRightselectedArr;
 @property (strong,nonatomic) NSMutableArray *selectedModelArr;
+@property (strong,nonatomic) NSMutableArray *selectedPathArr;
 // 当前提供的分页数
 @property (nonatomic , assign) NSInteger currentPage;
 @property (nonatomic , assign) NSInteger leftCount;
 @property (nonatomic , assign) NSInteger rightCount;
+@property (nonatomic , assign) int leftSelectedCount;
+@property (nonatomic , assign) int rightSelectedCount;
 // 当前提供的分页数
 @property (nonatomic , assign) BOOL isModelData;
 
