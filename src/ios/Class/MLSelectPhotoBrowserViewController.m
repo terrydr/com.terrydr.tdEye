@@ -459,7 +459,11 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     
     if (_isModelData) {
         self.navigationItem.rightBarButtonItem = _rightItem;
-        self.navigationItem.rightBarButtonItem.enabled = NO;
+        if ([_selectedModelArr isValid]) {
+            self.navigationItem.rightBarButtonItem.enabled = YES;
+        }else{
+            self.navigationItem.rightBarButtonItem.enabled = NO;
+        }
     }else{
         self.navigationItem.leftBarButtonItem = _leftItem;
     }
