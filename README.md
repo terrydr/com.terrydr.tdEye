@@ -15,6 +15,7 @@ cordova-plugin-eyecamera
 示例:
 
         tdeye.tdTakePhotos('before', function(result) {
+                
         }, function(error) {
-        console.log(error);
+                console.log(error);
         });
