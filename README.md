@@ -13,7 +13,7 @@ cordova-plugin-eyecamera
 卸载：cordova plugin rm cordova-plugin-eyecamera
         
 示例:
-        tdeye.tdTakePhotos('before', function(result) {
-        }, function(error) {
-            console.log(error);
-        });
+                tdeye.tdTakePhotos('before', function(result) {
+                }, function(error) {
+                console.log(error);
+                });
