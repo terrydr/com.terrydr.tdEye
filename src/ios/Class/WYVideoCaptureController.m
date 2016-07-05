@@ -326,7 +326,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)p_addObserver {
     NSError *error;
     [[AVAudioSession sharedInstance] setActive:YES error:&error];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cameraBtnTouchUpInside:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(volumeChanged:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
 }
 
 /**
@@ -368,7 +368,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
  */
 - (void)didBecomeActive {
     //重新监听音量改变事件
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cameraBtnTouchUpInside:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(volumeChanged:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
     
     //进入前台后，重新设置player状态为播放
     [self.player play];
@@ -395,6 +395,15 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         [_player setVolume:0.0];
     }
     return _player;
+}
+
+//受registerQYService方法的影响app启动后第一次进入此界面或退到后台在进入前台会自动拍摄一张图片
+- (void)volumeChanged:(NSNotification *)notification {
+    NSDictionary *infoDic = notification.userInfo;
+    NSString *singValue = [infoDic objectForKey:@"AVSystemController_AudioVolumeChangeReasonNotificationParameter"];
+    if ([singValue isEqualToString:@"ExplicitVolumeChange"]) {
+        [self cameraBtnTouchUpInside:nil];
+    }
 }
 
 #pragma mark - UI设计
