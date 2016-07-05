@@ -32,6 +32,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     CGRect _rightBtnFrame;
     AVPlayer *_player;
     AVPlayerLayer *_playerLayer;
+    BOOL _isAppear;
     BOOL _isLeftEye;
     BOOL _isLeftTouchDown;
     BOOL _isRightTouchDown;
@@ -105,6 +106,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    _isAppear = YES;
     [_captureSession startRunning];
     [self configureNavgationBar];
     [self initNavTitle];
@@ -119,6 +121,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 }
+
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    _isAppear = NO;
+}
+
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     [_captureSession stopRunning];
@@ -1114,6 +1122,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)takePictureMethodCore{
+    if (!_isAppear) {
+        return;
+    }
     if (!_cameraBtn.userInteractionEnabled) {
         return;
     }
