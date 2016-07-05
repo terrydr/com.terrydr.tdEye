@@ -263,36 +263,39 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     if (btn.selected) {
         if (_leftCount>0) {
             if (_currentPage+1<=_leftCount) {
+                //左眼
                 if (_leftSelectedCount == 2) {
                     [self mlShowBeyondLimitSelectedCount];
                 }else{
                     _leftSelectedCount++;
                     [_mlLeftselectedArr addObject:imgPath];
                     [_selectedModelArr addObject:pictureModel];
-                    [_selectedPathArr addObject:pictureModel.pictureName];
+                    [_leftSelectedPathArr addObject:pictureModel.pictureName];
                     pictureModel.isSelected = YES;
                     [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
                 }
             }else{
+                //右眼
                 if (_rightSelectedCount == 2) {
                     [self mlShowBeyondLimitSelectedCount];
                 }else{
                     _rightSelectedCount++;
                     [_mlRightselectedArr addObject:imgPath];
                     [_selectedModelArr addObject:pictureModel];
-                    [_selectedPathArr addObject:pictureModel.pictureName];
+                    [_rightSelectedPathArr addObject:pictureModel.pictureName];
                     pictureModel.isSelected = YES;
                     [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
                 }
             }
         }else{
+            //右眼
             if (_rightSelectedCount == 2) {
                 [self mlShowBeyondLimitSelectedCount];
             }else{
                 _rightSelectedCount++;
                 [_mlRightselectedArr addObject:imgPath];
                 [_selectedModelArr addObject:pictureModel];
-                [_selectedPathArr addObject:pictureModel.pictureName];
+                [_rightSelectedPathArr addObject:pictureModel.pictureName];
                 pictureModel.isSelected = YES;
                 [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
             }
@@ -300,18 +303,23 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     }else{
         if (_leftCount>0) {
             if (_currentPage+1<=_leftCount) {
+                //左眼
                 _leftSelectedCount--;
                 [_mlLeftselectedArr removeObject:imgPath];
+                [_leftSelectedPathArr removeObject:pictureModel.pictureName];
             }else{
+                //右眼
                 _rightSelectedCount--;
                 [_mlRightselectedArr removeObject:imgPath];
+                [_rightSelectedPathArr removeObject:pictureModel.pictureName];
             }
         }else{
+            //右眼
             _rightSelectedCount--;
             [_mlRightselectedArr removeObject:imgPath];
+            [_rightSelectedPathArr removeObject:pictureModel.pictureName];
         }
         [_selectedModelArr removeObject:pictureModel];
-        [_selectedPathArr removeObject:pictureModel.pictureName];
         pictureModel.isSelected = NO;
         [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
     }
@@ -619,11 +627,12 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         }
         if ([_selectedModelArr isValid] && [_selectedModelArr containsObject:pictureModel]) {
             [_selectedModelArr removeObject:pictureModel];
-            [_selectedPathArr removeObject:pictureModel.pictureName];
             if (_isCurrentLeftEye) {
                 _leftSelectedCount--;
+                [_leftSelectedPathArr removeObject:pictureModel.pictureName];
             }else{
                 _rightSelectedCount--;
+                [_rightSelectedPathArr removeObject:pictureModel.pictureName];
             }
             if (_leftCount>0) {
                 if (_rightCount>0) {

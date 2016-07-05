@@ -65,7 +65,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UIView *whiteBalanceView;
 @property (nonatomic, strong) UIView *scaleView;
 
-@property (nonatomic, strong) NSMutableArray *selectedPathArr;
+@property (nonatomic, strong) NSMutableArray *leftSelectedPathArr;
+@property (nonatomic, strong) NSMutableArray *rightSelectedPathArr;
 
 /// 负责输入和输出设备之间数据传递
 @property (nonatomic, strong) AVCaptureSession *captureSession;
@@ -717,10 +718,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     NSLog(@"rightFileArr:%@",rightFileArr);
     
     if ([leftFileArr isValid]) {
+        //左眼
         for (NSString *fileName in leftFileArr) {
             TDPictureModel *picture = [[TDPictureModel alloc] init];
             picture.pictureName = fileName;
-            if ([_selectedPathArr containsObject:fileName]) {
+            if ([_leftSelectedPathArr containsObject:fileName]) {
                 picture.isSelected = YES;
                 leftSelectedCount++;
                 NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:YES];
@@ -736,10 +738,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         browserVc.leftCount = leftFileArr.count;
         
         if ([rightFileArr isValid]) {
+            //右眼
             for (NSString *fileName in rightFileArr) {
                 TDPictureModel *picture = [[TDPictureModel alloc] init];
                 picture.pictureName = fileName;
-                if ([_selectedPathArr containsObject:fileName]) {
+                if ([_rightSelectedPathArr containsObject:fileName]) {
                     picture.isSelected = YES;
                     rightSelectedCount++;
                     NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:NO];
@@ -760,10 +763,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         browserVc.leftCount = 0;
         
         if ([rightFileArr isValid]) {
+            //右眼
             for (NSString *fileName in rightFileArr) {
                 TDPictureModel *picture = [[TDPictureModel alloc] init];
                 picture.pictureName = fileName;
-                if ([_selectedPathArr containsObject:fileName]) {
+                if ([_rightSelectedPathArr containsObject:fileName]) {
                     picture.isSelected = YES;
                     rightSelectedCount++;
                     NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:NO];
@@ -782,7 +786,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         }
     }
     
-    browserVc.selectedPathArr = self.selectedPathArr;
+    browserVc.leftSelectedPathArr = self.leftSelectedPathArr;
+    browserVc.rightSelectedPathArr = self.rightSelectedPathArr;
     browserVc.selectedModelArr = selectedModelArr;
     browserVc.leftSelectedCount = leftSelectedCount;
     browserVc.rightSelectedCount = rightSelectedCount;
@@ -1247,7 +1252,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _rightTakenPictureCount = 0;
     self.effectiveScale = 1.0f;
     self.beginGestureScale = 1.0f;
-    self.selectedPathArr = [[NSMutableArray alloc] initWithCapacity:0];
+    self.leftSelectedPathArr = [[NSMutableArray alloc] initWithCapacity:0];
+    self.rightSelectedPathArr = [[NSMutableArray alloc] initWithCapacity:0];
 }
 /// 切换拍照和视频录制
 ///
