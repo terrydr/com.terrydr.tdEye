@@ -112,6 +112,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [_captureSession startRunning];
     [self configureNavgationBar];
     [self initNavTitle];
+    [self addNotifications];
     
     //3.监听点击音量键事件
     [self p_addObserver];
