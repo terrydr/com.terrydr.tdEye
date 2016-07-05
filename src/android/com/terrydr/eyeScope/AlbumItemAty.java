@@ -51,8 +51,10 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	private ArrayList<String> selectPathsRight = new ArrayList<String>();// 选中的图片  右眼图片
 	private boolean leftOrRight = true;
 	private Bundle bundle;
-	
+	//定义当前数组的个数，为了和下标统一，以0开头
+//	private int currentNumber = 0;
 	private boolean isPlugin = false;  //标记是否是plugin传过来的,默认为false:否;ure:是
+	private ArrayList<String> recordSelectPaths = new ArrayList<String>();// 选中的图片
 	/** 
      * 装点点的ImageView数组 
      */  
@@ -65,6 +67,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		bundle = getIntent().getExtras();
 		if (bundle != null) {
 			isPlugin = bundle.getBoolean("isPlugin");
+			recordSelectPaths = bundle.getStringArrayList("selectPaths");
 		}
 		group = (ViewGroup)findViewById(R.id.imagegroup_ll); 
 		mViewPager=(AlbumViewPager)findViewById(R.id.albumviewpager);
@@ -107,6 +110,17 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		
 //		mViewPager.setOnSlideUpListener(AlbumItemAty.this);
 	}
+	
+	/**
+	 * 向数组中添加值
+	 * @param value  ture or false
+	 */
+//  private void add(String value){  
+//      if(currentNumber < files.size()){  
+//    	  albumitem_selected_cb_bool[currentNumber]=value;  
+//          currentNumber++;  
+//      }  
+//  } 
 	
 	/**
 	 * 删除照片重新加载图片，以及修改一些状态
@@ -258,8 +272,27 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 				imageView.setLayoutParams(new LayoutParams(
 						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 				tips[i] = imageView;
-				albumitem_selected_cb_bool[i] = "false";
-				tips[i].setBackgroundResource(R.drawable.albumitem_unselect_status);
+				if(recordSelectPaths.contains(file.getAbsolutePath())){
+					albumitem_selected_cb_bool[i] = "true";
+					tips[i].setBackgroundResource(R.drawable.albumitem_selected_status);
+					albumitem_selected_cb.setChecked(true);
+					selectPaths.add(file.getAbsolutePath());
+					if (file.getAbsolutePath().contains("left")) {
+						selectPathsLeft.add(file.getAbsolutePath());
+					} else if (file.getAbsolutePath().contains("right")) {
+						selectPathsRight.add(file.getAbsolutePath());
+					}
+				}else{
+					albumitem_selected_cb_bool[i] = "false";
+					tips[i].setBackgroundResource(R.drawable.albumitem_unselect_status);
+					albumitem_selected_cb.setChecked(false);
+					selectPaths.remove(file.getAbsolutePath());
+					if (file.getAbsolutePath().contains("left")) {
+						selectPathsLeft.remove(file.getAbsolutePath());
+					} else if (file.getAbsolutePath().contains("right")) {
+						selectPathsRight.remove(file.getAbsolutePath());
+					}
+				}
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 						new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 				layoutParams.leftMargin = 10;
@@ -272,7 +305,14 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 //			tips[currentItem].setBackgroundResource(R.drawable.albumitem_selected_current);
 			mViewPager.setCurrentItem(0);
 			tips[0].setBackgroundResource(R.drawable.albumitem_selected_current);
+			if (albumitem_selected_cb_bool[0].equals("true")) {
+				albumitem_selected_cb.setChecked(true);
+			} else {
+				albumitem_selected_cb.setChecked(false);
+			}
 			setCountView();
+			eye_left_select_count_tv.setText(selectPathsLeft.size()+ "/2");
+			eye_right_select_count_tv.setText(selectPathsRight.size()+ "/2");
 		}
 	}
 
@@ -391,6 +431,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 			intent = new Intent(AlbumItemAty.this, CameraActivity.class);
 			if (bundle != null) {
 				bundle.putBoolean("deleteFile", false);
+				bundle.putStringArrayList("selectPaths", selectPaths);
 				intent.putExtras(bundle);
 
 			}

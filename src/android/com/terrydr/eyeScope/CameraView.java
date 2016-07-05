@@ -25,6 +25,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
+@SuppressWarnings("deprecation")
 public class CameraView extends SurfaceView implements CameraOperation {
 
 	public final static String TAG = "CameraView";
@@ -43,11 +44,15 @@ public class CameraView extends SurfaceView implements CameraOperation {
 
 	private CameraActivity cActivity;
 	float previewRate = -1f;  
+	// 短边比长边
+//    private float ratio;
 	
 	public CameraView(Context context) {
 		super(context);
 		cActivity = (CameraActivity) context;
 		previewRate = getScreenRate(cActivity); //默认全屏的比例预览  
+		
+		
 		// 初始化容
 		getHolder().addCallback(callback);
 		openCamera();
@@ -160,31 +165,40 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 */
 	private void setCameraParameters() {
 		Camera.Parameters parameters = mCamera.getParameters();
+//        LOG.e(TAG, "this.getWidth():" + this.getWidth() + "-this.getHeight():" + this.getHeight());
+//        ratio = (float) this.getWidth() / this.getHeight();
+//		Log.e(TAG, "parameters.getPreviewSize():" + parameters.getPreviewSize().width + "*" + parameters.getPreviewSize().height);
 		
 		// 选择合的预览尺寸
 		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
-//		CameraSize.getInstance().sortCameraSize(sizeList, false);  //降序排序
-//		for(Size s : sizeList){
-//			Log.e(TAG, "previewSize:" + s.width + "*" + s.height);
-//		}
-//	    Size pictureS = CameraSize.getInstance().getPreviewSize(sizeList, 1280);  
 		Size pictureS = CameraSize.getInstance().getPropPreviewSize(sizeList,previewRate, 1280);  
+	    parameters.setPreviewSize(pictureS.width, pictureS.height); 
 	    Log.e(TAG, "previewWidth:" + pictureS.width +"-previewHeight:" + pictureS.height); 
-	    parameters.setPreviewSize(pictureS.width, pictureS.height);  
-//	    parameters.setPreviewSize(3840, 2160);  
 	     
-		// 设置生成的图片大
+		// 设置生成的图片大小
 	    sizeList1 = parameters.getSupportedPictureSizes();
-//	    CameraSize.getInstance().sortCameraSize(sizeList1, false);  //降序排序
-//		for(Size s : sizeList1){
-//			Log.e(TAG, "pictureSize:" + s.width + "*" + s.height);
-//		}
-//		pictureS1 = CameraSize.getInstance().getPictureSize(sizeList1, 1280);  
 	    Size pictureS1 = CameraSize.getInstance().getPropPictureSize(sizeList1,previewRate, 1280);  
-//		Size pictureS1 = sizeList1.get(sizeList1.size()-1);
 	    parameters.setPictureSize(pictureS1.width, pictureS1.height);  
-//	    parameters.setPictureSize(3840, 2160);  
 	    Log.e(TAG, "pictureWidth:" + pictureS1.width +"-pictureHeight:" + pictureS1.height); 
+	    
+//	 // 设置pictureSize
+//        List<Camera.Size> pictureSizes = parameters.getSupportedPictureSizes();
+//        Size mBestPictureSize = null;
+//        if (mBestPictureSize == null) {
+//            mBestPictureSize =CameraSize.getInstance().findBestPictureSize(pictureSizes, parameters.getPictureSize(), ratio);
+//        }
+//        parameters.setPictureSize(mBestPictureSize.width, mBestPictureSize.height);
+//        Log.e(TAG, "mBestPictureSizeWidth:" + mBestPictureSize.width +"-mBestPictureSizeHeight:" + mBestPictureSize.height); 
+//     // 设置previewSize
+//        List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
+//        Size mBestPreviewSize = null;
+//        if (mBestPreviewSize == null) {
+//            mBestPreviewSize = CameraSize.getInstance().findBestPreviewSize(previewSizes, parameters.getPreviewSize(),
+//                    mBestPictureSize, ratio);
+//        }
+//        parameters.setPreviewSize(mBestPreviewSize.width, mBestPreviewSize.height);
+//        Log.e(TAG, "mBestPreviewSizeWidth:" + mBestPreviewSize.width +"-mBestPreviewSizeHeight:" + mBestPreviewSize.height); 
+        
 		
 		// 设置图片格式
 		parameters.setPictureFormat(ImageFormat.JPEG);
@@ -341,7 +355,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 			return;
 		}
 		Rect focusRect = calculateTapArea(event.getRawX(), event.getRawY(), 1f);  
-        Rect meteringRect = calculateTapArea(event.getRawX(), event.getRawY(), 1.5f);  
+//        Rect meteringRect = calculateTapArea(event.getRawX(), event.getRawY(), 1.5f);  
   
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);  
           

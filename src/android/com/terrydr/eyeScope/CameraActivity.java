@@ -1,6 +1,7 @@
 package com.terrydr.eyeScope;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
 import android.Manifest;
@@ -84,6 +85,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private int width ;
 	private int getWidth ;
 	public static boolean PRE_CUPCAKE ; 
+	private ArrayList<String> recordSelectPaths = new ArrayList<String>();// 记录选中的图片
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -451,7 +453,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			bundle.putInt("mexposureNum", mexposureNum);  
 			bundle.putInt("wb_level", wb_level);  
 			bundle.putInt("zoom", zoom);  
-			
+			bundle.putStringArrayList("selectPaths", recordSelectPaths);
 			bundle.putString("path", thumbPath);
 			bundle.putString("root", mSaveRoot_left);
 			intent.putExtras(bundle);
@@ -738,6 +740,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 				mExposureNum = b.getInt("mexposureNum");
 				deleteFile = b.getBoolean("deleteFile");
 				wb_level = b.getInt("wb_level");
+				recordSelectPaths = b.getStringArrayList("selectPaths");
 				zoom = b.getInt("zoom");
 			}
 			mContainer.setCameraISO_int(mExposureNum,lightOn);
