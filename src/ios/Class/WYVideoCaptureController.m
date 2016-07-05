@@ -142,9 +142,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)initNavTitle{
     if (_isLeftEye) {
-        self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
+        self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount<0?0:_leftTakenPictureCount];
     }else{
-        self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
+        self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount<0?0:_rightTakenPictureCount];
     }
 }
 
@@ -800,11 +800,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         }else{
             _rightTakenPictureCount--;
         }
-        if (_isLeftEye) {
-            self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
-        }else{
-            self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
-        }
         if (_leftTakenPictureCount==0 && _rightTakenPictureCount==0) {
             _pictureScanView.hidden = YES;
         }
@@ -1183,11 +1178,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)saveTakenPictureData:(NSData *)imgData{
     [self begainScreenFlashAnimation];
-    if (_isLeftEye) {
-        self.title = [NSString stringWithFormat:@"%d/6",_leftTakenPictureCount];
-    }else{
-        self.title = [NSString stringWithFormat:@"%d/6",_rightTakenPictureCount];
-    }
+    [self initNavTitle];
     if (_pictureScanView.hidden) {
         _pictureScanView.hidden = NO;
     }
@@ -1261,7 +1252,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)ChangeToLeft:(BOOL)isLeft{
     [self restoreBtn];
     _isLeftEye = isLeft;
-    self.title = [NSString stringWithFormat:@"%d/6",isLeft?_leftTakenPictureCount:_rightTakenPictureCount];
+    [self initNavTitle];
     NSString *centerTitle = isLeft ? @"左眼" : @"右眼";
     [_centerBtn setTitle:centerTitle forState:UIControlStateNormal];
     _leftBtn.hidden = isLeft;
