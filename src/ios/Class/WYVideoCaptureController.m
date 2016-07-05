@@ -65,6 +65,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 @property (nonatomic, strong) UIView *whiteBalanceView;
 @property (nonatomic, strong) UIView *scaleView;
 
+@property (nonatomic, strong) NSMutableArray *takenPicturesArr;
 @property (nonatomic, strong) NSMutableArray *leftSelectedPathArr;
 @property (nonatomic, strong) NSMutableArray *rightSelectedPathArr;
 
@@ -186,6 +187,21 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [alertController addAction:cancelAction];
     [alertController addAction:sureAction];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)addNotifications{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deleteLastPictureMethod:)
+                                                 name:@"deleteTheLastPicture"
+                                               object:nil];
+}
+
+- (void)deleteLastPictureMethod:(NSNotification *)notify{
+    if ([_takenPicturesArr isValid]) {
+        [_takenPicturesArr removeLastObject];
+        if ([_takenPicturesArr isValid]) {
+            _pictureScanImgView.image = [_takenPicturesArr lastObject];
+        }
+    }
 }
 
 - (void)cleanOlderData{
@@ -1186,6 +1202,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     UIImage *image = [UIImage imageWithData:imgData];
     UIImage *saveImg = [self cropImage:image withCropSize:self.viewContainer.size];
     _pictureScanImgView.image = saveImg;
+    [_takenPicturesArr addObject:saveImg];
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
     
     TDMediaFileManage *fileManage = [TDMediaFileManage shareInstance];
@@ -1243,6 +1260,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     _rightTakenPictureCount = 0;
     self.effectiveScale = 1.0f;
     self.beginGestureScale = 1.0f;
+    self.takenPicturesArr = [[NSMutableArray alloc] initWithCapacity:0];
     self.leftSelectedPathArr = [[NSMutableArray alloc] initWithCapacity:0];
     self.rightSelectedPathArr = [[NSMutableArray alloc] initWithCapacity:0];
 }
