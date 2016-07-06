@@ -209,6 +209,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)initTakenPicturesArr{
     _leftTakenPictureCount = _rightTakenPictureCount = 0;
+    if ([_takenPicturesArr isValid]) {
+        [_takenPicturesArr removeAllObjects];
+    }
     
     NSString *leftFilePath = [[TDMediaFileManage shareInstance] getJRMediaPathWithType:YES];
     NSError *le = nil;
@@ -1229,6 +1232,14 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)showBeyondLimitTakenCount{
     //__weak WYVideoCaptureController *wself = self;
+    if (_isLeftTouchDown) {
+        _isLeftTouchDown = NO;
+    }
+    
+    if (_isRightTouchDown) {
+        _isRightTouchDown = NO;
+    }
+    
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"单侧眼睛最多拍摄六张图片,是否重拍?" message:nil preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"重拍" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [[TDMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
