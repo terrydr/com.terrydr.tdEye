@@ -98,7 +98,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self ChangeToLeft:YES];
     [self setupCaptureView];
     [self configureVolumeTool];
-    [self addNotifications];
     
     if (_isScan) {
         [self initTakenPicturesArr];
@@ -190,21 +189,6 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [alertController addAction:cancelAction];
     [alertController addAction:sureAction];
     [self presentViewController:alertController animated:YES completion:nil];
-}
-
-- (void)addNotifications{
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deleteLastPictureMethod:)
-                                                 name:@"deleteTheLastPicture"
-                                               object:nil];
-}
-
-- (void)deleteLastPictureMethod:(NSNotification *)notify{
-    if ([_takenPicturesArr isValid]) {
-        [_takenPicturesArr removeLastObject];
-        if ([_takenPicturesArr isValid]) {
-            _pictureScanImgView.image = [_takenPicturesArr lastObject];
-        }
-    }
 }
 
 - (void)initTakenPicturesArr{
@@ -877,14 +861,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     browserVc.mlLeftselectedArr = leftSelectedArr;
     browserVc.mlRightselectedArr = rightSelectedArr;
     browserVc.deleteCallBack = ^(NSArray *assets,NSString *eyeType){
-        if ([eyeType isEqualToString:@"left"]) {
-            _leftTakenPictureCount--;
-        }else{
-            _rightTakenPictureCount--;
-        }
-        if (_leftTakenPictureCount==0 && _rightTakenPictureCount==0) {
-            _pictureScanView.hidden = YES;
-        }
+        [self initTakenPicturesArr];
     };
     [self.navigationController pushViewController:browserVc animated:animated];
 }
