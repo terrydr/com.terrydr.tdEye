@@ -244,6 +244,16 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         _pictureScanView.hidden = NO;
         _pictureScanImgView.image = [_takenPicturesArr lastObject];
     }
+    
+    NSArray *leftTempArr = (NSArray *)[[NSUserDefaults standardUserDefaults] objectForKey:@"leftSelectedPathArr"];
+    if ([leftTempArr isValid]) {
+        _leftSelectedPathArr = [NSMutableArray arrayWithArray:leftTempArr];
+    }
+    
+    NSArray *rightTempArr = (NSArray *)[[NSUserDefaults standardUserDefaults] objectForKey:@"rightSelectedPathArr"];
+    if ([rightTempArr isValid]) {
+        _rightSelectedPathArr = [NSMutableArray arrayWithArray:rightTempArr];
+    }
 }
 
 - (void)cleanOlderData{

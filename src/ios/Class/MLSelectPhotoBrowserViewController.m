@@ -482,6 +482,16 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 - (void)mlRightBarButtonItemAction{
+    if ([_leftSelectedPathArr isValid]) {
+        [[NSUserDefaults standardUserDefaults] setObject:_leftSelectedPathArr forKey:@"leftSelectedPathArr"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    
+    if ([_rightSelectedPathArr isValid]) {
+        [[NSUserDefaults standardUserDefaults] setObject:_rightSelectedPathArr forKey:@"rightSelectedPathArr"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    
     NSMutableDictionary *temDic = [[NSMutableDictionary alloc] initWithCapacity:0];
     if ([_mlLeftselectedArr isValid]) {
         [temDic setObject:_mlLeftselectedArr forKey:@"leftEye"];
