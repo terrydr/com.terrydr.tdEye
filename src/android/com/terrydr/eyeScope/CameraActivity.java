@@ -10,9 +10,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.media.ThumbnailUtils;
@@ -22,6 +24,7 @@ import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextPaint;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.KeyEvent;
@@ -85,7 +88,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	private int width ;
 	private int getWidth ;
 	public static boolean PRE_CUPCAKE ; 
-	private ArrayList<String> recordSelectPaths = new ArrayList<String>();// 记录选中的图片
+	private ArrayList<String> recordSelectPaths;
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -93,7 +96,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);  //保持屏幕长亮
-		
+		recordSelectPaths = new ArrayList<String>();// 记录选中的图片
 		PRE_CUPCAKE = getSDKVersionNumber() < 23 ? true : false; 
 		if(!PRE_CUPCAKE){
 			checkWriteExternalPermission();  //判断如果用户阻止了权限给提示窗，目前紧对android6.0以上版本有效
@@ -152,13 +155,23 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		
 		wm = this.getWindowManager();
 		width = wm.getDefaultDisplay().getWidth();
-		getWidth = width*140/720;
+		getWidth = width * 140 / 720;
 		
-		//每次启动拍照界面删除已经存在的图片
-		String rootPath_left = getFolderPath(this, mSaveRoot_left);
-		deleteFolder(rootPath_left);
-		String rootPath_right = getFolderPath(this, mSaveRoot_right);
-		deleteFolder(rootPath_right);
+		Bundle bundle = getIntent().getExtras();
+		if(bundle!=null){
+			deleteFile = bundle.getBoolean("deleteFile");
+			recordSelectPaths = bundle.getStringArrayList("selectPaths");
+			if(recordSelectPaths == null){
+				recordSelectPaths = new ArrayList<String>();// 记录选中的图片
+			}
+		}
+		//删除图片
+		if(deleteFile){
+			String rootPath_left = getFolderPath(this, mSaveRoot_left);
+			deleteFolder(rootPath_left);
+			String rootPath_right = getFolderPath(this, mSaveRoot_right);
+			deleteFolder(rootPath_right);
+		}
 		
 //		int i = dip2px(30);
 //		int m = px2dip(38);
@@ -331,6 +344,34 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	}
 	
 	/**
+	 * 删除图片时更新缩略图
+	 */
+	private void updateImageThumbnail(){
+		// 获取根目录下缩略图文件夹
+		String folder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "left");
+		// 获取图片文件大图
+		List<File> imageList = FileOperateUtil.listFiles(folder, ".jpg");
+
+		String folderRight = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "right");
+		List<File> imageListRight = FileOperateUtil.listFiles(folderRight,".jpg");
+		
+		List<File> allImageList = new ArrayList<File>();
+		if(imageList!=null)
+			allImageList.addAll(imageList);
+		if(imageListRight!=null)
+			allImageList.addAll(imageListRight);
+		FileOperateUtil.sortList(allImageList, false);
+		if(allImageList.isEmpty()){
+			return;
+		}
+		Bitmap bm = BitmapFactory.decodeFile(allImageList.get(0).getAbsolutePath());
+		Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 320, 219);
+		btn_thumbnail.setImageBitmap(thumbnail);
+//		this.thumbPath = thumbPath;
+//		btn_thumbnail.setVisibility(View.VISIBLE);
+	}
+	
+	/**
 	 * 点击拍照事件
 	 */
 	private void takePictureing(){
@@ -349,6 +390,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 							if (i_left == 0 && i_right == 0) {
 								btn_thumbnail.setVisibility(View.GONE);
 							}
+							updateImageThumbnail();
 						}
 					}).setNegativeButton("取消", new OnClickListener() {
 						@Override
@@ -447,12 +489,12 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			break;
 		case R.id.btn_thumbnail: //点击下方缩略图的事件跳转
 			Intent intent = new Intent(CameraActivity.this, AlbumItemAty.class);
-			
 			Bundle bundle = new Bundle();
 			int mexposureNum = mExposureNum; // 曝光
 			bundle.putInt("mexposureNum", mexposureNum);  
 			bundle.putInt("wb_level", wb_level);  
 			bundle.putInt("zoom", zoom);  
+			Log.e(TAG, "commitrecordSelectPaths:" + recordSelectPaths);
 			bundle.putStringArrayList("selectPaths", recordSelectPaths);
 			bundle.putString("path", thumbPath);
 			bundle.putString("root", mSaveRoot_left);
@@ -673,20 +715,18 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 
 	
 	/**
-	 * 拍照结束后跳转
+	 * 拍照结束后更新缩略图
 	 */
 	@Override
 	public void onTakePictureEnd(Bitmap bm,String imagePath,String thumbPath) {
-//		Log.e(TAG, "拍照完成跳转");
 		startAlbumAty();  //拍照完成跳转
 		if(bm!=null){
 			setCameraText(leftOrRight);
 			photos_iv.setEnabled(true);
-			Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 213, 213);
+			Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 320, 219);
 			btn_thumbnail.setImageBitmap(thumbnail);
 			this.thumbPath = thumbPath;
 			btn_thumbnail.setVisibility(View.VISIBLE);
-//			Log.e(TAG, "thumbPath:" + thumbPath);
 		}
 	}
 	
@@ -700,7 +740,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		if( bm == null){
 			return;
 		}
-		Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 213, 213);
+		Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 320, 219);
 		btn_thumbnail.setImageBitmap(thumbnail);
 		this.thumbPath = thumbPath;
 		btn_thumbnail.setVisibility(View.VISIBLE);
@@ -741,6 +781,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 				deleteFile = b.getBoolean("deleteFile");
 				wb_level = b.getInt("wb_level");
 				recordSelectPaths = b.getStringArrayList("selectPaths");
+				Log.e(TAG, "0recordSelectPaths:" + recordSelectPaths);
 				zoom = b.getInt("zoom");
 			}
 			mContainer.setCameraISO_int(mExposureNum,lightOn);
@@ -758,6 +799,10 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		case 6:
 			Intent intent1 = new Intent();
 			Bundle b11 = data.getExtras();
+			if(b11!=null){
+				recordSelectPaths = b11.getStringArrayList("selectPaths");
+				Log.e(TAG, "6recordSelectPaths:" + recordSelectPaths);
+			}
 			intent1.putExtras(b11);
 			this.setResult(6, intent1);
 			this.finish();
@@ -1067,6 +1112,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 							if (i_left == 0 && i_right == 0) {
 								btn_thumbnail.setVisibility(View.GONE);
 							}
+							updateImageThumbnail();
 						}
 					}).setNegativeButton("取消", new OnClickListener() {
 						@Override
@@ -1181,18 +1227,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	}
 	@Override
 	protected void onResume() {		
+		//设置拍照界面的照片个数 '0/6'
 		setCameraText(leftOrRight);
-//		Bundle bundle = getIntent().getExtras();
-//		if(bundle!=null){
-//			deleteFile = bundle.getBoolean("deleteFile");
-//		}
-//		if(deleteFile){
-//			String rootPath_left = getFolderPath(this, mSaveRoot_left);
-//			deleteFolder(rootPath_left);
-//			String rootPath_right = getFolderPath(this, mSaveRoot_right);
-//			deleteFolder(rootPath_right);
-//		}
-		
 		// 获取根目录下缩略图文件夹
 		String folder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "left");
 		// 获取图片文件大图
@@ -1226,6 +1262,8 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		if (i_left == 0 && i_right == 0) {
 			btn_thumbnail.setVisibility(View.GONE);
 		}
+		//更新缩略图
+		updateImageThumbnail();
 		super.onResume();
 	}
 	

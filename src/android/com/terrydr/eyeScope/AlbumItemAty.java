@@ -2,7 +2,10 @@ package com.terrydr.eyeScope;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +14,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextPaint;
@@ -51,23 +55,30 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	private ArrayList<String> selectPathsRight = new ArrayList<String>();// 选中的图片  右眼图片
 	private boolean leftOrRight = true;
 	private Bundle bundle;
-	//定义当前数组的个数，为了和下标统一，以0开头
-//	private int currentNumber = 0;
 	private boolean isPlugin = false;  //标记是否是plugin传过来的,默认为false:否;ure:是
-	private ArrayList<String> recordSelectPaths = new ArrayList<String>();// 选中的图片
-	/** 
-     * 装点点的ImageView数组 
-     */  
+	private ArrayList<String> recordSelectPaths;// 选中的图片
+	// 装点点的ImageView数组 
     private ImageView[] tips;  
+    private SharedPreferences preferences;   //保存勾选要提交的图片路径
+    private SharedPreferences.Editor editor;
+    private static final String SAVEFILENAME = "saveSelectPaths";
+    private static final String SAVEKEYNAME = "sKey";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.albumitem);
-
+		recordSelectPaths = new ArrayList<String>();// 选中的图片
 		bundle = getIntent().getExtras();
 		if (bundle != null) {
 			isPlugin = bundle.getBoolean("isPlugin");
-			recordSelectPaths = bundle.getStringArrayList("selectPaths");
+			if(!isPlugin){  //如果不是js端传过来的直接获取上个activiy传参
+				recordSelectPaths = bundle.getStringArrayList("selectPaths");
+			}else{
+				Set<String> keySet = getSharedPreferences(SAVEKEYNAME);
+				if(keySet != null){
+					recordSelectPaths = new ArrayList<String>(keySet);
+				}
+			}
 		}
 		group = (ViewGroup)findViewById(R.id.imagegroup_ll); 
 		mViewPager=(AlbumViewPager)findViewById(R.id.albumviewpager);
@@ -111,16 +122,105 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 //		mViewPager.setOnSlideUpListener(AlbumItemAty.this);
 	}
 	
-	/**
-	 * 向数组中添加值
-	 * @param value  ture or false
+	/**  
+	 *  加载图片
+	 *  @param rootPath   图片根路
 	 */
-//  private void add(String value){  
-//      if(currentNumber < files.size()){  
-//    	  albumitem_selected_cb_bool[currentNumber]=value;  
-//          currentNumber++;  
-//      }  
-//  } 
+	public void loadAlbum(String rootPath,String fileName){
+		//获取根目录下缩略图文件夹
+		String folder=FileOperateUtil.getFolderPath(this, FileOperateUtil.TYPE_IMAGE, "left");
+		//获取图片文件大图
+		List<File> imageList=FileOperateUtil.listFiles(folder, ".jpg");
+		
+		String folderRight=FileOperateUtil.getFolderPath(this, FileOperateUtil.TYPE_IMAGE, "right");
+		List<File> imageListRight=FileOperateUtil.listFiles(folderRight, ".jpg");
+		
+		files=new ArrayList<File>();
+		if(imageList!=null&&imageList.size()>0){
+			files.addAll(imageList);
+			eye_left_tv.setVisibility(View.VISIBLE);
+			eye_left_select_count_tv.setVisibility(View.VISIBLE);
+		} else {
+			eye_left_tv.setVisibility(View.GONE);
+			eye_left_select_count_tv.setVisibility(View.GONE);
+		}
+		FileOperateUtil.sortList(files, true);
+		
+		List<File> filesRight=new ArrayList<File>();
+		if(imageListRight!=null&&imageListRight.size()>0){
+			filesRight.addAll(imageListRight);
+			eye_right_tv.setVisibility(View.VISIBLE);
+			eye_right_select_count_tv.setVisibility(View.VISIBLE);
+		} else {
+			eye_right_tv.setVisibility(View.GONE);
+			eye_right_select_count_tv.setVisibility(View.GONE);
+		}
+		FileOperateUtil.sortList(filesRight, true);
+		
+		files.addAll(filesRight);  //把右眼图片添加到左眼
+        //将点点加入到ViewGroup中  
+        tips = new ImageView[files.size()];  
+        albumitem_selected_cb_bool = new String[files.size()];
+		
+		if(files.size()>0){
+			paths=new ArrayList<String>();
+			int currentItem=0;
+			int i = 0;
+			for (File file : files) {
+				if(fileName!=null && file.getName().contains(fileName))
+					currentItem=files.indexOf(file);
+				paths.add(file.getAbsolutePath());
+
+				ImageView imageView = new ImageView(this);
+				imageView.setLayoutParams(new LayoutParams(
+						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+				tips[i] = imageView;
+				if(recordSelectPaths != null){
+					if(recordSelectPaths.contains(file.getAbsolutePath())){
+						albumitem_selected_cb_bool[i] = "true";
+						tips[i].setBackgroundResource(R.drawable.albumitem_selected_status);
+						albumitem_selected_cb.setChecked(true);
+						selectPaths.add(file.getAbsolutePath());
+						if (file.getAbsolutePath().contains("left")) {
+							selectPathsLeft.add(file.getAbsolutePath());
+						} else if (file.getAbsolutePath().contains("right")) {
+							selectPathsRight.add(file.getAbsolutePath());
+						}
+					}else{
+						albumitem_selected_cb_bool[i] = "false";
+						tips[i].setBackgroundResource(R.drawable.albumitem_unselect_status);
+						albumitem_selected_cb.setChecked(false);
+						selectPaths.remove(file.getAbsolutePath());
+						if (file.getAbsolutePath().contains("left")) {
+							selectPathsLeft.remove(file.getAbsolutePath());
+						} else if (file.getAbsolutePath().contains("right")) {
+							selectPathsRight.remove(file.getAbsolutePath());
+						}
+					}
+				}
+				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+						new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+				layoutParams.leftMargin = 10;
+				layoutParams.rightMargin = 10;
+				group.addView(imageView, layoutParams);
+				i++;
+			}
+			mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(this,paths));
+//			mViewPager.setCurrentItem(currentItem);
+//			tips[currentItem].setBackgroundResource(R.drawable.albumitem_selected_current);
+			mViewPager.setCurrentItem(0);
+			tips[0].setBackgroundResource(R.drawable.albumitem_selected_current);
+			if (albumitem_selected_cb_bool[0].equals("true")) {
+				albumitem_selected_cb.setChecked(true);
+			} else {
+				albumitem_selected_cb.setChecked(false);
+			}
+			setCountView();
+			eye_left_select_count_tv.setText(selectPathsLeft.size()+ "/2");
+			eye_right_select_count_tv.setText(selectPathsRight.size()+ "/2");
+		}
+	}
+
 	
 	/**
 	 * 删除照片重新加载图片，以及修改一些状态
@@ -219,103 +319,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		}
 	}
 	
-	/**  
-	 *  加载图片
-	 *  @param rootPath   图片根路
-	 */
-	public void loadAlbum(String rootPath,String fileName){
-		//获取根目录下缩略图文件夹
-		String folder=FileOperateUtil.getFolderPath(this, FileOperateUtil.TYPE_IMAGE, "left");
-		//获取图片文件大图
-		List<File> imageList=FileOperateUtil.listFiles(folder, ".jpg");
-		
-		String folderRight=FileOperateUtil.getFolderPath(this, FileOperateUtil.TYPE_IMAGE, "right");
-		List<File> imageListRight=FileOperateUtil.listFiles(folderRight, ".jpg");
-		
-		files=new ArrayList<File>();
-		if(imageList!=null&&imageList.size()>0){
-			files.addAll(imageList);
-			eye_left_tv.setVisibility(View.VISIBLE);
-			eye_left_select_count_tv.setVisibility(View.VISIBLE);
-		} else {
-			eye_left_tv.setVisibility(View.GONE);
-			eye_left_select_count_tv.setVisibility(View.GONE);
-		}
-		FileOperateUtil.sortList(files, true);
-		
-		List<File> filesRight=new ArrayList<File>();
-		if(imageListRight!=null&&imageListRight.size()>0){
-			filesRight.addAll(imageListRight);
-			eye_right_tv.setVisibility(View.VISIBLE);
-			eye_right_select_count_tv.setVisibility(View.VISIBLE);
-		} else {
-			eye_right_tv.setVisibility(View.GONE);
-			eye_right_select_count_tv.setVisibility(View.GONE);
-		}
-		FileOperateUtil.sortList(filesRight, true);
-		
-		files.addAll(filesRight);  //把右眼图片添加到左眼
-        //将点点加入到ViewGroup中  
-        tips = new ImageView[files.size()];  
-        albumitem_selected_cb_bool = new String[files.size()];
-		
-		if(files.size()>0){
-			paths=new ArrayList<String>();
-			int currentItem=0;
-			int i = 0;
-			for (File file : files) {
-				if(fileName!=null && file.getName().contains(fileName))
-					currentItem=files.indexOf(file);
-				paths.add(file.getAbsolutePath());
-
-				ImageView imageView = new ImageView(this);
-				imageView.setLayoutParams(new LayoutParams(
-						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-				tips[i] = imageView;
-				if(recordSelectPaths.contains(file.getAbsolutePath())){
-					albumitem_selected_cb_bool[i] = "true";
-					tips[i].setBackgroundResource(R.drawable.albumitem_selected_status);
-					albumitem_selected_cb.setChecked(true);
-					selectPaths.add(file.getAbsolutePath());
-					if (file.getAbsolutePath().contains("left")) {
-						selectPathsLeft.add(file.getAbsolutePath());
-					} else if (file.getAbsolutePath().contains("right")) {
-						selectPathsRight.add(file.getAbsolutePath());
-					}
-				}else{
-					albumitem_selected_cb_bool[i] = "false";
-					tips[i].setBackgroundResource(R.drawable.albumitem_unselect_status);
-					albumitem_selected_cb.setChecked(false);
-					selectPaths.remove(file.getAbsolutePath());
-					if (file.getAbsolutePath().contains("left")) {
-						selectPathsLeft.remove(file.getAbsolutePath());
-					} else if (file.getAbsolutePath().contains("right")) {
-						selectPathsRight.remove(file.getAbsolutePath());
-					}
-				}
-				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-						new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-				layoutParams.leftMargin = 10;
-				layoutParams.rightMargin = 10;
-				group.addView(imageView, layoutParams);
-				i++;
-			}
-			mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(this,paths));
-//			mViewPager.setCurrentItem(currentItem);
-//			tips[currentItem].setBackgroundResource(R.drawable.albumitem_selected_current);
-			mViewPager.setCurrentItem(0);
-			tips[0].setBackgroundResource(R.drawable.albumitem_selected_current);
-			if (albumitem_selected_cb_bool[0].equals("true")) {
-				albumitem_selected_cb.setChecked(true);
-			} else {
-				albumitem_selected_cb.setChecked(false);
-			}
-			setCountView();
-			eye_left_select_count_tv.setText(selectPathsLeft.size()+ "/2");
-			eye_right_select_count_tv.setText(selectPathsRight.size()+ "/2");
-		}
-	}
-
 	/**
 	 * 设置图片标题文字 
 	 */
@@ -410,7 +413,7 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	 * 返回上一个activity
 	 */
 	private void backPrevious(){
-		Intent intent = null;
+//		Intent intent = null;
 //		Bundle bundle = new Bundle();
 //		bundle.putStringArrayList("selectPaths", selectPaths);
 //		bundle.putStringArrayList("selectPathsLeft", selectPathsLeft);
@@ -426,28 +429,19 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 //		}
 //		this.setResult(0, intent);
 //		this.finish();
-		
-		if (!isPlugin) {
-			intent = new Intent(AlbumItemAty.this, CameraActivity.class);
-			if (bundle != null) {
-				bundle.putBoolean("deleteFile", false);
-				bundle.putStringArrayList("selectPaths", selectPaths);
-				intent.putExtras(bundle);
 
-			}
-			// 设置返回数据
-			this.setResult(0, intent);
-			this.finish();
-		} else {
-			intent = new Intent(AlbumItemAty.this, CameraActivity.class);
-			if (bundle != null) {
-				bundle.putBoolean("deleteFile", false);
-				intent.putExtras(bundle);
-			}
-			// 设置返回数据
-			this.setResult(6, intent);
-			this.finish();
+		Intent intent = new Intent(AlbumItemAty.this, CameraActivity.class);
+		if (bundle != null) {
+			bundle.putBoolean("deleteFile", false);
+			bundle.putStringArrayList("selectPaths", selectPaths);
+			intent.putExtras(bundle);
 		}
+		if (isPlugin) { //js端跳转过来返回6
+			this.setResult(6, intent);
+		} else {     //正常 返回0
+			this.setResult(0, intent);
+		}
+		this.finish();
 	}
 	@Override
 	public void onClick(View v) {
@@ -544,6 +538,8 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 			Toast.makeText(getApplicationContext(), "请选择图片再提交!",Toast.LENGTH_SHORT).show();
 			return;
 		}
+		Set<String> selectPathsSet = new HashSet<String>(selectPaths);
+		saveSharedPreferences(SAVEKEYNAME,selectPathsSet); //保存数据到本地
 		Intent intent1 = new Intent();
 		Bundle bundle1 = new Bundle();
 		bundle1.putString("result_Json", result_Json.toString());
@@ -559,6 +555,40 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	@Override
 	protected void onStop() {
 		super.onStop();
+	}
+	
+	/**
+	 * 保存选中的图片路径到本地文件
+	 * @param fileName   文件名称(.xml)
+	 * @param keyName     key名称
+	 * @param keyValue    对应key的值 
+	 */
+	private void saveSharedPreferences(String keyName,Set<String> keyValue){
+		//实例化SharedPreferences对象（第一步）
+		preferences = getSharedPreferences(SAVEFILENAME,Activity.MODE_PRIVATE);
+		//实例化SharedPreferences.Editor对象（第二步）
+		 editor = preferences.edit();
+		//用putString的方法保存数据
+		editor.putStringSet(keyName, keyValue);
+		//提交当前数据
+		editor.commit(); 
+	}
+	
+	/**
+	 * 保存选中的图片路径到本地文件
+	 * 
+	 * @param fileName
+	 *            文件名称(.xml)
+	 * @param keyName
+	 *            key名称
+	 * @param keyValue
+	 *            对应key的值
+	 */
+	private Set<String> getSharedPreferences(String keyName) {
+		preferences = getSharedPreferences(SAVEFILENAME, Activity.MODE_PRIVATE);
+		// 使用getString方法获得value，注意第2个参数是value的默认值
+		Set<String> keyValue = preferences.getStringSet(keyName, null);
+		return keyValue;
 	}
 
 	public void onChangeTesChanged(String _text) {
