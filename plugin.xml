@@ -241,6 +241,8 @@
 		<source-file src="src/android/com/terrydr/eyeScope/SeekBarArcView.java"
                      target-dir="src/com/terrydr/eyeScope"/>		
 		<source-file src="src/android/com/terrydr/eyeScope/SeekBarBallView.java"
+                     target-dir="src/com/terrydr/eyeScope"/>
+		<source-file src="src/android/com/terrydr/eyeScope/SystemBarTintManager.java"
                      target-dir="src/com/terrydr/eyeScope"/>						 
 		<source-file src="src/android/com/terrydr/eyeScope/ThumbnaiImageView.java"
                      target-dir="src/com/terrydr/eyeScope"/>
