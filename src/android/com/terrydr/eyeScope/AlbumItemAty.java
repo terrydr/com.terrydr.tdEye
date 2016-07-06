@@ -10,16 +10,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.terrydr.eyeScope.MatrixImageView.OnSingleTapListener;
+
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -67,6 +72,10 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.albumitem);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			setTranslucentStatus(true);
+		}
+		setTranslucentStatus(); //设置状态栏颜色
 		recordSelectPaths = new ArrayList<String>();// 选中的图片
 		bundle = getIntent().getExtras();
 		if (bundle != null) {
@@ -120,6 +129,28 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 		loadAlbum(mSaveRoot,currentFileName);
 		
 //		mViewPager.setOnSlideUpListener(AlbumItemAty.this);
+	}
+	
+	/**
+	 * 设置状态的颜色
+	 */
+	private void setTranslucentStatus(){
+		SystemBarTintManager tintManager = new SystemBarTintManager(this);
+		tintManager.setStatusBarTintEnabled(true);
+		tintManager.setStatusBarTintResource(R.color.common_title_bg);//通知栏所需颜色
+	}
+	
+	@TargetApi(19) 
+	private void setTranslucentStatus(boolean on) {
+		Window win = getWindow();
+		WindowManager.LayoutParams winParams = win.getAttributes();
+		final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+		if (on) {
+			winParams.flags |= bits;
+		} else {
+			winParams.flags &= ~bits;
+		}
+		win.setAttributes(winParams);
 	}
 	
 	/**  

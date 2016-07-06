@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:descendantFocusability="blocksDescendants"
-    tools:context="com.terrydr.eyeScope.CameraActivity" >
+    tools:context="com.terrydr.eyeScope.CameraActivity"
+    android:fitsSystemWindows="true" >
 
     <!-- 显示预览图形 -->
 

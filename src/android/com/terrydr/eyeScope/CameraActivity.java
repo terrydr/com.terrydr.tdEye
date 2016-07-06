@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.terrydr.eyeScope.CameraContainer.TakePictureListener;
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -18,6 +19,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.media.ThumbnailUtils;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -32,6 +34,7 @@ import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -95,6 +98,11 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			setTranslucentStatus(true);
+		}
+		setTranslucentStatus(); //设置状态栏颜色
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);  //保持屏幕长亮
 		recordSelectPaths = new ArrayList<String>();// 记录选中的图片
 		PRE_CUPCAKE = getSDKVersionNumber() < 23 ? true : false; 
@@ -1308,4 +1316,25 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		return super.onKeyDown(keyCode, event);
 	}
 
+	/**
+	 * 设置状态的颜色
+	 */
+	private void setTranslucentStatus(){
+		SystemBarTintManager tintManager = new SystemBarTintManager(this);
+		tintManager.setStatusBarTintEnabled(true);
+		tintManager.setStatusBarTintResource(R.color.transparent_background);//通知栏所需颜色
+	}
+	
+	@TargetApi(19) 
+	private void setTranslucentStatus(boolean on) {
+		Window win = getWindow();
+		WindowManager.LayoutParams winParams = win.getAttributes();
+		final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+		if (on) {
+			winParams.flags |= bits;
+		} else {
+			winParams.flags &= ~bits;
+		}
+		win.setAttributes(winParams);
+	}
 }

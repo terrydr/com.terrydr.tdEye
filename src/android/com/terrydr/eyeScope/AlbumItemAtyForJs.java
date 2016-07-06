@@ -5,12 +5,17 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
@@ -35,6 +40,10 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.albumitem_for_js);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			setTranslucentStatus(true);
+		}
+		setTranslucentStatus(); //设置状态栏颜色
 		mBackView = (TextView) findViewById(R.id.header_bar_photo_back);
 		mCountView = (TextView) findViewById(R.id.header_bar_photo_count);
 		header_bar_photo_commit_bt = (TextView) findViewById(R.id.header_bar_photo_commit_bt);
@@ -56,6 +65,28 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 
 		parseJsonMulti(data); // 解析传过来的数据并且加载图片
 
+	}
+	
+	/**
+	 * 设置状态的颜色
+	 */
+	private void setTranslucentStatus(){
+		SystemBarTintManager tintManager = new SystemBarTintManager(this);
+		tintManager.setStatusBarTintEnabled(true);
+		tintManager.setStatusBarTintResource(R.color.common_title_bg);//通知栏所需颜色
+	}
+	
+	@TargetApi(19) 
+	private void setTranslucentStatus(boolean on) {
+		Window win = getWindow();
+		WindowManager.LayoutParams winParams = win.getAttributes();
+		final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+		if (on) {
+			winParams.flags |= bits;
+		} else {
+			winParams.flags &= ~bits;
+		}
+		win.setAttributes(winParams);
 	}
 
 	/**
