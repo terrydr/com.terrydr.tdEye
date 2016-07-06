@@ -242,8 +242,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
 }
 
 - (void)seclectedBtnClick:(id)sender{
-    UIButton *btn = (UIButton *)sender;
-    btn.selected = !btn.isSelected;
     TDPictureModel *pictureModel = self.photos[_currentPage];
     
     BOOL isLeftEye;
@@ -260,7 +258,29 @@ static NSString *_cellIdentifier = @"collectionViewCell";
     NSString *imgPath = [[TDMediaFileManage shareInstance] getImagePathWithPictureName:pictureModel.pictureName isLeftEye:isLeftEye];
     UIImage *selectedImg = [UIImage imageNamed:@"selectedicon"];
     UIImage *unselectedImg = [UIImage imageNamed:@"unselectedicon"];
-    if (btn.selected) {
+    if (pictureModel.isSelected) {
+        if (_leftCount>0) {
+            if (_currentPage+1<=_leftCount) {
+                //左眼
+                _leftSelectedCount--;
+                [_mlLeftselectedArr removeObject:imgPath];
+                [_leftSelectedPathArr removeObject:pictureModel.pictureName];
+            }else{
+                //右眼
+                _rightSelectedCount--;
+                [_mlRightselectedArr removeObject:imgPath];
+                [_rightSelectedPathArr removeObject:pictureModel.pictureName];
+            }
+        }else{
+            //右眼
+            _rightSelectedCount--;
+            [_mlRightselectedArr removeObject:imgPath];
+            [_rightSelectedPathArr removeObject:pictureModel.pictureName];
+        }
+        [_selectedModelArr removeObject:pictureModel];
+        pictureModel.isSelected = NO;
+        [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
+    }else{
         if (_leftCount>0) {
             if (_currentPage+1<=_leftCount) {
                 //左眼
@@ -300,28 +320,6 @@ static NSString *_cellIdentifier = @"collectionViewCell";
                 [_selectedBtn setBackgroundImage:selectedImg forState:UIControlStateNormal];
             }
         }
-    }else{
-        if (_leftCount>0) {
-            if (_currentPage+1<=_leftCount) {
-                //左眼
-                _leftSelectedCount--;
-                [_mlLeftselectedArr removeObject:imgPath];
-                [_leftSelectedPathArr removeObject:pictureModel.pictureName];
-            }else{
-                //右眼
-                _rightSelectedCount--;
-                [_mlRightselectedArr removeObject:imgPath];
-                [_rightSelectedPathArr removeObject:pictureModel.pictureName];
-            }
-        }else{
-            //右眼
-            _rightSelectedCount--;
-            [_mlRightselectedArr removeObject:imgPath];
-            [_rightSelectedPathArr removeObject:pictureModel.pictureName];
-        }
-        [_selectedModelArr removeObject:pictureModel];
-        pictureModel.isSelected = NO;
-        [_selectedBtn setBackgroundImage:unselectedImg forState:UIControlStateNormal];
     }
     
     if (_leftCount>0) {
