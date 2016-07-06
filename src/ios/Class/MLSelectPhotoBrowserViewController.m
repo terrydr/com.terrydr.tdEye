@@ -609,17 +609,19 @@ static NSString *_cellIdentifier = @"collectionViewCell";
         }else{
             
             int index = (int)self.currentPage +1;
-            int totalCount = (int)_rightCount;
+            int totalCount = (int)self.photos.count;
             if (index != totalCount) {
                 //重新排序
+                int j = 0;
                 for (int i=index; i<totalCount; i++) {
+                    j++;
                     TDPictureModel *tempPictureModel = self.photos[i];
                     NSString *imgPath = [[TDMediaFileManage shareInstance] getImagePathWithPictureName:tempPictureModel.pictureName isLeftEye:NO];
                     NSData *imgData = [NSData dataWithContentsOfFile:imgPath];
                     
                     TDMediaFileManage *fileManage = [TDMediaFileManage shareInstance];
                     NSString *filePath = [fileManage getJRMediaPathWithType:NO];
-                    NSString *imageName = [NSString stringWithFormat:@"0%d.jpg",i];
+                    NSString *imageName = [NSString stringWithFormat:@"0%d.jpg",j];
                     NSString *destinationImgPath = [NSString stringWithFormat:@"%@/%@",filePath,imageName];
                     BOOL result = [fileManage saveFileWithPath:destinationImgPath fileData:imgData];
                     NSLog(@"result:%d",result);
