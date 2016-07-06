@@ -219,6 +219,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     if ([leftFileArr isValid]) {
         //左眼
         for (NSString *fileName in leftFileArr) {
+            _leftTakenPictureCount++;
             NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:YES];
             [_takenPicturesArr addObject:[UIImage imageWithContentsOfFile:imgPath]];
         }
@@ -226,6 +227,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         if ([rightFileArr isValid]) {
             //右眼
             for (NSString *fileName in rightFileArr) {
+                _rightTakenPictureCount++;
                 NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:NO];
                 [_takenPicturesArr addObject:[UIImage imageWithContentsOfFile:imgPath]];
             }
@@ -234,6 +236,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         if ([rightFileArr isValid]) {
             //右眼
             for (NSString *fileName in rightFileArr) {
+                _rightTakenPictureCount++;
                 NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:NO];
                 [_takenPicturesArr addObject:[UIImage imageWithContentsOfFile:imgPath]];
             }
@@ -243,6 +246,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     if ([_takenPicturesArr isValid]) {
         _pictureScanView.hidden = NO;
         _pictureScanImgView.image = [_takenPicturesArr lastObject];
+        [self initNavTitle];
     }
     
     NSArray *leftTempArr = (NSArray *)[[NSUserDefaults standardUserDefaults] objectForKey:@"leftSelectedPathArr"];
