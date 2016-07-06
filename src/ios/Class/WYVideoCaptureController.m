@@ -100,6 +100,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [self configureVolumeTool];
     
     if (_isScan) {
+        [self initTakenPicturesArr];
         [self pushToPictureScan:NO];
     }else{
         [self cleanOlderData];
@@ -202,6 +203,46 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         if ([_takenPicturesArr isValid]) {
             _pictureScanImgView.image = [_takenPicturesArr lastObject];
         }
+    }
+}
+
+- (void)initTakenPicturesArr{
+    NSString *leftFilePath = [[TDMediaFileManage shareInstance] getJRMediaPathWithType:YES];
+    NSError *le = nil;
+    NSArray *leftFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:leftFilePath error:&le];
+    NSLog(@"leftFileArr:%@",leftFileArr);
+    NSString *rightFilePath = [[TDMediaFileManage shareInstance] getJRMediaPathWithType:NO];
+    NSError *re = nil;
+    NSArray *rightFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:rightFilePath error:&re];
+    NSLog(@"rightFileArr:%@",rightFileArr);
+    
+    if ([leftFileArr isValid]) {
+        //左眼
+        for (NSString *fileName in leftFileArr) {
+            NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:YES];
+            [_takenPicturesArr addObject:[UIImage imageWithContentsOfFile:imgPath]];
+        }
+        
+        if ([rightFileArr isValid]) {
+            //右眼
+            for (NSString *fileName in rightFileArr) {
+                NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:NO];
+                [_takenPicturesArr addObject:[UIImage imageWithContentsOfFile:imgPath]];
+            }
+        }
+    }else{
+        if ([rightFileArr isValid]) {
+            //右眼
+            for (NSString *fileName in rightFileArr) {
+                NSString *imgPath = [self getImagePathWithImageName:fileName isLeftEye:NO];
+                [_takenPicturesArr addObject:[UIImage imageWithContentsOfFile:imgPath]];
+            }
+        }
+    }
+    
+    if ([_takenPicturesArr isValid]) {
+        _pictureScanView.hidden = NO;
+        _pictureScanImgView.image = [_takenPicturesArr lastObject];
     }
 }
 
