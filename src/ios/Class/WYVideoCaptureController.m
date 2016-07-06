@@ -102,6 +102,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     
     if (_isScan) {
         [self initTakenPicturesArr];
+        [self initSelectedPathArr];
         [self pushToPictureScan:NO];
     }else{
         [self cleanOlderData];
@@ -207,6 +208,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 }
 
 - (void)initTakenPicturesArr{
+    _leftTakenPictureCount = _rightTakenPictureCount = 0;
+    
     NSString *leftFilePath = [[TDMediaFileManage shareInstance] getJRMediaPathWithType:YES];
     NSError *le = nil;
     NSArray *leftFileArr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:leftFilePath error:&le];
@@ -247,8 +250,12 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         _pictureScanView.hidden = NO;
         _pictureScanImgView.image = [_takenPicturesArr lastObject];
         [self initNavTitle];
+    }else{
+        _pictureScanView.hidden = YES;
     }
-    
+}
+
+- (void)initSelectedPathArr{
     NSArray *leftTempArr = (NSArray *)[[NSUserDefaults standardUserDefaults] objectForKey:@"leftSelectedPathArr"];
     if ([leftTempArr isValid]) {
         _leftSelectedPathArr = [NSMutableArray arrayWithArray:leftTempArr];
@@ -1224,16 +1231,8 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     //__weak WYVideoCaptureController *wself = self;
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"单侧眼睛最多拍摄六张图片,是否重拍?" message:nil preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"重拍" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        if (_isLeftEye) {
-            _leftTakenPictureCount=0;
-        }else{
-            _rightTakenPictureCount=0;
-        }
-        self.title = @"0/6";
-        if (_leftTakenPictureCount==0 && _rightTakenPictureCount==0) {
-            _pictureScanView.hidden = YES;
-        }
         [[TDMediaFileManage shareInstance] deleteFileWithEyeType:_isLeftEye];
+        [self initTakenPicturesArr];
         //[wself takePictureMethod];
     }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
