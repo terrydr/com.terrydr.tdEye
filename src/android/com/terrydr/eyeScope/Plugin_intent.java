@@ -60,10 +60,10 @@ public class Plugin_intent extends CordovaPlugin {
 			editor.putBoolean("isStart", true);
 			editor.commit();
 			return true;
-		} else if (action.equals("tdEyeSelectPhotos")) { // 相册缩略图界面
+		} else if (action.equals("tdEyeSelectPhotos")) { 
 			this.callbackContext = callbackContext;
 			Log.e(TAG, "tdEyeSelectPhotos:" + callbackContext);
-			startAlbumAty();
+			startAlbumItemAty();
 			return true;
 		} else if (action.equals("tdEyeScanPhotos")) { // 大图片预览界面参数{data:[图片路径，图片路径]}
 			this.callbackContext = callbackContext;
@@ -80,13 +80,17 @@ public class Plugin_intent extends CordovaPlugin {
 	 */
 	private void startCameraActivity() {
 		Intent intent = new Intent(cordova.getActivity(), CameraActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putBoolean("deleteFile", true);
+		intent.putExtras(bundle);
 		cordova.startActivityForResult((CordovaPlugin) this, intent, 0);
 	}
 
 	/**
-	 * 跳转到相册缩略图界面
+	 * 提交图片点击返回时
+	 * 跳转到大图浏览界面
 	 */
-	private void startAlbumAty() {
+	private void startAlbumItemAty() {
 		Intent intent = new Intent(cordova.getActivity(), AlbumItemAty.class);
 		Bundle bundle = new Bundle();
 		bundle.putBoolean("isPlugin", true);
@@ -124,8 +128,7 @@ public class Plugin_intent extends CordovaPlugin {
 			break;
 		case 6:
 			Intent intent1 = new Intent(cordova.getActivity(), CameraActivity.class);
-			Bundle bundle = new Bundle();
-			bundle.putBoolean("deleteFile", false);
+			Bundle bundle = intent.getExtras();
 			intent1.putExtras(bundle);
 			cordova.startActivityForResult((CordovaPlugin) this, intent1, 0);
 			break;
