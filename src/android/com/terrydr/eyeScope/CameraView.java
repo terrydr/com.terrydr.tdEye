@@ -46,6 +46,8 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	float previewRate = -1f;  
 	// 短边比长边
 //    private float ratio;
+	int w_screen;
+	int h_screen;
 	
 	public CameraView(Context context) {
 		super(context);
@@ -75,8 +77,8 @@ public class CameraView extends SurfaceView implements CameraOperation {
      */  
     public Point getScreenMetrics(Context context){  
         DisplayMetrics dm =context.getResources().getDisplayMetrics();  
-        int w_screen = dm.widthPixels;  
-        int h_screen = dm.heightPixels;  
+        w_screen = dm.widthPixels;  
+        h_screen = dm.heightPixels;  
         Log.e(TAG, "Screen---Width = " + w_screen + " Height = " + h_screen + " densityDpi = " + dm.densityDpi);  
         return new Point(w_screen, h_screen);  
           
@@ -165,22 +167,28 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 */
 	private void setCameraParameters() {
 		Camera.Parameters parameters = mCamera.getParameters();
-//        LOG.e(TAG, "this.getWidth():" + this.getWidth() + "-this.getHeight():" + this.getHeight());
-//        ratio = (float) this.getWidth() / this.getHeight();
-//		Log.e(TAG, "parameters.getPreviewSize():" + parameters.getPreviewSize().width + "*" + parameters.getPreviewSize().height);
+		Log.e(TAG, "this.getWidth():" + this.getWidth() + "-this.getHeight():" + this.getHeight());
+        float ratio = this.getHeight() / (float) this.getWidth();
+        Log.e(TAG, "ratio:" + ratio);
+//        int minWidth = this.getHeight()>this.getWidth() ? this.getHeight():this.getWidth();
+        int minWidth = this.getHeight();
+        Log.e(TAG, "minWidth:" + minWidth);
 		
 		// 选择合的预览尺寸
 		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
-		Size pictureS = CameraSize.getInstance().getPropPreviewSize(sizeList,previewRate, 1280);  
+		Size pictureS = CameraSize.getInstance().getPropPreviewSize(sizeList,previewRate, minWidth,ratio);  
 	    parameters.setPreviewSize(pictureS.width, pictureS.height); 
 	    Log.e(TAG, "previewWidth:" + pictureS.width +"-previewHeight:" + pictureS.height); 
 	     
 		// 设置生成的图片大小
 	    sizeList1 = parameters.getSupportedPictureSizes();
-	    Size pictureS1 = CameraSize.getInstance().getPropPictureSize(sizeList1,previewRate, 1280);  
+	    Size pictureS1 = CameraSize.getInstance().getPropPictureSize(sizeList1,previewRate, minWidth,ratio);  
 	    parameters.setPictureSize(pictureS1.width, pictureS1.height);  
 	    Log.e(TAG, "pictureWidth:" + pictureS1.width +"-pictureHeight:" + pictureS1.height); 
 	    
+//        setPreviewSize(parameters);
+//        setPictureSize(parameters);
+        
 //	 // 设置pictureSize
 //        List<Camera.Size> pictureSizes = parameters.getSupportedPictureSizes();
 //        Size mBestPictureSize = null;
@@ -272,7 +280,8 @@ public class CameraView extends SurfaceView implements CameraOperation {
 				else if (rotation == 270)
 					rotation = 90;
 			}
-			parameters.setRotation(rotation);// 生成的图片转90°
+//			Log.e(TAG, "rotation-------------------------"+ rotation);
+//			parameters.setRotation(rotation);// 生成的图片转90°
 			// 预览图片旋转90°
 			mCamera.setDisplayOrientation(90);// 预览
 			mCamera.autoFocus(autoFocusCallback);  //添加自动对焦

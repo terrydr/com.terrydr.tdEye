@@ -43,7 +43,9 @@ public class AlbumViewPagerForJs extends ViewPager implements OnMovingListener,O
 		builder = builder
 				// .showImageOnLoading(R.drawable.ic_stub)
 				// .showImageOnFail(R.drawable.ic_error)
-				.cacheInMemory(true).cacheOnDisk(false).displayer(new MatrixBitmapDisplayer());
+//				.cacheInMemory(true)
+				.cacheOnDisk(false)
+				.displayer(new MatrixBitmapDisplayer());
 		mOptions = builder.build();
 	}
 
@@ -103,19 +105,12 @@ public class AlbumViewPagerForJs extends ViewPager implements OnMovingListener,O
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								Log.e(TAG, "getPaths()1:" + getPaths());
 								int deleteCurretItem = getCurrentItem();
-								Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
 								String deletePath = deleteCurrentPath();
-								Log.e(TAG, "deletePath:" + deletePath);
-								Log.e(TAG, "getPaths()2:" + getPaths());
 								String selectPath = null;
 								if(!getPaths().isEmpty()){
 									selectPath = getPaths().get(getCurrentItem());
 								}
-								
-								Log.e(TAG, "selectPath:" + selectPath);
-								Log.e(TAG, "getCurrentItem():" + getCurrentItem()); 
 								albumItemAty.reloadAlbum(getPaths(), deletePath, selectPath,deleteCurretItem,getCurrentItem());
 							}
 						})

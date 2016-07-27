@@ -35,7 +35,7 @@ public class AlbumGridView extends GridView {
 		builder = builder
 //				.showImageOnLoading(R.drawable.ic_stub)
 //				.showImageOnFail(R.drawable.ic_error)
-				.cacheInMemory(true)
+//				.cacheInMemory(true)
 				.cacheOnDisk(false)
 				.displayer(new RoundedBitmapDisplayer(0));  //是否图角
 		mOptions = builder.build();
@@ -239,7 +239,7 @@ public class AlbumGridView extends GridView {
 		@Override
 		public void onClick(View v) {
 			if (getOnItemClickListener() != null) {
-//				// 这里取了上两层父类，因为真正触onClick的是FilterImageView
+				// 这里取了上两层父类，因为真正触onClick的是FilterImageView
 				ThumbnaiImageView view = (ThumbnaiImageView) v.getParent().getParent();
 				getOnItemClickListener().onItemClick(AlbumGridView.this, view,view.getPosition(), 0L);
 			}

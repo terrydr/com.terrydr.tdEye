@@ -4,12 +4,10 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-
-import org.apache.cordova.LOG;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
@@ -19,6 +17,7 @@ import android.media.ThumbnailUtils;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -124,7 +123,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 			mPreviewCallback = new PreviewCallback();
 		}
 		if(mPreviewCallback != null){
-			
     		if(mCameraView.mCamera != null){
     			mCameraView.mCamera.startPreview();
     			mCameraView.mCamera.setPreviewCallback(mPreviewCallback);
@@ -143,14 +141,18 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
     		mCameraView.mCamera.setPreviewCallback(null);
     		mCameraView.mCamera.startPreview();
     	}
-    	
+    	if(bm != null && !bm.isRecycled()){ 
+            // 回收并且置为null
+    		bm.recycle(); 
+    		bm = null; 
+    	}  
     }
     
     /**
      * 每一张连拍结束的回调函数
      */
     public void countShoot(Bitmap bm,String thumbPath){
-    	cActivity.delectMultiFile2();
+    	cActivity.delectMultiFile();
         if(mMode == 1){
         	if(mCameraView.mCamera!=null){
         		mCameraView.mCamera.setPreviewCallback(mPreviewCallback);    
@@ -174,31 +176,29 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
     }
 	
     /**
-     * 拍照完返回调用函数
+     * 拍照完回调函数
      */
 	private PictureCallback pictureCallback = new PictureCallback() {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
 			if (mSavePath == null)
-				throw new RuntimeException("mSavePath is null");
-				mDataHandler = new DataHandler();
-			mDataHandler.setMaxSize(200);
-			// 解析生成相机返回的图
-//			Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
-			// 生成缩略
-//			Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 213, 213);
-//			Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 320, 219);
-			// 产生新的文件
+				throw new RuntimeException("Save the file path is null");
+			mDataHandler = new DataHandler();
+			//设置压缩图征的大小
+			mDataHandler.setMaxSize(2*1024); 
+			// 生成新的文件名称
 			String imgName = FileOperateUtil.createFileNmae(".jpg");
+			// 生成大图名称
 			String imagePath = mDataHandler.mImageFolder + File.separator + imgName;
+			// 生成缩略图名称
 			String thumbPath = mDataHandler.mThumbnailFolder + File.separator + imgName;
-			
-			Bitmap bm = mDataHandler.save(data,imagePath,thumbPath);
+			Bitmap bm = mDataHandler.save(data, imagePath, thumbPath);
 			// 重新打开预览图，进行下一次的拍照准备
 			camera.startPreview();
 			if (mListener != null)
-				mListener.onTakePictureEnd(bm,imagePath,thumbPath);
+				//添加拍照完成监听
+				mListener.onTakePictureEnd(bm, imagePath, thumbPath);
 		}
 	};
 	
@@ -231,6 +231,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
                         try {
                             Thread.sleep(500); //500毫秒拍一张
                         } catch (InterruptedException e) {
+                        	Log.e(TAG, "连拍出现异常！",e);
                         }
                         if(mCameraView.mCamera != null){
                             if(mMode == 1){
@@ -260,8 +261,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 			String imgName = FileOperateUtil.createFileNmae(".jpg");
 			String imagePath = mImageFolder + File.separator + imgName;
 			String thumbPath = mThumbnailFolder + File.separator + imgName;
-            
-//			Size bmSize = mCameraView.returnPictureSzie();
 			Size bmSize = convertPreviewSize(data);
             int width = bmSize.width;
             int height = bmSize.height;
@@ -294,135 +293,6 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
         return null;
     }
 
-	/**
-	 * @ClassName: TakePictureListener
-	 * @Description: 拍照监听接口，用以在拍照始和结束后执行相应操
-	 * @date 20160415
-	 * 
-	 */
-	public static interface TakePictureListener {
-		/**
-		 * 拍照结束执行的动作，该方法会在onPictureTaken函数执行后触
-		 * 
-		 * @param bm
-		 *            拍照生成的图
-		 */
-		public void onTakePictureEnd(Bitmap bm,String imagePath,String thumbPath);
-
-		/**
-		 * 临时图片动画结束后触
-		 * 
-		 * @param bm
-		 *            拍照生成的图
-		 * @param isVideo
-		 *            true：当前为录像缩略false:为拍照缩略图
-		 * */
-		public void onAnimtionEnd(Bitmap bm, boolean isVideo);
-	}
-	
-	/**
-	 * 拍照返回的byte数据处理
-	 * 
-	 */
-	private final class DataHandler {
-		/** 大图存放路径 */
-		public String mThumbnailFolder;
-		/** 小图存放路径 */
-		public String mImageFolder;
-		/** 压缩后的图片单位KB */
-		private int maxSize = 200;
-
-		public DataHandler() {
-			mImageFolder = FileOperateUtil.getFolderPath(getContext(),
-					FileOperateUtil.TYPE_IMAGE, mSavePath);
-			mThumbnailFolder = FileOperateUtil.getFolderPath(getContext(),
-					FileOperateUtil.TYPE_THUMBNAIL, mSavePath);
-			File folder = new File(mImageFolder);
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
-			folder = new File(mThumbnailFolder);
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
-		}
-
-		/**
-		 * 保存图片
-		 * 
-		 * @param 相机返回的文件流
-		 * @return 解析流生成的缩略
-		 */
-		public Bitmap save(byte[] data,String imagePath,String thumbPath) {
-			if (data != null) {
-
-				// 解析生成相机返回的图
-				Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
-				// 生成缩略
-//				Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 213, 213);
-				Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 320, 219);
-				// 产生新的文件
-//				String imgName = FileOperateUtil.createFileNmae(".jpg");
-//				String imagePath = mImageFolder + File.separator + imgName;
-//				String thumbPath = mThumbnailFolder + File.separator + imgName;
-
-				File file = new File(imagePath);
-				File thumFile = new File(thumbPath);
-				try {
-					// 存图片大
-					FileOutputStream fos = new FileOutputStream(file);
-					ByteArrayOutputStream bos = compress(bm);
-					fos.write(bos.toByteArray());
-					fos.flush();
-					fos.close();
-					// 存图片小
-					BufferedOutputStream bufferos = new BufferedOutputStream(new FileOutputStream(thumFile));
-					thumbnail.compress(Bitmap.CompressFormat.JPEG, 50, bufferos);
-					bufferos.flush();
-					bufferos.close();
-					return bm;
-				} catch (Exception e) {
-					Toast.makeText(getContext(), "解析相机返回流失败",Toast.LENGTH_SHORT).show();
-				}
-			} else {
-				Toast.makeText(getContext(), "拍照失败，请重试", Toast.LENGTH_SHORT).show();
-			}
-			return null;
-		}
-
-
-		/**
-		 * 图片压缩方法
-		 * 
-		 * @param bitmap
-		 *            图片文件
-		 * @param max
-		 *            文件大小
-		 * @return 压缩后的字节
-		 * @throws Exception
-		 */
-		public ByteArrayOutputStream compress(Bitmap bitmap) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);// 质量压缩方法，这表示不压缩，把压缩后的数据存放到baos
-//			int options = 99;
-//			while (baos.toByteArray().length / 1024 > maxSize) { // 循环判断如果压缩后图片是否大100kb,大于继续压缩
-//				options -= 3;// 每次都减
-//				// 压缩比小，不再压
-//				if (options < 0) {
-//					break;
-//				}
-////				Log.i(TAG, baos.toByteArray().length / 1024 + "");
-//				baos.reset();// 重置baos即清空baos
-//				bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);// 这里压缩options%，把压缩后的数据存放到baos
-//			}
-			return baos;
-		}
-
-		public void setMaxSize(int maxSize) {
-			this.maxSize = maxSize;
-		}
-	}
-	
 	/**
 	 * 设置文件保存路径
 	 * @param rootPath
@@ -525,5 +395,184 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 	 */
 	public int getZoom() {
 		return mCameraView.getZoom();
+	}
+	
+	/**
+	 * 拍照返回的byte数据处理
+	 * 
+	 */
+	private final class DataHandler {
+		/** 大图存放路径 */
+		public String mThumbnailFolder;
+		/** 小图存放路径 */
+		public String mImageFolder;
+		/** 压缩后的图片单位KB */
+		private int maxSize = 1024;
+
+		public DataHandler() {
+			mImageFolder = FileOperateUtil.getFolderPath(getContext(),
+					FileOperateUtil.TYPE_IMAGE, mSavePath);
+			mThumbnailFolder = FileOperateUtil.getFolderPath(getContext(),
+					FileOperateUtil.TYPE_THUMBNAIL, mSavePath);
+			File folder = new File(mImageFolder);
+			if (!folder.exists()) {
+				folder.mkdirs();
+			}
+			folder = new File(mThumbnailFolder);
+			if (!folder.exists()) {
+				folder.mkdirs();
+			}
+		}
+
+		/**
+	     * 将图片按照某个角度进行旋转
+	     *
+	     * @param bm
+	     *            需要旋转的图片
+	     * @param degree
+	     *            旋转角度
+	     * @return 旋转后的图片
+	     */
+	    public Bitmap rotateBitmapByDegree(Bitmap bm, int degree) {
+	        Bitmap returnBm = null;
+	 
+	        // 根据旋转角度，生成旋转矩阵
+	        Matrix matrix = new Matrix();
+	        matrix.postRotate(degree);
+	        try {
+	            // 将原始图片按照旋转矩阵进行旋转，并得到新的图片
+	            returnBm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(),
+	                    bm.getHeight(), matrix, true);
+	        } catch (OutOfMemoryError e) {
+	        	e.printStackTrace();
+	        }
+	        if (returnBm == null) {
+	            returnBm = bm;
+	        }
+	        if (bm != returnBm) {
+	            bm.recycle();
+	        }
+	        return returnBm;
+	    }
+	    
+		/**
+		 * 保存图片
+		 * 
+		 * @param 相机返回的文件流
+		 * @return 解析流生成的缩略
+		 */
+		public Bitmap save(byte[] data,String imagePath,String thumbPath) {
+			if (data != null) {
+				// 解析生成相机返回的图
+				BitmapFactory.Options options = new BitmapFactory.Options();
+				//等比缩放保存拍照图片，防止OOM异常 
+				options.inSampleSize = 2;
+				Bitmap bm0 = BitmapFactory.decodeByteArray(data, 0, data.length,options);
+				//保存的图片旋转90℃,部分手机拍照保存的图片会向左旋转90℃
+				Bitmap bm = rotateBitmapByDegree(bm0,90);  
+				// 生成缩略图
+				Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 320, 219);
+				
+				File file = new File(imagePath);
+				File thumFile = new File(thumbPath);
+				try {
+					// 保存大图片
+					FileOutputStream fos = new FileOutputStream(file);
+					ByteArrayOutputStream bos = compress(bm);
+					fos.write(bos.toByteArray());
+					fos.flush();
+					fos.close();
+					
+					// 保存缩略图片
+					BufferedOutputStream bufferos = new BufferedOutputStream(new FileOutputStream(thumFile));
+					thumbnail.compress(Bitmap.CompressFormat.JPEG, 70, bufferos);
+					bufferos.flush();
+					bufferos.close();
+					
+			    	if(bm != null && !bm.isRecycled()){ 
+			            // 回收并且置为null
+			    		bm.recycle(); 
+			    		bm = null; 
+			    	}  
+			    	System.gc();
+					return thumbnail;
+				} catch (Exception e) {
+					Log.e(TAG, "解析拍照返回流失败！",e);
+					Toast.makeText(getContext(), "拍照失败",Toast.LENGTH_SHORT).show();
+				}
+			} else {
+				Log.i(TAG, "拍照data为NULL!");
+				Toast.makeText(getContext(), "拍照失败，请重试", Toast.LENGTH_SHORT).show();
+			}
+			return null;
+		}
+		
+
+
+
+		/**
+		 * 图片压缩方法
+		 * 
+		 * @param bitmap
+		 *            图片文件
+		 * @param max
+		 *            文件大小
+		 * @return 压缩后的字节
+		 */
+		public ByteArrayOutputStream compress(Bitmap bitmap) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//			long s = System.currentTimeMillis();
+//			Log.e(TAG, "s:" + s);
+			// 质量压缩方法，这表示不压缩，把压缩后的数据存放到baos
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//			long e = System.currentTimeMillis();
+//			Log.e(TAG, "e:" + e);
+//			Log.e(TAG, "e-s:" + (e-s));
+//			int options = 99;
+//			while (baos.toByteArray().length / 1024 > maxSize) { // 循环判断如果压缩后图片是否大maxSize,大于继续压缩
+//				options -= 3;// 每次都减
+//				// 压缩比小，不再压
+//				if (options < 0) {
+//					break;
+//				}
+////				Log.i(TAG, baos.toByteArray().length / 1024 + "");
+//				baos.reset();// 重置baos即清空baos
+//				bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);// 这里压缩options%，把压缩后的数据存放到baos
+//			}
+//			long e1 = System.currentTimeMillis();
+//			Log.e(TAG, "e1:" + e1);
+//			Log.e(TAG, "e1-:" + (e1-e));
+			return baos;
+		}
+
+		public void setMaxSize(int maxSize) {
+			this.maxSize = maxSize;
+		}
+	}
+	
+	/**
+	 * @ClassName: TakePictureListener
+	 * @Description: 拍照监听接口，用以在拍照始和结束后执行相应操
+	 * @date 20160415
+	 * 
+	 */
+	public static interface TakePictureListener {
+		/**
+		 * 拍照结束执行的动作，该方法会在onPictureTaken函数执行后触
+		 * 
+		 * @param bm
+		 *            拍照生成的图
+		 */
+		public void onTakePictureEnd(Bitmap bm,String imagePath,String thumbPath);
+
+		/**
+		 * 临时图片动画结束后触
+		 * 
+		 * @param bm
+		 *            拍照生成的图
+		 * @param isVideo
+		 *            true：当前为录像缩略false:为拍照缩略图
+		 * */
+		public void onAnimtionEnd(Bitmap bm, boolean isVideo);
 	}
 }

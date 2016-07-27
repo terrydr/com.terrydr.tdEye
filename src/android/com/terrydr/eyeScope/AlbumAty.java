@@ -39,7 +39,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	 * 显示相册的View
 	 */
 	private AlbumGridView mAlbumView, mAlbumView_right;
-
 	private String mSaveRoot_left = "left";
 	private String mSaveRoot_right = "right";
 	protected TextView left_count_tv,right_count_tv;
@@ -53,11 +52,8 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 	private ThumbnaiImageView view;
 	private LinearLayout linearLayou_left,linearLayou_right;
 	private ImageView header_bar_back_iv,header_bar_back_iv1;
-//	private boolean returnB = false;
-
-	
-	Set<String> itemSelectedLeft = new HashSet<String>();
-	Set<String> itemSelectedRight = new HashSet<String>();
+	private Set<String> itemSelectedLeft = new HashSet<String>();
+	private Set<String> itemSelectedRight = new HashSet<String>();
 
 	/**
 	 * 透明状态栏,透明导航栏
@@ -143,7 +139,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 							});
 					builder.create().show();
 				}else{
-//					Log.e(TAG, "itemSelectedLeft:"+itemSelectedLeft);
 					if(isChecked){
 						itemSelectedLeft.remove(_view.getTag().toString());
 						view.checkBox.setChecked(false);
@@ -153,7 +148,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 						view.checkBox.setChecked(true);
 						view.checkBox.setVisibility(View.VISIBLE);
 					}
-//					Log.e(TAG, "selectPathsLeft:"+itemSelectedLeft);
 					left_count_tv.setText(itemSelectedLeft.size() + "/2");
 				}
 				return;
@@ -200,7 +194,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 				}
 				return;
 			}
-			
 			Intent intent = new Intent(AlbumAty.this, AlbumItemAty.class);
 			intent.putExtra("path", _view.getTag().toString());
 			intent.putExtra("root", mSaveRoot_right);
@@ -231,9 +224,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 
 	@Override
 	protected void onResume() {
-		// loadAlbum(mSaveRoot_left, ".jpg", mAlbumView);
-		// loadAlbum(mSaveRoot_right, ".jpg", mAlbumView_right);
-
 		super.onResume();
 	}
 
@@ -264,9 +254,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 		if (mAlbumView_right.getChildCount() > 0) {
 			mAlbumView_right.setEditable(false,false);
 		}
-		
-//		selectPathsLeft.clear();
-//		selectPathsRight.clear();
 		itemSelectedLeft = new HashSet<String>();
 		itemSelectedRight = new HashSet<String>();
 		left_count_tv.setVisibility(View.GONE);
@@ -285,7 +272,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			enterEdit();
 			break;
 		case R.id.cance_back_iv:
-//			leaveEdit();
 			backPrevious();
 			break;
 		case R.id.header_bar_back_iv1:
@@ -298,7 +284,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			String imageNmae = this.getString(R.string.Image);
 			String thumbnail = this.getString(R.string.Thumbnail);
 			JSONObject result_Json = new JSONObject();
-//			Set<String> left_mAlbumView = mAlbumView.getSelectedItems(); 
 			Set<String> left_mAlbumView = itemSelectedLeft;    //获得左眼选中图片
 			if (left_mAlbumView != null) {
 				if (!left_mAlbumView.isEmpty()) {
@@ -315,7 +300,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 					}
 				}
 			}
-//			Set<String> right_mAlbumView = mAlbumView_right.getSelectedItems();
 			Set<String> right_mAlbumView = itemSelectedRight; //获得右眼选中图片
 			if (right_mAlbumView != null) {
 				if (!right_mAlbumView.isEmpty()) {
@@ -336,7 +320,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 				Toast.makeText(getApplicationContext(), "请选择图片再提交!",Toast.LENGTH_SHORT).show();
 				return;
 			}
-//			Log.e(TAG, "5");
 			Intent intent1 = new Intent();
 			Bundle bundle1 = new Bundle();
 			bundle1.putString("result_Json", result_Json.toString());
@@ -435,7 +418,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 			} else {
 				enterEdit();
 			}
-//			returnB = true;
 			loadAlbumBySelectImage(mSaveRoot_left, ".jpg", mAlbumView, sl);
 			loadAlbumBySelectImage(mSaveRoot_right, ".jpg", mAlbumView_right, sr);
 			left_count_tv.setText(selectPathsLeftSize + "/2");
