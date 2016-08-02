@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.terrydr.eyeScope.MatrixImageView.OnSingleTapListener;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -127,7 +125,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 				currentFileName=currentFileName.substring(0, currentFileName.lastIndexOf("."));
 		}
 		loadAlbum(mSaveRoot,currentFileName);
-		
 //		mViewPager.setOnSlideUpListener(AlbumItemAty.this);
 	}
 	
@@ -237,8 +234,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 				i++;
 			}
 			mViewPager.setAdapter(mViewPager.new ViewPagerAdapter(this,paths));
-//			mViewPager.setCurrentItem(currentItem);
-//			tips[currentItem].setBackgroundResource(R.drawable.albumitem_selected_current);
 			mViewPager.setCurrentItem(0);
 			tips[0].setBackgroundResource(R.drawable.albumitem_selected_current);
 			if (albumitem_selected_cb_bool[0].equals("true")) {
@@ -444,23 +439,6 @@ public class AlbumItemAty extends Activity implements OnClickListener,OnSingleTa
 	 * 返回上一个activity
 	 */
 	private void backPrevious(){
-//		Intent intent = null;
-//		Bundle bundle = new Bundle();
-//		bundle.putStringArrayList("selectPaths", selectPaths);
-//		bundle.putStringArrayList("selectPathsLeft", selectPathsLeft);
-//		bundle.putStringArrayList("selectPathsRight", selectPathsRight);
-//		bundle.putInt("selectPathsLeftSize", selectPathsLeft.size());
-//		bundle.putInt("selectPathsRightSize", selectPathsRight.size());
-//		intent.putExtras(bundle);
-		
-//		if (bundle != null) {
-//			intent = new Intent();
-//			bundle.putBoolean("deleteFile", false);
-//			intent.putExtras(bundle);
-//		}
-//		this.setResult(0, intent);
-//		this.finish();
-
 		Intent intent = new Intent(AlbumItemAty.this, CameraActivity.class);
 		if (bundle != null) {
 			bundle.putBoolean("deleteFile", false);

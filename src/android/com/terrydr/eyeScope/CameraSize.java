@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.util.Log;
 
 /**
  * 20160506 获取预览图片大小和拍照图片大小
@@ -69,12 +70,14 @@ public class CameraSize {
 	 * @param minWidth
 	 * @return
 	 */
-	public  Size getPropPreviewSize(List<Camera.Size> list, float th, int minWidth){  
-        Collections.sort(list, sizeComparator);  
+	public  Size getPropPreviewSize(List<Camera.Size> list, float th, int minWidth,float ratio){  
+//        Collections.sort(list, sizeComparator);  
+		sortCameraSize(list,false);
         boolean isEmpty = true;
         int i = 0;  
         for(Size s:list){  
-            if((s.width >= minWidth) && equalRate1(s, 1.333f)){  
+//            if((s.width >= minWidth) && equalRate1(s, 1.333f)){  
+        	if((s.width >= minWidth) && equalRate1(s, ratio)){  
 //                Log.i(TAG, "PreviewSize:w = " + s.width + "h = " + s.height);  
             	isEmpty = false;
                 break;  
@@ -104,13 +107,16 @@ public class CameraSize {
 	 * @param minWidth
 	 * @return
 	 */
-    public Size getPropPictureSize(List<Camera.Size> list, float th, int minWidth){  
-        Collections.sort(list, sizeComparator);  
+    public Size getPropPictureSize(List<Camera.Size> list, float th, int minWidth,float ratio){  
+//        Collections.sort(list, sizeComparator);  
+    	sortCameraSize(list,false);
         boolean isEmpty = true;
         int i = 0;  
         for(Size s:list){  
-            if((s.width >= minWidth) && equalRate1(s, 1.333f)){  
+//            if((s.width >= minWidth) && equalRate1(s, 1.333f)){  
+            	if((s.width >= minWidth) && equalRate1(s, ratio)){  
 //                Log.i(TAG, "PictureSize : w = " + s.width + "h = " + s.height);  
+            	
             	isEmpty = false;
                 break;  
             }  
@@ -129,12 +135,50 @@ public class CameraSize {
         if(i == list.size()){  
             i = 0;//如果没找到，就选最小的size  
         }  
+        Log.i(TAG, "i = " + i);  
         return list.get(i);  
     }  
+    
+    
+    /**
+     * 找到短边比长边大于于所接受的最小比例的最大尺寸
+     *
+     * @param sizes       支持的尺寸列表
+     * @param defaultSize 默认大小
+     * @param minRatio    相机图片短边比长边所接受的最小比例
+     * @return 返回计算之后的尺寸
+     */
+    private Camera.Size findBestPictureSize1(List<Camera.Size> sizes, Camera.Size defaultSize, float minRatio) {
+        final int MIN_PIXELS = 320 * 480;
+
+//        sortSizes(sizes);
+        Collections.sort(sizes, sizeComparator);  
+
+        Iterator<Camera.Size> it = sizes.iterator();
+        while (it.hasNext()) {
+            Camera.Size size = it.next();
+            //移除不满足比例的尺寸
+            if ((float) size.height / size.width <= minRatio) {
+                it.remove();
+                continue;
+            }
+            //移除太小的尺寸
+            if (size.width * size.height < MIN_PIXELS) {
+                it.remove();
+            }
+        }
+
+        // 返回符合条件中最大尺寸的一个
+        if (!sizes.isEmpty()) {
+            return sizes.get(0);
+        }
+        // 没得选，默认吧
+        return defaultSize;
+    }
   
     public boolean equalRate1(Size s, float rate){  
         float r = (float)(s.width)/(float)(s.height);  
-        if(Math.abs(r - rate) <= 0.03)  
+        if(Math.abs(r - rate) <= 0.2)  
         {  
             return true;  
         }  

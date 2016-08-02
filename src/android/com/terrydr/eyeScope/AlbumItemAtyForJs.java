@@ -5,7 +5,6 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
@@ -138,13 +137,11 @@ public class AlbumItemAtyForJs extends Activity implements OnClickListener,
 
 		@Override
 		public void onPageScrolled(int arg0, float arg1, int arg2) {
-			// TODO Auto-generated method stub
 
 		}
 
 		@Override
 		public void onPageScrollStateChanged(int arg0) {
-			// TODO Auto-generated method stub
 
 		}
 	};

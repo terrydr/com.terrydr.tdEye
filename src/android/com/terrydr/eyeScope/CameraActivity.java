@@ -11,7 +11,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -356,11 +355,11 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 */
 	private void updateImageThumbnail(){
 		// 获取根目录下缩略图文件夹
-		String folder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "left");
+		String folder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_THUMBNAIL, "left");
 		// 获取图片文件大图
 		List<File> imageList = FileOperateUtil.listFiles(folder, ".jpg");
 
-		String folderRight = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, "right");
+		String folderRight = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_THUMBNAIL, "right");
 		List<File> imageListRight = FileOperateUtil.listFiles(folderRight,".jpg");
 		
 		List<File> allImageList = new ArrayList<File>();
@@ -375,8 +374,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		Bitmap bm = BitmapFactory.decodeFile(allImageList.get(0).getAbsolutePath());
 		Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 320, 219);
 		btn_thumbnail.setImageBitmap(thumbnail);
-//		this.thumbPath = thumbPath;
-//		btn_thumbnail.setVisibility(View.VISIBLE);
 	}
 	
 	/**
@@ -502,7 +499,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 			bundle.putInt("mexposureNum", mexposureNum);  
 			bundle.putInt("wb_level", wb_level);  
 			bundle.putInt("zoom", zoom);  
-			Log.e(TAG, "commitrecordSelectPaths:" + recordSelectPaths);
 			bundle.putStringArrayList("selectPaths", recordSelectPaths);
 			bundle.putString("path", thumbPath);
 			bundle.putString("root", mSaveRoot_left);
@@ -515,16 +511,17 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	}
 	
 	/**
-	    WHITE_BALANCE_AUTO              Constant Value: "auto" 				自动
-		WHITE_BALANCE_INCANDESCENT      Constant Value: "incandescent"    	白炽光
-		WHITE_BALANCE_FLUORESCENT		Constant Value: "fluorescent"  		日光
-		WHITE_BALANCE_WARM_FLUORESCENT	Constant Value: "warm-fluorescent"  荧光
-		WHITE_BALANCE_DAYLIGHT			Constant Value: "daylight" 			白天
-		WHITE_BALANCE_CLOUDY_DAYLIGHT	Constant Value: "cloudy-daylight" 	多云、阴天
-		WHITE_BALANCE_TWILIGHT			Constant Value: "twilight" 			黄昏
-		WHITE_BALANCE_SHADE				Constant Value: "shade" 			暧荧光灯
+	 * 设置白平衡
+	 * @param value
+	  			WHITE_BALANCE_AUTO              Constant Value: "auto" 				自动
+				WHITE_BALANCE_INCANDESCENT      Constant Value: "incandescent"    	白炽光
+				WHITE_BALANCE_FLUORESCENT		Constant Value: "fluorescent"  		日光
+				WHITE_BALANCE_WARM_FLUORESCENT	Constant Value: "warm-fluorescent"  荧光
+				WHITE_BALANCE_DAYLIGHT			Constant Value: "daylight" 			白天
+				WHITE_BALANCE_CLOUDY_DAYLIGHT	Constant Value: "cloudy-daylight" 	多云、阴天
+				WHITE_BALANCE_TWILIGHT			Constant Value: "twilight" 			黄昏
+				WHITE_BALANCE_SHADE				Constant Value: "shade" 			暧荧光灯
 	 */
-    
 	private void setWB(int value){
 		switch (value) {
 		case 0:
@@ -575,7 +572,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 * 当拍照大于6张时删除多于图片
 	 * @leftOrRight 左、右眼图片路径
 	 */
-	public void deleteMultiSelectFile(String leftOrRight){
+	private void deleteMultiSelectFile(String leftOrRight){
 		String thumbFolder = FileOperateUtil.getFolderPath(this,
 				FileOperateUtil.TYPE_THUMBNAIL, leftOrRight);
 		List<File> files = FileOperateUtil.listFiles(thumbFolder,".jpg");
@@ -595,7 +592,7 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 	 * 当拍照大于6张时删除多于图片
 	 * @leftOrRight 左、右眼图片路径
 	 */
-	public void deleteMultiSelectFile2(String leftOrRight){
+	private void deleteMultiSelectFile2(String leftOrRight){
 		String thumbFolder = FileOperateUtil.getFolderPath(this,
 				FileOperateUtil.TYPE_THUMBNAIL, leftOrRight);
 		List<File> files = FileOperateUtil.listFiles(thumbFolder,".jpg");
@@ -611,32 +608,6 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		}
 	}
 	
-	
-	
-	/**
-	 * 当拍照大于6张时删除多于图片
-	 * @leftOrRight 左、右眼图片路径
-	 */
-	public void deleteMultiSelectFile1(String leftOrRight){
-		String thumbFolder = FileOperateUtil.getFolderPath(this,
-				FileOperateUtil.TYPE_THUMBNAIL, leftOrRight);
-		List<File> files = FileOperateUtil.listFiles(thumbFolder,".jpg");
-		String imgFolder = FileOperateUtil.getFolderPath(this,FileOperateUtil.TYPE_IMAGE, leftOrRight);
-		List<File> imgFiles = FileOperateUtil.listFiles(imgFolder,".jpg");
-		if (files != null) {
-			if (files.size() >= 6) {
-				for(int i=0;i<files.size();i++){
-					if(i>=6){
-						String deleteFilePath = files.get(i).getAbsolutePath();
-						deleteFile(deleteFilePath);
-						String deleteImgFilePath = imgFiles.get(i).getAbsolutePath();
-						deleteFile(deleteImgFilePath);
-					}
-				}
-			}
-		}
-	}
-
 	/**
 	 * 根据路径删除指定的目录或文件，无论存在与
 	 * 
@@ -731,12 +702,18 @@ public class CameraActivity extends Activity implements View.OnClickListener,
 		if(bm!=null){
 			setCameraText(leftOrRight);
 			photos_iv.setEnabled(true);
-			Bitmap thumbnail=ThumbnailUtils.extractThumbnail(bm, 320, 219);
-			btn_thumbnail.setImageBitmap(thumbnail);
+			btn_thumbnail.setImageBitmap(bm);
 			this.thumbPath = thumbPath;
 			btn_thumbnail.setVisibility(View.VISIBLE);
+			//闪屏动画效果
+			AlphaAnimation alphaAnimation = new AlphaAnimation(0.1f, 1.0f);  
+	        alphaAnimation.setDuration(200);  
+	        btn_thumbnail.startAnimation(alphaAnimation);
 		}
 	}
+	
+
+
 	
 	/**
 	 * 设置连拍结束时保存缩略图
@@ -1083,14 +1060,10 @@ public class CameraActivity extends Activity implements View.OnClickListener,
         mContainer.startAnimation(alphaAnimation);
     }
     
+    /**
+     * 连拍删除大于6张的图片
+     */
     public void delectMultiFile(){
-    	if (leftOrRight) {
-    		deleteMultiSelectFile(mSaveRoot_left);
-    	}else{
-    		deleteMultiSelectFile(mSaveRoot_right);
-    	}
-    }
-    public void delectMultiFile2(){
     	if (leftOrRight) {
     		deleteMultiSelectFile2(mSaveRoot_left);
     	}else{

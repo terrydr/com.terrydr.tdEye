@@ -49,7 +49,9 @@ public class AlbumViewPager extends ViewPager implements OnMovingListener,OnSlid
 		builder = builder
 				// .showImageOnLoading(R.drawable.ic_stub)
 				// .showImageOnFail(R.drawable.ic_error)
-				.cacheInMemory(true).cacheOnDisk(false).displayer(new MatrixBitmapDisplayer());
+//				.cacheInMemory(true)
+				.cacheOnDisk(false)
+				.displayer(new MatrixBitmapDisplayer());
 		mOptions = builder.build();
 	}
 
