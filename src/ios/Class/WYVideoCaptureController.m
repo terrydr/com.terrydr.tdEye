@@ -1247,11 +1247,11 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         _pictureScanView.hidden = NO;
     }
     
-    _pictureScanImgView.frame = CGRectMake(45.0f, 40.0f, 5.0f, 5.0f);
+    _pictureScanImgView.frame = CGRectMake(25.5f, 25.0f, 5.0f, 5.0f);
     _pictureScanImgView.image = saveImg;
     
     [UIView animateWithDuration:0.2f animations:^{
-        _pictureScanImgView.frame = CGRectMake(20.0f, 15.0f, 55.0f, 55.0f);
+        _pictureScanImgView.frame = CGRectMake(0.0f, 0.0f, 55.0f, 55.0f);
     }];
     
     [_takenPicturesArr addObject:saveImg];
