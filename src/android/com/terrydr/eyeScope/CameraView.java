@@ -172,7 +172,7 @@ public class CameraView extends SurfaceView implements CameraOperation {
 		float ratio = this.getHeight() / (float) this.getWidth();  
         Log.e(TAG, "ratio:" + ratio);
 //        int minWidth = this.getHeight()>this.getWidth() ? this.getHeight():this.getWidth();
-        int minWidth = this.getWidth();
+        int minWidth = 1440;
         Log.e(TAG, "minWidth:" + minWidth);
 		
 		// 选择合的预览尺寸
