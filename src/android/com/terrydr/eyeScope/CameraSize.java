@@ -76,6 +76,7 @@ public class CameraSize {
         boolean isEmpty = true;
         int i = 0;  
         for(Size s:list){  
+//        	Log.e(TAG, "list : w = " + s.width + "*h = " + s.height);  
 //            if((s.width >= minWidth) && equalRate1(s, 1.333f)){  
         	if((s.width >= minWidth) && equalRate1(s, ratio)){  
 //                Log.i(TAG, "PreviewSize:w = " + s.width + "h = " + s.height);  
@@ -113,6 +114,7 @@ public class CameraSize {
         boolean isEmpty = true;
         int i = 0;  
         for(Size s:list){  
+//        	Log.e(TAG, "list : w = " + s.width + "*h = " + s.height);  
 //            if((s.width >= minWidth) && equalRate1(s, 1.333f)){  
             	if((s.width >= minWidth) && equalRate1(s, ratio)){  
 //                Log.i(TAG, "PictureSize : w = " + s.width + "h = " + s.height);  

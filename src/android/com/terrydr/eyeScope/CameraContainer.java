@@ -193,7 +193,10 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 			String imagePath = mDataHandler.mImageFolder + File.separator + imgName;
 			// 生成缩略图名称
 			String thumbPath = mDataHandler.mThumbnailFolder + File.separator + imgName;
+			long s = System.currentTimeMillis();
 			Bitmap bm = mDataHandler.save(data, imagePath, thumbPath);
+			long e = System.currentTimeMillis();
+			Log.e(TAG, "e-s:" + (e-s));
 			// 重新打开预览图，进行下一次的拍照准备
 			camera.startPreview();
 			if (mListener != null)
@@ -468,7 +471,7 @@ public class CameraContainer extends RelativeLayout implements CameraOperation{
 				//等比缩放保存拍照图片，防止OOM异常 
 				options.inSampleSize = 2;
 				Bitmap bm0 = BitmapFactory.decodeByteArray(data, 0, data.length,options);
-				//保存的图片旋转90℃,部分手机拍照保存的图片会向左旋转90℃
+				//保存的图片旋转90℃,解决部分手机拍照保存的图片会向左旋转90℃
 				Bitmap bm = rotateBitmapByDegree(bm0,90);  
 				// 生成缩略图
 				Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bm, 320, 219);

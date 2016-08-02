@@ -167,15 +167,19 @@ public class CameraView extends SurfaceView implements CameraOperation {
 	 */
 	private void setCameraParameters() {
 		Camera.Parameters parameters = mCamera.getParameters();
-		Log.e(TAG, "this.getWidth():" + this.getWidth() + "-this.getHeight():" + this.getHeight());
-        float ratio = this.getHeight() / (float) this.getWidth();
+//		Log.e(TAG, "CameraView.getWidth():" + this.getWidth() + "-CameraView.getHeight():" + this.getHeight());
+        //预览实际比率
+		float ratio = this.getHeight() / (float) this.getWidth();  
         Log.e(TAG, "ratio:" + ratio);
 //        int minWidth = this.getHeight()>this.getWidth() ? this.getHeight():this.getWidth();
-        int minWidth = this.getHeight();
+        int minWidth = this.getWidth();
         Log.e(TAG, "minWidth:" + minWidth);
 		
 		// 选择合的预览尺寸
 		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
+//        for(Size s:sizeList){  
+//        	Log.e(TAG, "list : w = " + s.width + "*h = " + s.height);  
+//        }  
 		Size pictureS = CameraSize.getInstance().getPropPreviewSize(sizeList,previewRate, minWidth,ratio);  
 	    parameters.setPreviewSize(pictureS.width, pictureS.height); 
 	    Log.e(TAG, "previewWidth:" + pictureS.width +"-previewHeight:" + pictureS.height); 
