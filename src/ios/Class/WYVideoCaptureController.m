@@ -1239,13 +1239,21 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)saveTakenPictureData:(NSData *)imgData{
     [self begainScreenFlashAnimation];
     [self initNavTitle];
+    
+    UIImage *image = [UIImage imageWithData:imgData];
+    UIImage *saveImg = [self cropImage:image withCropSize:self.viewContainer.size];
+    
     if (_pictureScanView.hidden) {
         _pictureScanView.hidden = NO;
     }
     
-    UIImage *image = [UIImage imageWithData:imgData];
-    UIImage *saveImg = [self cropImage:image withCropSize:self.viewContainer.size];
+    _pictureScanImgView.frame = CGRectMake(45.0f, 40.0f, 5.0f, 5.0f);
     _pictureScanImgView.image = saveImg;
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        _pictureScanImgView.frame = CGRectMake(20.0f, 15.0f, 55.0f, 55.0f);
+    }];
+    
     [_takenPicturesArr addObject:saveImg];
     NSData *saveImgData = UIImageJPEGRepresentation(saveImg, 1.0f);
     
